@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>試験体管理システム</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans min-h-screen">
+  <header class="bg-blue-600 text-white shadow-md">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <h1 class="text-lg md:text-xl font-bold">🧪 試験体管理ダッシュボード</h1>
+      <a href="form.html" class="bg-white text-blue-600 font-semibold px-4 py-2 rounded shadow hover:bg-blue-50 transition duration-150">
+        ＋ 測定・移動入力へ
+      </a>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-4 py-6">
+    <div id="alert-container" class="mb-6 hidden"></div>
+
+    <div class="bg-white p-4 rounded shadow mb-6 flex flex-wrap gap-4 justify-between items-center">
+      <div class="flex gap-2 flex-wrap items-center">
+        <input type="text" id="search-input" placeholder="試験体IDで検索..." class="border rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <select id="condition-filter" class="border rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="">すべての状態</option>
+          <option value="暴露前">暴露前</option>
+          <option value="暴露期間中">暴露期間中</option>
+          <option value="暴露終了">暴露終了</option>
+        </select>
+      </div>
+      <button onclick="fetchData()" class="bg-gray-700 text-white px-4 py-1.5 rounded text-sm hover:bg-gray-800 flex items-center gap-1 shadow">
+        <span>🔄 データを更新</span>
+      </button>
+    </div>
+
+    <div id="loading" class="text-center py-12">
+      <div class="animate-spin inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full" role="status"></div>
+      <p class="mt-2 text-gray-600">スプレッドシートからデータを取得中...</p>
+    </div>
+
+    <div class="bg-white rounded shadow overflow-x-auto hidden" id="table-container">
+      <table class="min-w-full text-left text-sm whitespace-nowrap">
+        <thead class="bg-gray-50 border-b font-semibold text-gray-600">
+          <tr>
+            <th class="py-3 px-4">試験体ID</th>
+            <th class="py-3 px-4">素材</th>
+            <th class="py-3 px-4">状態</th>
+            <th class="py-3 px-4">現在地</th>
+            <th class="py-3 px-4">暴露日数 (経過/計画)</th>
+            <th class="py-3 px-4">次回測定日</th>
+            <th class="py-3 px-4">終了予定日</th>
+            <th class="py-3 px-4">操作</th>
+          </tr>
+        </thead>
+        <tbody id="specimen-list" class="divide-y divide-gray-200"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    // ★ ご自身のGASウェブアプリURLを貼り付けてください ★
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwdIw1KRL_7AnmLfBMitZCUZW46QX7klzBhd_fkdbL0_1qUtvo9hfRlM5ntCHknH9v_Zw/exec";
+
+    let allSpecimens = [];
+
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchData();
+      document.getElementById('search-input').addEventListener('input', renderTable);
+      document.getElementById('condition-filter').addEventListener('change', renderTable);
+    });
+
+    // 日付を「年/月/日 (YYYY/MM/DD)」の形式に整えるヘルパー関数
+    function formatDateToYMD(dateStr) {
+      if (!dateStr) return '-';
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return dateStr; // 日付として解釈できない文字列ならそのまま返す
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}/${m}/${day}`;
+    }
+
+    async function fetchData() {
+      document.getElementById('loading').classList.remove('hidden');
+      document.getElementById('table-container').classList.add('hidden');
+      document.getElementById('alert-container').classList.add('hidden');
+
+      try {
+        const response = await fetch(GAS_API_URL);
+        const result = await response.json();
+
+        if (result.status === "success") {
+          allSpecimens = result.data;
+          renderTable();
+          checkAlerts();
+        } else {
+          alert("データの読み込みに失敗しました: " + result.message);
+        }
+      } catch (error) {
+        console.error("エラー:", error);
+        alert("通信エラーが発生しました。GAS_API_URLが正しく設定されているか確認してください。");
+      } finally {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('table-container').classList.remove('hidden');
+      }
+    }
+
+    function renderTable() {
+      const searchVal = document.getElementById('search-input').value.toLowerCase();
+      const filterVal = document.getElementById('condition-filter').value;
+      const tbody = document.getElementById('specimen-list');
+      tbody.innerHTML = '';
+
+      const filtered = allSpecimens.filter(item => {
+        const matchId = (item.specimen_id || '').toLowerCase().includes(searchVal);
+        const matchCondition = filterVal === '' || item.status === filterVal;
+        return matchId && matchCondition;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-gray-400">該当するデータがありません</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-gray-50 transition duration-150";
+
+        let badgeStyle = "bg-gray-200 text-gray-700";
+        if (item.status === "暴露期間中") badgeStyle = "bg-green-100 text-green-800 font-semibold";
+        if (item.status === "暴露終了") badgeStyle = "bg-blue-100 text-blue-800";
+
+        const effective = Number(item.effective_days) || 0;
+        const planned = Number(item.planned_days) || 0;
+        const isOver = planned > 0 && effective >= planned;
+        const daysColor = isOver ? "text-red-600 font-bold" : "text-gray-700";
+
+        // 日付を確実に YYYY/MM/DD にフォーマットする
+        const nextMeasureFormatted = formatDateToYMD(item.next_measurements);
+        const expectedEndFormatted = formatDateToYMD(item.expected_end);
+
+        tr.innerHTML = `
+          <td class="py-3 px-4 font-medium text-blue-600">${item.specimen_id || '-'}</td>
+          <td class="py-3 px-4">${item.material || '-'}</td>
+          <td class="py-3 px-4"><span class="px-2 py-1 rounded text-xs ${badgeStyle}">${item.status || '-'}</span></td>
+          <td class="py-3 px-4">${item.current_location || '-'}</td>
+          <td class="py-3 px-4 ${daysColor}">${effective} 日 / ${planned} 日</td>
+          <td class="py-3 px-4">${nextMeasureFormatted}</td>
+          <td class="py-3 px-4">${expectedEndFormatted}</td>
+          <td class="py-3 px-4">
+            <a href="form.html?id=${encodeURIComponent(item.specimen_id || '')}" class="text-indigo-600 hover:text-indigo-900 text-xs bg-indigo-50 px-2 py-1 rounded border border-indigo-200">
+              記録する
+            </a>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function checkAlerts() {
+      const alertContainer = document.getElementById('alert-container');
+      const todayStr = new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '/');
+      
+      let alerts = [];
+
+      allSpecimens.forEach(item => {
+        const effective = Number(item.effective_days) || 0;
+        const planned = Number(item.planned_days) || 0;
+        if (planned > 0 && effective >= planned && item.status === "暴露期間中") {
+          alerts.push(`【目標日数到達】試験体 <b>${item.specimen_id}</b> が計画日数（${planned}日）に到達・超過しています。`);
+        }
+
+        const nextDate = formatDateToYMD(item.next_measurements);
+        if (nextDate && nextDate === todayStr) {
+          alerts.push(`【測定日当日】試験体 <b>${item.specimen_id}</b> の重量測定日です。`);
+        }
+      });
+
+      if (alerts.length > 0) {
+        alertContainer.innerHTML = `
+          <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded shadow-sm">
+            <div class="flex items-center mb-1">
+              <span class="text-red-500 text-lg mr-2">⚠️</span>
+              <h3 class="text-red-800 font-bold">システム通知・警告</h3>
+            </div>
+            <ul class="list-disc list-inside text-sm text-red-700 space-y-1 ml-6">
+              ${alerts.map(a => `<li>${a}</li>`).join('')}
+            </ul>
+          </div>
+        `;
+        alertContainer.classList.remove('hidden');
+      }
+    }
+  </script>
+</body>
+</html>

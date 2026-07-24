@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>測定・移動入力 - 試験体管理</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans min-h-screen pb-12">
+  <header class="bg-blue-600 text-white shadow-md mb-6">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <h1 class="text-lg md:text-xl font-bold">📝 測定・移動 データ入力</h1>
+      <a href="index.html" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded text-sm transition duration-150">
+        ← ダッシュボードに戻る
+      </a>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-4 max-w-lg">
+    <div class="bg-white p-6 rounded-lg shadow-md">
+      
+      <!-- 1. アクション選択 -->
+      <div class="mb-6">
+        <label class="block text-sm font-bold text-gray-700 mb-2">入力する作業の種類</label>
+        <div class="grid grid-cols-2 gap-2">
+          <button type="button" id="btn-action-measure" onclick="setAction('measurement')" class="py-2 px-4 rounded font-semibold border-2 border-blue-600 bg-blue-600 text-white text-center transition duration-150">
+            ⚖️ 重量測定
+          </button>
+          <button type="button" id="btn-action-episode" onclick="setAction('episode')" class="py-2 px-4 rounded font-semibold border-2 border-gray-300 bg-white text-gray-700 text-center hover:bg-gray-50 transition duration-150">
+            📦 試験体移動
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. 試験体ID選択 -->
+      <div class="mb-6">
+        <label class="block text-sm font-bold text-gray-700 mb-2">試験体IDの入力方法</label>
+        <div class="flex gap-4 mb-3">
+          <label class="inline-flex items-center cursor-pointer">
+            <input type="radio" name="input-method" value="select" checked onchange="toggleInputMethod()" class="form-radio text-blue-600">
+            <span class="ml-2 text-sm">プルダウンから選択</span>
+          </label>
+          <label class="inline-flex items-center cursor-pointer">
+            <input type="radio" name="input-method" value="barcode" onchange="toggleInputMethod()" class="form-radio text-blue-600">
+            <span class="ml-2 text-sm">📷 カメラでバーコード</span>
+          </label>
+        </div>
+
+        <div id="area-select">
+          <select id="specimen-select" class="w-full border border-gray-300 rounded p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+            <option value="">データを読み込み中...</option>
+          </select>
+        </div>
+
+        <div id="area-barcode" class="hidden">
+          <div id="reader" class="w-full bg-black rounded overflow-hidden mb-2"></div>
+          <p id="barcode-result" class="text-sm font-bold text-green-600 my-1 hidden"></p>
+          <button type="button" id="btn-camera-toggle" onclick="toggleCamera()" class="w-full bg-gray-700 text-white py-1.5 rounded text-sm hover:bg-gray-800">
+            カメラを起動する
+          </button>
+        </div>
+      </div>
+
+      <hr class="my-6 border-gray-200">
+
+      <!-- 3. 重量測定用フォーム -->
+      <div id="form-measurement">
+        <div class="mb-4">
+          <label class="block text-sm font-bold text-gray-700 mb-1">重量 (g) <span class="text-red-500">*</span></label>
+          <input type="number" id="input-weight" step="0.01" placeholder="例: 1250.50" class="w-full border border-gray-300 rounded p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div class="mb-6">
+          <label class="block text-sm font-bold text-gray-700 mb-1">備考・メモ (任意)</label>
+          <input type="text" id="input-note-measure" placeholder="状態の変化などがあれば記録" class="w-full border border-gray-300 rounded p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+      </div>
+
+      <!-- 4. 試験体移動用フォーム -->
+      <div id="form-episode" class="hidden">
+        
+        <!-- 【変更】移動先をプルダウン化 -->
+        <div class="mb-4">
+          <label class="block text-sm font-bold text-gray-700 mb-1">新しい移動場所 <span class="text-red-500">*</span></label>
+          <select id="input-location" class="w-full border border-gray-300 rounded p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+            <option value="">-- 移動場所を選択 --</option>
+            <option value="回収">回収</option>
+            <option value="I-ref棟恒温室">I-ref棟恒温室</option>
+            <option value="5号館恒温室">5号館恒温室</option>
+            <option value="7号館恒温恒湿室">7号館恒温恒湿室</option>
+            <option value="5号館屋上">5号館屋上</option>
+          </select>
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-sm font-bold text-gray-700 mb-1">更新後の状態 <span class="text-red-500">*</span></label>
+          <select id="input-condition" class="w-full border border-gray-300 rounded p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+            <option value="暴露期間中">暴露期間中</option>
+            <option value="恒温恒湿環境">恒温恒湿環境</option>
+            <option value="乾湿繰り返し環境">乾湿繰り返し環境</option>
+            <option value="屋外暴露">屋外暴露</option>
+            <option value="促進耐候性試験">促進耐候性試験</option>
+            <option value="暴露終了">暴露終了（回収）</option>
+          </select>
+        </div>
+
+        <!-- 【新規追加】暴露日数に含めるかどうかの選択 -->
+        <div class="mb-4">
+          <label class="block text-sm font-bold text-gray-700 mb-1">この移動先の期間を暴露日数に含めますか？ <span class="text-red-500">*</span></label>
+          <select id="input-count-exposure" class="w-full border border-gray-300 rounded p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white font-semibold text-blue-700">
+            <option value="含める">含める（暴露期間としてカウント）</option>
+            <option value="含めない">含めない（一時保管・恒温室・回収など）</option>
+          </select>
+          <p class="text-xs text-gray-500 mt-1">※自動計算バッチ処理がこの設定を読み取り、夜間に残り日数と終了予定日を更新します。</p>
+        </div>
+
+        <div class="mb-6">
+          <label class="block text-sm font-bold text-gray-700 mb-1">備考・メモ (任意)</label>
+          <input type="text" id="input-note-episode" placeholder="移動の理由や作業者名など" class="w-full border border-gray-300 rounded p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+      </div>
+
+      <button type="button" id="btn-submit" onclick="submitData()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded shadow transition duration-150 flex justify-center items-center">
+        <span>この内容で登録する</span>
+      </button>
+
+    </div>
+  </main>
+
+  <script>
+    // ★ ご自身のGASウェブアプリURLを貼り付けてください ★
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwdIw1KRL_7AnmLfBMitZCUZW46QX7klzBhd_fkdbL0_1qUtvo9hfRlM5ntCHknH9v_Zw/exec";
+
+    let currentAction = 'measurement';
+    let html5QrCode = null;
+    let isCameraRunning = false;
+    let scannedSpecimenId = "";
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadSpecimenList();
+      checkUrlParams();
+    });
+
+    function checkUrlParams() {
+      const params = new URLSearchParams(window.location.search);
+      const targetId = params.get('id');
+      if (targetId) {
+        scannedSpecimenId = targetId;
+      }
+    }
+
+    async function loadSpecimenList() {
+      const select = document.getElementById('specimen-select');
+      try {
+        const res = await fetch(GAS_API_URL);
+        const json = await res.json();
+        
+        if (json.status === "success") {
+          select.innerHTML = '<option value="">-- 試験体を選択してください --</option>';
+          json.data.forEach(item => {
+            const opt = document.createElement('option');
+            opt.value = item.specimen_id;
+            opt.textContent = `${item.specimen_id} (${item.material} - ${item.status})`;
+            if (item.specimen_id === scannedSpecimenId) {
+              opt.selected = true;
+            }
+            select.appendChild(opt);
+          });
+        }
+      } catch (e) {
+        select.innerHTML = '<option value="">データの読み込みに失敗しました</option>';
+      }
+    }
+
+    function setAction(action) {
+      currentAction = action;
+      const btnMeasure = document.getElementById('btn-action-measure');
+      const btnEpisode = document.getElementById('btn-action-episode');
+      const formMeasure = document.getElementById('form-measurement');
+      const formEpisode = document.getElementById('form-episode');
+
+      if (action === 'measurement') {
+        btnMeasure.className = "py-2 px-4 rounded font-semibold border-2 border-blue-600 bg-blue-600 text-white text-center transition duration-150";
+        btnEpisode.className = "py-2 px-4 rounded font-semibold border-2 border-gray-300 bg-white text-gray-700 text-center hover:bg-gray-50 transition duration-150";
+        formMeasure.classList.remove('hidden');
+        formEpisode.classList.add('hidden');
+      } else {
+        btnEpisode.className = "py-2 px-4 rounded font-semibold border-2 border-blue-600 bg-blue-600 text-white text-center transition duration-150";
+        btnMeasure.className = "py-2 px-4 rounded font-semibold border-2 border-gray-300 bg-white text-gray-700 text-center hover:bg-gray-50 transition duration-150";
+        formEpisode.classList.remove('hidden');
+        formMeasure.classList.add('hidden');
+      }
+    }
+
+    function toggleInputMethod() {
+      const method = document.querySelector('input[name="input-method"]:checked').value;
+      const areaSelect = document.getElementById('area-select');
+      const areaBarcode = document.getElementById('area-barcode');
+
+      if (method === 'select') {
+        areaSelect.classList.remove('hidden');
+        areaBarcode.classList.add('hidden');
+        if (isCameraRunning) stopCamera();
+      } else {
+        areaSelect.classList.add('hidden');
+        areaBarcode.classList.remove('hidden');
+      }
+    }
+
+    async function toggleCamera() {
+      const btn = document.getElementById('btn-camera-toggle');
+      
+      if (isCameraRunning) {
+        await stopCamera();
+      } else {
+        btn.textContent = "起動中...";
+        html5QrCode = new Html5Qrcode("reader");
+        try {
+          await html5QrCode.start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: { width: 250, height: 150 } },
+            (decodedText) => {
+              scannedSpecimenId = decodedText.trim();
+              const resultEl = document.getElementById('barcode-result');
+              resultEl.textContent = `読み取り成功: ${scannedSpecimenId}`;
+              resultEl.classList.remove('hidden');
+              
+              const select = document.getElementById('specimen-select');
+              select.value = scannedSpecimenId;
+              
+              stopCamera();
+            }
+          );
+          isCameraRunning = true;
+          btn.textContent = "カメラを停止する";
+          btn.className = "w-full bg-red-600 text-white py-1.5 rounded text-sm hover:bg-red-700";
+        } catch (err) {
+          alert("カメラの起動に失敗しました。ブラウザのカメラ許可設定をご確認ください。");
+          btn.textContent = "カメラを起動する";
+        }
+      }
+    }
+
+    async function stopCamera() {
+      if (html5QrCode && isCameraRunning) {
+        await html5QrCode.stop();
+        html5QrCode.clear();
+        isCameraRunning = false;
+        const btn = document.getElementById('btn-camera-toggle');
+        btn.textContent = "カメラを起動する";
+        btn.className = "w-full bg-gray-700 text-white py-1.5 rounded text-sm hover:bg-gray-800";
+      }
+    }
+
+    async function submitData() {
+      const method = document.querySelector('input[name="input-method"]:checked').value;
+      let targetId = "";
+
+      if (method === 'select') {
+        targetId = document.getElementById('specimen-select').value;
+      } else {
+        targetId = scannedSpecimenId;
+      }
+
+      if (!targetId) {
+        alert("試験体IDを選択するか、バーコードを読み取ってください。");
+        return;
+      }
+
+      let payload = {
+        action: currentAction,
+        specimen_id: targetId
+      };
+
+      if (currentAction === 'measurement') {
+        const weight = document.getElementById('input-weight').value;
+        if (!weight) {
+          alert("重量を入力してください。");
+          return;
+        }
+        payload.weight = weight;
+        payload.note = document.getElementById('input-note-measure').value;
+      } else {
+        const loc = document.getElementById('input-location').value;
+        if (!loc) {
+          alert("新しい移動場所を選択してください。");
+          return;
+        }
+        payload.new_location = loc;
+        payload.condition = document.getElementById('input-condition').value;
+        // 【新規追加】暴露日数に含めるかの値を取得してpayloadに追加
+        payload.count_exposure = document.getElementById('input-count-exposure').value;
+        payload.note = document.getElementById('input-note-episode').value;
+      }
+
+      const btn = document.getElementById('btn-submit');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<span class="animate-spin inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full mr-2"></span>送信中...`;
+
+      try {
+        const response = await fetch(GAS_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify(payload)
+        });
+        
+        const result = await response.json();
+
+        if (result.status === "success") {
+          alert("✅ 登録が完了しました！\n" + result.message);
+          window.location.href = "index.html";
+        } else {
+          alert("エラーが発生しました: " + result.message);
+        }
+      } catch (error) {
+        console.error("送信エラー:", error);
+        alert("通信エラーが発生しました。");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    }
+  </script>
+</body>
+</html>
