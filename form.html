@@ -134,7 +134,16 @@
     let isCameraRunning = false;
     let scannedSpecimenId = "";
 
+    // 保存されているパスワードを呼び出す
+    let appPassword = localStorage.getItem('app_password') || '';
+
     window.addEventListener('DOMContentLoaded', () => {
+      // パスワードがない場合は index.html へ戻してログインさせる
+      if (!appPassword) {
+        alert("ログインが必要です。");
+        window.location.href = "index.html";
+        return;
+      }
       loadSpecimenList();
       checkUrlParams();
     });
@@ -150,7 +159,8 @@
     async function loadSpecimenList() {
       const select = document.getElementById('specimen-select');
       try {
-        const res = await fetch(GAS_API_URL);
+        // 【変更】パスワードをパラメータに含める
+        const res = await fetch(`${GAS_API_URL}?password=${encodeURIComponent(appPassword)}`);
         const json = await res.json();
         
         if (json.status === "success") {
@@ -164,6 +174,11 @@
             }
             select.appendChild(opt);
           });
+        } else if (json.status === "auth_error") {
+           // 認証エラー時は localStorage を消去してダッシュボードへ戻す
+           localStorage.removeItem('app_password');
+           alert("認証の有効期限が切れました。再度ログインしてください。");
+           window.location.href = "index.html";
         }
       } catch (e) {
         select.innerHTML = '<option value="">データの読み込みに失敗しました</option>';
@@ -267,7 +282,8 @@
 
       let payload = {
         action: currentAction,
-        specimen_id: targetId
+        specimen_id: targetId,
+        password: appPassword // 【追加】送信データにもパスワードを含める
       };
 
       if (currentAction === 'measurement') {
@@ -307,6 +323,10 @@
 
         if (result.status === "success") {
           alert("✅ 登録が完了しました！\n" + result.message);
+          window.location.href = "index.html";
+        } else if (result.status === "auth_error") {
+          localStorage.removeItem('app_password');
+          alert("認証エラーです。再度ログインしてください。");
           window.location.href = "index.html";
         } else {
           alert("エラーが発生しました: " + result.message);
