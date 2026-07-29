@@ -85,10 +85,11 @@
           <select id="input-location" class="w-full border border-gray-300 rounded p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
             <option value="">-- 移動場所を選択 --</option>
             <option value="回収">回収</option>
-            <option value="I-ref棟恒温室">I-ref棟恒温室</option>
+            <option value="I-REF棟恒温室">I-REF棟恒温室</option>
             <option value="5号館恒温室">5号館恒温室</option>
             <option value="7号館恒温恒湿室">7号館恒温恒湿室</option>
             <option value="5号館屋上">5号館屋上</option>
+            <option value="森林総合研究所">森林総合研究所</option>
           </select>
         </div>
 
@@ -102,7 +103,7 @@
           </select>
         </div>
 
-        <!-- 【新規追加】暴露日数に含めるかどうかの選択 -->
+        <!-- 暴露日数に含めるかどうかの選択 -->
         <div class="mb-4">
           <label class="block text-sm font-bold text-gray-700 mb-1">この移動先の期間を暴露日数に含めますか？ <span class="text-red-500">*</span></label>
           <select id="input-count-exposure" class="w-full border border-gray-300 rounded p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white font-semibold text-blue-700">
@@ -116,6 +117,12 @@
           <label class="block text-sm font-bold text-gray-700 mb-1">備考・メモ (任意)</label>
           <input type="text" id="input-note-episode" placeholder="移動の理由や作業者名など" class="w-full border border-gray-300 rounded p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
+      </div>
+
+      <!-- 連続入力モードのチェックボックス -->
+      <div class="mb-4 bg-blue-50 p-3 rounded border border-blue-200 flex items-center">
+        <input type="checkbox" id="continuous-mode" class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer">
+        <label for="continuous-mode" class="ml-2 font-bold text-blue-800 cursor-pointer text-sm">連続で入力する</label>
       </div>
 
       <button type="button" id="btn-submit" onclick="submitData()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded shadow transition duration-150 flex justify-center items-center">
@@ -302,7 +309,7 @@
         }
         payload.new_location = loc;
         payload.condition = document.getElementById('input-condition').value;
-        // 【新規追加】暴露日数に含めるかの値を取得してpayloadに追加
+        // 暴露日数に含めるかの値を取得してpayloadに追加
         payload.count_exposure = document.getElementById('input-count-exposure').value;
         payload.note = document.getElementById('input-note-episode').value;
       }
@@ -322,8 +329,29 @@
         const result = await response.json();
 
         if (result.status === "success") {
-          alert("✅ 登録が完了しました！\n" + result.message);
-          window.location.href = "index.html";
+          // 連続入力モードがONかどうかを判定
+          const isContinuous = document.getElementById('continuous-mode').checked;
+          
+          if (isContinuous) {
+            // ダッシュボードに戻らず、入力欄だけをリセットする
+            alert("✅ 登録が完了しました！\n続けて次の試験体を入力できます。");
+            
+            scannedSpecimenId = "";
+            document.getElementById('specimen-select').value = "";
+            document.getElementById('input-weight').value = "";
+            document.getElementById('input-location').value = "";
+            document.getElementById('input-note-measure').value = "";
+            document.getElementById('input-note-episode').value = "";
+            document.getElementById('barcode-result').classList.add('hidden');
+            
+            // 状態が変更された可能性があるのでリストを再読み込み
+            loadSpecimenList();
+            
+          } else {
+            // 従来通りダッシュボードへ戻る
+            alert("✅ 登録が完了しました！\n" + result.message);
+            window.location.href = "index.html";
+          }
         } else if (result.status === "auth_error") {
           localStorage.removeItem('app_password');
           alert("認証エラーです。再度ログインしてください。");

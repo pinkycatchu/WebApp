@@ -56,7 +56,7 @@
         <select id="location-filter" class="border rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto bg-white">
           <option value="">-- すべての場所 --</option>
           <option value="回収">回収</option>
-          <option value="I-ref棟恒温室">I-REF棟恒温室</option>
+          <option value="I-REF棟恒温室">I-REF棟恒温室</option>
           <option value="5号館恒温室">5号館恒温室</option>
           <option value="7号館恒温恒湿室">7号館恒温恒湿室</option>
           <option value="5号館屋上">5号館屋上</option>
@@ -73,7 +73,12 @@
         </div>
       </div>
       
-      <!-- 更新ボタン -->
+      <!-- CSV出力ボタンと更新ボタン -->
+      <div class="flex gap-2 w-full lg:w-auto mt-2 lg:mt-0 justify-end">
+        <button onclick="exportCSV()" class="bg-gray-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700 flex items-center gap-1 shadow whitespace-nowrap">
+          <span>CSV出力</span>
+        </button>
+      </div>
       <button onclick="fetchData()" class="bg-gray-700 text-white px-5 py-2 rounded text-sm hover:bg-gray-800 flex items-center gap-1 shadow whitespace-nowrap">
         <span>データを更新</span>
       </button>
@@ -241,6 +246,52 @@
         `;
         tbody.appendChild(tr);
       });
+    }
+
+    function exportCSV() {
+      if (currentFilteredSpecimens.length === 0) {
+        alert("出力するデータがありません。");
+        return;
+      }
+      
+      // 1行目の見出し
+      const headers = ["試験体ID", "素材", "状態", "現在地", "暴露日数", "計画日数", "次回測定日", "終了予定日"];
+      const csvRows = [headers.join(",")];
+      
+      // データ行の作成
+      currentFilteredSpecimens.forEach(item => {
+        const row = [
+          item.specimen_id || '',
+          item.material || '',
+          item.status || '',
+          item.current_location || '',
+          item.effective_days || 0,
+          item.planned_days || 0,
+          formatDateToYMD(item.next_measurements),
+          formatDateToYMD(item.expected_end)
+        ];
+        
+        // カンマや改行が含まれても壊れないようにダブルクォーテーションで囲む
+        const escapedRow = row.map(v => `"${String(v).replace(/"/g, '""')}"`);
+        csvRows.push(escapedRow.join(","));
+      });
+      
+      const csvString = csvRows.join("\n");
+      
+      // Excelで文字化けしないようにBOM(Byte Order Mark)を付与
+      const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+      const blob = new Blob([bom, csvString], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      
+      // ダウンロードの実行
+      const a = document.createElement("a");
+      a.href = url;
+      const dateStr = new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '');
+      a.download = `試験体データ_${dateStr}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     }
 
     function checkAlerts() {
