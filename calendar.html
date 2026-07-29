@@ -73,6 +73,26 @@
     </div>
   </main>
 
+  <!-- イベント詳細ダイアログ -->
+  <div id="event-dialog" class="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] hidden">
+    <div id="event-dialog-panel" class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+      <div class="flex justify-between items-start mb-4">
+        <h3 id="event-dialog-title" class="text-lg font-bold text-gray-900">詳細</h3>
+        <button onclick="closeEventDialog()" class="text-gray-500 hover:text-gray-700 transition" aria-label="閉じる">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div id="event-dialog-body" class="text-sm text-gray-700 whitespace-pre-line leading-6"></div>
+      <div class="mt-6 flex justify-end">
+        <button onclick="closeEventDialog()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+          閉じる
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // ★ ご自身のGASウェブアプリURLを貼り付けてください ★
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwdIw1KRL_7AnmLfBMitZCUZW46QX7klzBhd_fkdbL0_1qUtvo9hfRlM5ntCHknH9v_Zw/exec";
@@ -194,16 +214,41 @@
         eventClick: function(info) {
           const props = info.event.extendedProps;
           const msg = `【${props.type}】\n`
-                    + `試験体ID: ${info.event.title.replace(/⚖️ |🏁 /g, '')}\n`
-                    + `素材: ${props.material || '-'}\n`
-                    + `現在地: ${props.location || '-'}\n`
-                    + `状態: ${props.status || '-'}`;
-          alert(msg);
+                + `試験体ID: ${info.event.title.replace(/⚖️ |🏁 /g, '')}\n`
+                + `素材: ${props.material || '-'}\n`
+                + `現在地: ${props.location || '-'}\n`
+                + `状態: ${props.status || '-'}`;
+
+          showEventDialog('詳細', msg);
         }
       });
 
       calendar.render();
     }
+
+    function showEventDialog(title, message) {
+      document.getElementById('event-dialog-title').textContent = title;
+      document.getElementById('event-dialog-body').textContent = message;
+      document.getElementById('event-dialog').classList.remove('hidden');
+    }
+
+    function closeEventDialog() {
+      document.getElementById('event-dialog').classList.add('hidden');
+    }
+
+    document.addEventListener('click', function(event) {
+      const menu = document.getElementById('mobile-menu');
+      const button = event.target.closest('button[onclick="toggleMenu()"]');
+
+      if (!menu.classList.contains('hidden') && !button && !menu.contains(event.target)) {
+        menu.classList.add('hidden');
+      }
+
+      const dialog = document.getElementById('event-dialog');
+      if (!dialog.classList.contains('hidden') && event.target === dialog) {
+        closeEventDialog();
+      }
+    });
   </script>
 </body>
 </html>
