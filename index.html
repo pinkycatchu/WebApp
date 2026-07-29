@@ -8,7 +8,7 @@
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans min-h-screen">
   
-  <!-- ログイン画面オーバーレイ（未ログイン時に表示） -->
+  <!-- ログイン画面 -->
   <div id="login-overlay" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex justify-center items-center z-50">
     <div class="bg-white p-6 rounded shadow-lg max-w-sm w-full mx-4">
       <h2 class="text-xl font-bold mb-4 text-center">システムへのログイン</h2>
@@ -30,18 +30,53 @@
   <main class="container mx-auto px-4 py-6">
     <div id="alert-container" class="mb-6 hidden"></div>
 
-    <div class="bg-white p-4 rounded shadow mb-6 flex flex-wrap gap-4 justify-between items-center">
-      <div class="flex gap-2 flex-wrap items-center">
-        <input type="text" id="search-input" placeholder="試験体IDで検索..." class="border rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <select id="condition-filter" class="border rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <option value="">すべての状態</option>
+    <!-- 高機能コントロールバー（検索・各種フィルタ・更新） -->
+    <div class="bg-white p-4 rounded shadow mb-6 flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
+      <div class="flex gap-3 flex-wrap items-center w-full">
+        
+        <!-- 1. 試験体ID検索 -->
+        <input type="text" id="search-input" placeholder="ID検索..." class="border rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto">
+        
+        <!-- 2. 素材検索 -->
+        <input type="text" id="material-filter" placeholder="素材検索 (例: CLT)..." class="border rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto">
+        <select id="material-filter" class="border rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto bg-white">
+          <option value="">-- すべての素材 --</option>
+          <option value="CLT">CLT</option>
+          <option value="集成材">集成材</option>
+        </select>
+        
+        <!-- 3. 状態フィルター -->
+        <select id="condition-filter" class="border rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto bg-white">
+          <option value="">-- すべての状態 --</option>
           <option value="暴露前">暴露前</option>
           <option value="暴露期間中">暴露期間中</option>
           <option value="暴露終了">暴露終了</option>
         </select>
+
+        <!-- 4. 現在地フィルター -->
+        <select id="location-filter" class="border rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto bg-white">
+          <option value="">-- すべての場所 --</option>
+          <option value="回収">回収</option>
+          <option value="I-ref棟恒温室">I-ref棟恒温室</option>
+          <option value="5号館恒温室">5号館恒温室</option>
+          <option value="7号館恒温恒湿室">7号館恒温恒湿室</option>
+          <option value="5号館屋上">5号館屋上</option>
+          <option value="森林総合研究所">森林総合研究所</option>
+        </select>
+
+        <!-- 5. 暴露日数フィルター（範囲） -->
+        <div class="flex items-center gap-1 bg-gray-50 border rounded px-2 py-1 w-full sm:w-auto">
+          <span class="text-sm text-gray-600 font-medium whitespace-nowrap">暴露日数:</span>
+          <input type="number" id="days-min" placeholder="Min" class="w-16 border rounded px-1.5 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+          <span class="text-gray-500 text-sm">〜</span>
+          <input type="number" id="days-max" placeholder="Max" class="w-16 border rounded px-1.5 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+          <span class="text-gray-500 text-sm">日</span>
+        </div>
       </div>
-      <button onclick="fetchData()" class="bg-gray-700 text-white px-4 py-1.5 rounded text-sm hover:bg-gray-800 flex items-center gap-1 shadow">
-        <span>🔄 データを更新</span>
+      
+      <!-- 更新ボタン -->
+      <button onclick="fetchData()" class="bg-gray-700 text-white px-5 py-2 rounded text-sm hover:bg-gray-800 flex items-center gap-1 shadow whitespace-nowrap">
+        <span>データを更新</span>
       </button>
     </div>
 
@@ -55,13 +90,13 @@
         <thead class="bg-gray-50 border-b font-semibold text-gray-600">
           <tr>
             <th class="py-3 px-4">試験体ID</th>
-            <th class="py-3 px-4">操作</th>
             <th class="py-3 px-4">素材</th>
             <th class="py-3 px-4">状態</th>
             <th class="py-3 px-4">現在地</th>
-            <th class="py-3 px-4">暴露日数</th>
+            <th class="py-3 px-4">暴露日数 (経過/計画)</th>
             <th class="py-3 px-4">次回測定日</th>
             <th class="py-3 px-4">終了予定日</th>
+            <th class="py-3 px-4">操作</th>
           </tr>
         </thead>
         <tbody id="specimen-list" class="divide-y divide-gray-200"></tbody>
@@ -81,8 +116,14 @@
         document.getElementById('login-overlay').classList.add('hidden');
         fetchData();
       }
+      
+      // フィルター入力欄の値が変わった時に、表を再描画するイベント設定
       document.getElementById('search-input').addEventListener('input', renderTable);
       document.getElementById('condition-filter').addEventListener('change', renderTable);
+      document.getElementById('material-filter').addEventListener('input', renderTable);
+      document.getElementById('location-filter').addEventListener('change', renderTable);
+      document.getElementById('days-min').addEventListener('input', renderTable);
+      document.getElementById('days-max').addEventListener('input', renderTable);
     });
 
     function login() {
@@ -116,7 +157,6 @@
       document.getElementById('alert-container').classList.add('hidden');
 
       try {
-        // パスワードをURLパラメータに含めて送信
         const response = await fetch(`${GAS_API_URL}?password=${encodeURIComponent(appPassword)}`);
         const result = await response.json();
 
@@ -139,17 +179,30 @@
       }
     }
 
-    // --- 以下、既存の renderTable() と checkAlerts() のコードをそのまま配置 ---
     function renderTable() {
       const searchVal = document.getElementById('search-input').value.toLowerCase();
-      const filterVal = document.getElementById('condition-filter').value;
+      const conditionVal = document.getElementById('condition-filter').value;
+      const materialVal = document.getElementById('material-filter').value.toLowerCase();
+      const locationVal = document.getElementById('location-filter').value;
+      const daysMinVal = parseInt(document.getElementById('days-min').value, 10);
+      const daysMaxVal = parseInt(document.getElementById('days-max').value, 10);
+      
       const tbody = document.getElementById('specimen-list');
       tbody.innerHTML = '';
 
       const filtered = allSpecimens.filter(item => {
         const matchId = (item.specimen_id || '').toLowerCase().includes(searchVal);
-        const matchCondition = filterVal === '' || item.status === filterVal;
-        return matchId && matchCondition;
+        const matchMaterial = (item.material || '').toLowerCase().includes(materialVal);
+        const matchCondition = conditionVal === '' || item.status === conditionVal;
+        const matchLocation = locationVal === '' || item.current_location === locationVal;
+
+        const effective = Number(item.effective_days) || 0;
+        let matchDaysMin = true;
+        let matchDaysMax = true;
+        if (!isNaN(daysMinVal)) matchDaysMin = effective >= daysMinVal;
+        if (!isNaN(daysMaxVal)) matchDaysMax = effective <= daysMaxVal;
+
+        return matchId && matchMaterial && matchCondition && matchLocation && matchDaysMin && matchDaysMax;
       });
 
       if (filtered.length === 0) {
@@ -162,6 +215,7 @@
         tr.className = "hover:bg-gray-50 transition duration-150";
 
         let badgeStyle = "bg-gray-200 text-gray-700";
+        // バッジの判定を status に戻しました
         if (item.status === "暴露期間中") badgeStyle = "bg-green-100 text-green-800 font-semibold";
         if (item.status === "暴露終了") badgeStyle = "bg-blue-100 text-blue-800";
 
@@ -174,17 +228,17 @@
 
         tr.innerHTML = `
           <td class="py-3 px-4 font-medium text-blue-600">${item.specimen_id || '-'}</td>
-          <td class="py-3 px-4">
-            <a href="form.html?id=${encodeURIComponent(item.specimen_id || '')}" class="text-indigo-600 hover:text-indigo-900 text-xs bg-indigo-50 px-2 py-1 rounded border border-indigo-200">
-              記録する
-            </a>
-          </td>
           <td class="py-3 px-4">${item.material || '-'}</td>
           <td class="py-3 px-4"><span class="px-2 py-1 rounded text-xs ${badgeStyle}">${item.status || '-'}</span></td>
           <td class="py-3 px-4">${item.current_location || '-'}</td>
           <td class="py-3 px-4 ${daysColor}">${effective} 日 / ${planned} 日</td>
           <td class="py-3 px-4">${nextMeasureFormatted}</td>
           <td class="py-3 px-4">${expectedEndFormatted}</td>
+          <td class="py-3 px-4">
+            <a href="form.html?id=${encodeURIComponent(item.specimen_id || '')}" class="text-indigo-600 hover:text-indigo-900 text-xs bg-indigo-50 px-2 py-1 rounded border border-indigo-200">
+              記録する
+            </a>
+          </td>
         `;
         tbody.appendChild(tr);
       });
@@ -198,9 +252,12 @@
       allSpecimens.forEach(item => {
         const effective = Number(item.effective_days) || 0;
         const planned = Number(item.planned_days) || 0;
-        if (planned > 0 && effective >= planned && item.status === "暴露期間中") {
+        
+        // 警告の判定を status に戻しました
+        if (planned > 0 && effective >= planned && (item.status === "屋外暴露" || item.status === "促進耐候性試験" || item.status === "暴露期間中")) {
           alerts.push(`【目標日数到達】試験体 <b>${item.specimen_id}</b> が計画日数（${planned}日）に到達・超過しています。`);
         }
+        
         const nextDate = formatDateToYMD(item.next_measurements);
         if (nextDate && nextDate === todayStr) {
           alerts.push(`【測定日当日】試験体 <b>${item.specimen_id}</b> の重量測定日です。`);
