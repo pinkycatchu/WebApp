@@ -17,13 +17,32 @@
     </div>
   </div>
 
-  <header class="bg-blue-600 text-white shadow-md">
+ <header class="bg-blue-600 text-white shadow-md relative z-40">
     <div class="container mx-auto px-4 py-3 flex justify-between items-center">
       <h1 class="text-lg md:text-xl font-bold">暴露試験体管理</h1>
-      <div class="flex gap-2">
-        <button onclick="logout()" class="text-white text-sm hover:underline px-2">ログアウト</button>
-        <a href="form.html" class="bg-white text-blue-600 font-semibold px-4 py-2 rounded shadow hover:bg-blue-50 transition duration-150">＋ 入力へ</a>
+      
+      <div class="flex items-center gap-3">
+        <!-- PCなどの広い画面では「入力へ」ボタンを見せておくと便利です。スマホでは自動で隠れてメニューに入ります -->
+        <a href="form.html" class="hidden sm:block bg-white text-blue-600 font-semibold px-4 py-2 rounded shadow hover:bg-blue-50 transition duration-150">＋ 入力へ</a>
+
+        <!-- 3本線のハンバーガーメニューボタン -->
+        <button onclick="toggleMenu()" class="text-white hover:bg-blue-700 p-2 rounded focus:outline-none transition duration-150">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
       </div>
+    </div>
+
+    <!-- ドロップダウンメニュー（初期状態はhiddenで非表示） -->
+    <div id="mobile-menu" class="hidden absolute right-4 top-14 bg-white text-gray-800 rounded shadow-xl border border-gray-200 w-56 overflow-hidden z-50">
+      <a href="index.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm font-semibold">ホーム</a>
+      <a href="form.html" class="block sm:hidden px-4 py-3 hover:bg-gray-100 border-b text-sm font-semibold text-blue-600">＋ 測定・移動入力</a>
+      <a href="calendar.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm">カレンダー</a>
+      <a href="materials.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm">資料ページ</a>
+      
+      <!-- ログアウトは一番下に配置し、少し赤色にしてわかりやすくしています -->
+      <button onclick="logout()" class="w-full text-left block px-4 py-3 hover:bg-red-50 text-red-600 text-sm font-medium">🚪 ログアウト</button>
     </div>
   </header>
 
@@ -144,6 +163,22 @@
       localStorage.removeItem('app_password');
       location.reload();
     }
+
+    // メニューの開閉処理
+    function toggleMenu() {
+      const menu = document.getElementById('mobile-menu');
+      menu.classList.toggle('hidden');
+    }
+
+    // メニューの外側をクリックした時にメニューを閉じる処理
+    document.addEventListener('click', function(event) {
+      const menu = document.getElementById('mobile-menu');
+      const button = event.target.closest('button[onclick="toggleMenu()"]');
+      // メニューが開いており、かつクリックされたのがメニューボタンでもメニュー内でもない場合
+      if (!menu.classList.contains('hidden') && !button && !menu.contains(event.target)) {
+        menu.classList.add('hidden');
+      }
+    });
 
     function formatDateToYMD(dateStr) {
       if (!dateStr) return '-';
