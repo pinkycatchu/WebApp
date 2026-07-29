@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ギャラリー - 試験体管理</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="header.js"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans min-h-screen pb-12">
+
+  <main class="container mx-auto px-4 max-w-4xl mt-6">
+    
+    <!-- ▼ 撮影ボタン（タップすると即カメラが起動） ▼ -->
+    <div class="mb-8 text-center">
+      <label class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-full shadow-lg text-lg transition transform hover:scale-105 inline-flex items-center justify-center cursor-pointer gap-2">
+        <span>写真を撮影する</span>
+        <input type="file" id="input-photo" accept="image/*" capture="environment" class="hidden" onchange="handlePhotoSelect(event)">
+      </label>
+      <p class="text-xs text-gray-500 mt-2">タップすると直接カメラが起動し、撮影後に自動保存されます</p>
+    </div>
+
+    <!-- 送信中のローディング画面 -->
+    <div id="uploading-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50 hidden">
+      <div class="bg-white p-6 rounded-lg shadow-xl text-center">
+        <div class="animate-spin inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mb-2"></div>
+        <p class="text-sm font-bold text-gray-700">写真を処理・保存中...</p>
+      </div>
+    </div>
+
+    <!-- ▼ 撮影済み写真ギャラリー ▼ -->
+    <section>
+      <h2 class="text-xl font-bold text-gray-700 mb-4 border-b-2 border-blue-500 pb-2">ギャラリー</h2>
+      
+      <div id="loading" class="text-center py-12">
+        <div class="animate-spin inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full" role="status"></div>
+        <p class="mt-2 text-gray-600">写真を読み込み中...</p>
+      </div>
+
+      <div id="gallery-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 hidden">
+        <!-- ギャラリーカードがここに自動生成されます -->
+      </div>
+      
+      <div id="no-photos" class="text-center py-12 text-gray-400 hidden">
+        保存された写真はありません。
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // ★ ご自身のGASウェブアプリURLを貼り付けてください ★
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwdIw1KRL_7AnmLfBMitZCUZW46QX7klzBhd_fkdbL0_1qUtvo9hfRlM5ntCHknH9v_Zw/exec";
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.appPassword) {
+        fetchPhotosGallery();
+      }
+    });
+
+    async function fetchPhotosGallery() {
+      const loading = document.getElementById('loading');
+      const container = document.getElementById('gallery-container');
+      const noPhotos = document.getElementById('no-photos');
+
+      try {
+        const res = await fetch(`${GAS_API_URL}?action=get_photos&password=${encodeURIComponent(window.appPassword)}`);
+        const json = await res.json();
+
+        loading.classList.add('hidden');
+
+        if (json.status === "success" && json.data.length > 0) {
+          container.classList.remove('hidden');
+          container.innerHTML = '';
+
+          json.data.forEach(item => {
+            let viewUrl = item.photo_url;
+            if (viewUrl && viewUrl.includes('id=')) {
+              const fileId = viewUrl.split('id=')[1].split('&')[0];
+              viewUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
+            }
+
+            const card = document.createElement('div');
+            card.className = "bg-white rounded-lg shadow overflow-hidden border border-gray-200 flex flex-col";
+            card.innerHTML = `
+              <div class="h-48 bg-gray-100 overflow-hidden relative">
+                <a href="${item.photo_url}" target="_blank" title="拡大表示">
+                  <img src="${viewUrl}" alt="写真" class="w-full h-full object-cover hover:scale-105 transition duration-300">
+                </a>
+              </div>
+              <div class="p-3 bg-gray-50 flex justify-between items-center text-xs text-gray-600">
+                <span class="font-medium">${item.file_name}</span>
+                <span>${item.timestamp}</span>
+              </div>
+            `;
+            container.appendChild(card);
+          });
+        } else {
+          noPhotos.classList.remove('hidden');
+        }
+      } catch (error) {
+        loading.classList.add('hidden');
+        noPhotos.classList.remove('hidden');
+      }
+    }
+
+    function resizeImage(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 1000; 
+            const scaleSize = MAX_WIDTH / img.width;
+            let width = MAX_WIDTH;
+            let height = img.height * scaleSize;
+            if (img.width < MAX_WIDTH) { width = img.width; height = img.height; }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            resolve(canvas.toDataURL('image/jpeg', 0.8)); 
+          }
+          img.src = e.target.result;
+        }
+        reader.onerror = error => reject(error);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // 写真が選択・撮影されたら即座にリサイズ＆送信
+    async function handlePhotoSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      document.getElementById('uploading-overlay').classList.remove('hidden');
+
+      try {
+        const base64Data = await resizeImage(file);
+
+        let payload = {
+          action: "photo",
+          photo_data: base64Data,
+          password: window.appPassword
+        };
+
+        const response = await fetch(GAS_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify(payload)
+        });
+        
+        const result = await response.json();
+
+        if (result.status === "success") {
+          event.target.value = ""; // 入力リセット
+          fetchPhotosGallery();    // ギャラリー再読み込み
+        } else {
+          alert("エラー: " + result.message);
+        }
+      } catch (error) {
+        alert("通信エラーが発生しました。");
+      } finally {
+        document.getElementById('uploading-overlay').classList.add('hidden');
+      }
+    }
+  </script>
+</body>
+</html>
