@@ -19,15 +19,15 @@
     </div>
   </div>
 
+  <!-- 共通ヘッダー（ハンバーガーメニュー付き） -->
   <header class="bg-blue-600 text-white shadow-md relative z-40">
     <div class="container mx-auto px-4 py-3 flex justify-between items-center">
       <h1 class="text-lg md:text-xl font-bold">試験予定カレンダー</h1>
       
       <div class="flex items-center gap-3">
-        <!-- PCなどの広い画面では「入力へ」ボタンを見せておくと便利です。スマホでは自動で隠れてメニューに入ります -->
-        <a href="form.html" class="hidden sm:block bg-white text-blue-600 font-semibold px-4 py-2 rounded shadow hover:bg-blue-50 transition duration-150">＋ 入力へ</a>
-
-        <!-- 3本線のハンバーガーメニューボタン -->
+        <a href="index.html" class="hidden sm:block bg-white text-blue-600 font-semibold px-4 py-2 rounded shadow hover:bg-blue-50 transition duration-150">
+          HOME
+        </a>
         <button onclick="toggleMenu()" class="text-white hover:bg-blue-700 p-2 rounded focus:outline-none transition duration-150">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
@@ -36,13 +36,13 @@
       </div>
     </div>
 
-    <!-- ドロップダウンメニュー（初期状態はhiddenで非表示） -->
+    <!-- モバイル用メニュー -->
     <div id="mobile-menu" class="hidden absolute right-4 top-14 bg-white text-gray-800 rounded shadow-xl border border-gray-200 w-56 overflow-hidden z-50">
       <a href="index.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm font-semibold">HOME</a>
-      <a href="form.html" class="block sm:hidden px-4 py-3 hover:bg-gray-100 border-b text-sm font-semibold text-blue-600">＋ 測定・移動入力</a>
-      <a href="calendar.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm">カレンダー</a>
-      <a href="materials.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm">資料ページ</a>
-      
+      <a href="form.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm font-medium">＋ 測定・移動入力</a>
+      <a href="calendar.html" class="block px-4 py-3 bg-blue-50 border-b text-sm font-bold text-blue-700">カレンダー</a>
+      <a href="materials.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm font-medium">資料ページ</a>
+
       <!-- ログアウトは一番下に配置し、少し赤色にしてわかりやすくしています -->
       <button onclick="logout()" class="w-full text-left block px-4 py-3 hover:bg-red-50 text-red-600 text-sm font-medium">ログアウト</button>
     </div>
