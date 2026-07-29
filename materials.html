@@ -40,7 +40,7 @@
   <main class="container mx-auto px-4 py-6 max-w-4xl">
     <!-- 共有ドライブ・重要ドキュメント -->
     <section class="mb-8">
-      <h2 class="text-xl font-bold text-gray-700 mb-4 border-b-2 border-blue-500 pb-2">📂 共有ドライブ・重要ドキュメント</h2>
+      <h2 class="text-xl font-bold text-gray-700 mb-4 border-b-2 border-blue-500 pb-2">リンク集</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         
         <!-- ドライブリンク -->
@@ -50,7 +50,6 @@
           </div>
           <div>
             <h3 class="font-bold text-gray-800">修士論文ドライブ</h3>
-            <p class="text-xs text-gray-500">写真や実験データの一元管理</p>
           </div>
         </a>
 
@@ -61,50 +60,45 @@
           </div>
           <div>
             <h3 class="font-bold text-gray-800">試験計画書</h3>
-            <p class="text-xs text-gray-500">試験条件や測定項目の詳細仕様</p>
           </div>
         </a>
 
+      </div>
+      <div class="text-sm text-gray-500 mt-2">
+        <a href="https://www.forest.go.jp/" target="_blank" class="hover:underline">森林総合研究所HP</a>
       </div>
     </section>
 
     <!-- 3. 参考文献リスト -->
     <section class="mb-8">
-      <h2 class="text-xl font-bold text-gray-700 mb-4 border-b-2 border-blue-500 pb-2">📖 参考文献・関連論文</h2>
-      <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-        <ul class="divide-y divide-gray-200">
-          
-          <!-- 論文リンク 1 -->
-          <li class="p-4 hover:bg-gray-50 transition duration-150">
-            <a href="#" target="_blank" class="block">
-              <h3 class="text-sm font-bold text-blue-600 mb-1">木材の含水率変化と気象条件の相関に関する研究</h3>
-              <p class="text-xs text-gray-500">著者名 (2025) / 〇〇学会誌</p>
-            </a>
-          </li>
+      <h2 class="text-xl font-bold text-gray-700 mb-4 border-b-2 border-blue-500 pb-2">参考文献リスト</h2>
+      <div class="bg-white rounded-lg shadow-sm p-4">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+          <label class="inline-flex items-center justify-center bg-blue-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-blue-700 transition">
+            <span>リストを開く</span>
+            <input id="reference-folder-input" type="file" class="hidden" webkitdirectory directory multiple />
+          </label>
+        </div>
 
-          <!-- 論文リンク 2 -->
-          <li class="p-4 hover:bg-gray-50 transition duration-150">
-            <a href="#" target="_blank" class="block">
-              <h3 class="text-sm font-bold text-blue-600 mb-1">CLT（直交集成板）の屋外暴露における耐久性評価</h3>
-              <p class="text-xs text-gray-500">著者名 (2024) / 〇〇論文集</p>
-            </a>
-          </li>
+        <div id="reference-tree" class="mt-4 border rounded p-3 bg-gray-50 min-h-[180px] text-sm text-gray-600">
+          <p class="text-gray-500">フォルダを選択してください。</p>
+        </div>
 
-          <!-- 論文リンク 3 -->
-          <li class="p-4 hover:bg-gray-50 transition duration-150">
-            <a href="#" target="_blank" class="block">
-              <h3 class="text-sm font-bold text-blue-600 mb-1">機械学習を用いた建築材料の劣化予測モデル</h3>
-              <p class="text-xs text-gray-500">著者名 (2023) / 〇〇ジャーナル</p>
-            </a>
-          </li>
-
-        </ul>
+        <div id="reference-preview" class="mt-4 border rounded overflow-hidden bg-white hidden">
+          <div class="flex justify-between items-center px-4 py-2 bg-gray-100 border-b">
+            <span id="reference-preview-title" class="font-semibold text-gray-700"></span>
+            <button type="button" onclick="closePreview()" class="text-sm text-gray-600 hover:text-gray-900">閉じる</button>
+          </div>
+          <iframe id="reference-pdf-frame" class="w-full h-[70vh]"></iframe>
+        </div>
       </div>
     </section>
 
   </main>
 
   <script>
+    let selectedPdfUrl = null;
+
     // メニューの開閉処理
     function toggleMenu() {
       const menu = document.getElementById('mobile-menu');
@@ -117,6 +111,151 @@
       const button = event.target.closest('button[onclick="toggleMenu()"]');
       if (!menu.classList.contains('hidden') && !button && !menu.contains(event.target)) {
         menu.classList.add('hidden');
+      }
+    });
+
+    // フォルダ選択イベント
+    document.getElementById('reference-folder-input').addEventListener('change', handleFolderSelection);
+
+    function handleFolderSelection(event) {
+      const files = Array.from(event.target.files || []);
+      if (files.length === 0) {
+        renderTreeMessage('PDFファイルが見つかりませんでした。');
+        return;
+      }
+
+      const pdfFiles = files.filter(file => file.type === 'application/pdf' || /\.pdf$/i.test(file.name));
+      if (pdfFiles.length === 0) {
+        renderTreeMessage('PDFファイルが見つかりませんでした。');
+        return;
+      }
+
+      const tree = buildFileTree(pdfFiles);
+      renderTree(tree);
+      closePreview();
+    }
+
+    function buildFileTree(files) {
+      const root = { name: 'Reference_list', type: 'folder', children: [] };
+
+      files.slice()
+        .sort((a, b) => {
+          const pathA = a.webkitRelativePath || a.name;
+          const pathB = b.webkitRelativePath || b.name;
+          return pathA.localeCompare(pathB, 'ja');
+        })
+        .forEach(file => {
+          const relPath = file.webkitRelativePath || file.name;
+          const parts = relPath.split('/').filter(Boolean);
+          let current = root;
+
+          parts.forEach((part, index) => {
+            const isFile = index === parts.length - 1;
+            if (isFile) {
+              current.children.push({
+                name: part,
+                type: 'file',
+                file
+              });
+            } else {
+              let child = current.children.find(node => node.type === 'folder' && node.name === part);
+              if (!child) {
+                child = { name: part, type: 'folder', children: [] };
+                current.children.push(child);
+              }
+              current = child;
+            }
+          });
+        });
+
+      return root;
+    }
+
+    function renderTree(root) {
+      const container = document.getElementById('reference-tree');
+      container.innerHTML = '';
+
+      if (!root.children.length) {
+        container.innerHTML = '<p class="text-gray-500">PDFファイルが見つかりませんでした。</p>';
+        return;
+      }
+
+      const ul = document.createElement('ul');
+      ul.className = 'space-y-2';
+      root.children.forEach(node => appendNode(node, ul));
+      container.appendChild(ul);
+    }
+
+    function appendNode(node, parentEl) {
+      const li = document.createElement('li');
+
+      if (node.type === 'folder') {
+        const details = document.createElement('details');
+        details.className = 'group';
+
+        const summary = document.createElement('summary');
+        summary.className = 'cursor-pointer list-none font-semibold text-gray-700 py-1 select-none';
+        summary.innerHTML = `<span class="mr-2">📁</span>${escapeHtml(node.name)}`;
+
+        const ul = document.createElement('ul');
+        ul.className = 'ml-5 mt-1 space-y-1';
+
+        node.children.forEach(child => appendNode(child, ul));
+
+        details.appendChild(summary);
+        details.appendChild(ul);
+        li.appendChild(details);
+      } else {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'text-left text-blue-600 hover:underline';
+        button.innerHTML = `<span class="mr-2">📄</span>${escapeHtml(node.name)}`;
+        button.addEventListener('click', () => previewPdf(node.file));
+        li.appendChild(button);
+      }
+
+      parentEl.appendChild(li);
+    }
+
+    function renderTreeMessage(message) {
+      document.getElementById('reference-tree').innerHTML = `<p class="text-gray-500">${escapeHtml(message)}</p>`;
+    }
+
+    function previewPdf(file) {
+      if (selectedPdfUrl) {
+        URL.revokeObjectURL(selectedPdfUrl);
+      }
+
+      selectedPdfUrl = URL.createObjectURL(file);
+
+      document.getElementById('reference-preview-title').textContent = file.name;
+      document.getElementById('reference-pdf-frame').src = selectedPdfUrl;
+      document.getElementById('reference-preview').classList.remove('hidden');
+    }
+
+    function closePreview() {
+      const frame = document.getElementById('reference-pdf-frame');
+      if (selectedPdfUrl) {
+        URL.revokeObjectURL(selectedPdfUrl);
+        selectedPdfUrl = null;
+      }
+      frame.src = '';
+      document.getElementById('reference-preview').classList.add('hidden');
+    }
+
+    function escapeHtml(text) {
+      return String(text).replace(/[&<>"']/g, (match) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      })[match]);
+    }
+
+    window.addEventListener('beforeunload', () => {
+      if (selectedPdfUrl) {
+        URL.revokeObjectURL(selectedPdfUrl);
       }
     });
   </script>
