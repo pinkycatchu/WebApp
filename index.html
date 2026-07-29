@@ -56,7 +56,7 @@
         <select id="location-filter" class="border rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto bg-white">
           <option value="">-- すべての場所 --</option>
           <option value="回収">回収</option>
-          <option value="I-ref棟恒温室">I-ref棟恒温室</option>
+          <option value="I-ref棟恒温室">I-REF棟恒温室</option>
           <option value="5号館恒温室">5号館恒温室</option>
           <option value="7号館恒温恒湿室">7号館恒温恒湿室</option>
           <option value="5号館屋上">5号館屋上</option>
@@ -89,13 +89,13 @@
         <thead class="bg-gray-50 border-b font-semibold text-gray-600">
           <tr>
             <th class="py-3 px-4">試験体ID</th>
+            <th class="py-3 px-4">操作</th>
             <th class="py-3 px-4">素材</th>
             <th class="py-3 px-4">状態</th>
             <th class="py-3 px-4">現在地</th>
             <th class="py-3 px-4">暴露日数 (経過/計画)</th>
             <th class="py-3 px-4">次回測定日</th>
             <th class="py-3 px-4">終了予定日</th>
-            <th class="py-3 px-4">操作</th>
           </tr>
         </thead>
         <tbody id="specimen-list" class="divide-y divide-gray-200"></tbody>
@@ -227,17 +227,17 @@
 
         tr.innerHTML = `
           <td class="py-3 px-4 font-medium text-blue-600">${item.specimen_id || '-'}</td>
+          <td class="py-3 px-4">
+            <a href="form.html?id=${encodeURIComponent(item.specimen_id || '')}" class="text-indigo-600 hover:text-indigo-900 text-xs bg-indigo-50 px-2 py-1 rounded border border-indigo-200">
+              記録する
+            </a>
+          </td>
           <td class="py-3 px-4">${item.material || '-'}</td>
           <td class="py-3 px-4"><span class="px-2 py-1 rounded text-xs ${badgeStyle}">${item.status || '-'}</span></td>
           <td class="py-3 px-4">${item.current_location || '-'}</td>
           <td class="py-3 px-4 ${daysColor}">${effective} 日 / ${planned} 日</td>
           <td class="py-3 px-4">${nextMeasureFormatted}</td>
           <td class="py-3 px-4">${expectedEndFormatted}</td>
-          <td class="py-3 px-4">
-            <a href="form.html?id=${encodeURIComponent(item.specimen_id || '')}" class="text-indigo-600 hover:text-indigo-900 text-xs bg-indigo-50 px-2 py-1 rounded border border-indigo-200">
-              記録する
-            </a>
-          </td>
         `;
         tbody.appendChild(tr);
       });
