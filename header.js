@@ -33,7 +33,7 @@ window.appPassword = localStorage.getItem('app_password') || '';
     <div class="container mx-auto px-4 py-3 flex justify-between items-center">
       <h1 class="text-lg md:text-xl font-bold">${headerTitle}</h1>
       <div class="flex items-center gap-3">
-        <a href="form.html" class="hidden sm:block bg-white text-blue-600 font-semibold px-4 py-2 rounded shadow hover:bg-blue-50 transition duration-150">
+        <a href=${currentPage === 'index.html' ? 'form.html' : 'index.html'} class="hidden sm:block bg-white text-blue-600 font-semibold px-4 py-2 rounded shadow hover:bg-blue-50 transition duration-150">
             ${currentPage === 'index.html' ? '＋入力へ' : 'HOME'}
         </a>
         <button onclick="toggleGlobalMenu()" class="text-white hover:bg-blue-700 p-2 rounded focus:outline-none transition duration-150">
