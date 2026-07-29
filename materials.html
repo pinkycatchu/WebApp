@@ -69,27 +69,20 @@
       </div>
     </section>
 
-    <!-- 3. 参考文献リスト -->
+    <!-- 2. ローカル Reference_list フォルダツリー（自動生成） -->
     <section class="mb-8">
       <h2 class="text-xl font-bold text-gray-700 mb-4 border-b-2 border-blue-500 pb-2">参考文献リスト</h2>
-      <div class="bg-white rounded-lg shadow-sm p-4">
-        <div class="flex flex-col sm:flex-row sm:items-center gap-3">
-          <label class="inline-flex items-center justify-center bg-blue-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-blue-700 transition">
-            <span>リストを開く</span>
-            <input id="reference-folder-input" type="file" class="hidden" webkitdirectory directory multiple />
-          </label>
-        </div>
-
-        <div id="reference-tree" class="mt-4 border rounded p-3 bg-gray-50 min-h-[180px] text-sm text-gray-600">
-          <p class="text-gray-500">フォルダを選択してください。</p>
-        </div>
-
-        <div id="reference-preview" class="mt-4 border rounded overflow-hidden bg-white hidden">
-          <div class="flex justify-between items-center px-4 py-2 bg-gray-100 border-b">
-            <span id="reference-preview-title" class="font-semibold text-gray-700"></span>
-            <button type="button" onclick="closePreview()" class="text-sm text-gray-600 hover:text-gray-900">閉じる</button>
+      <div class="bg-white p-5 rounded-lg shadow-sm">
+        <p class="text-sm text-gray-600 mb-4">GitHubの <code>Reference_list</code> フォルダ内を自動で読み込んでいます。</p>
+        
+        <!-- ここにフォルダツリーが自動描画されます -->
+        <div id="reference-tree-container" class="text-sm">
+          <div class="animate-pulse flex space-x-4">
+            <div class="flex-1 space-y-4 py-1">
+              <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+              <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+            </div>
           </div>
-          <iframe id="reference-pdf-frame" class="w-full h-[70vh]"></iframe>
         </div>
       </div>
     </section>
@@ -97,15 +90,12 @@
   </main>
 
   <script>
-    let selectedPdfUrl = null;
-
     // メニューの開閉処理
     function toggleMenu() {
       const menu = document.getElementById('mobile-menu');
       menu.classList.toggle('hidden');
     }
 
-    // メニューの外側をクリックした時に閉じる処理
     document.addEventListener('click', function(event) {
       const menu = document.getElementById('mobile-menu');
       const button = event.target.closest('button[onclick="toggleMenu()"]');
@@ -114,150 +104,97 @@
       }
     });
 
-    // フォルダ選択イベント
-    document.getElementById('reference-folder-input').addEventListener('change', handleFolderSelection);
+    // ==========================================
+    // GitHub APIを利用したフォルダツリー自動生成
+    // ==========================================
+    
+    const GITHUB_USERNAME = "pinkycatchu"; 
+    const GITHUB_REPO = "WebApp"; 
+    const TARGET_FOLDER = "Reference_list";
 
-    function handleFolderSelection(event) {
-      const files = Array.from(event.target.files || []);
-      if (files.length === 0) {
-        renderTreeMessage('PDFファイルが見つかりませんでした。');
-        return;
-      }
+    window.addEventListener('DOMContentLoaded', () => {
+      const container = document.getElementById('reference-tree-container');
+      loadGitHubFolder(TARGET_FOLDER, container);
+    });
 
-      const pdfFiles = files.filter(file => file.type === 'application/pdf' || /\.pdf$/i.test(file.name));
-      if (pdfFiles.length === 0) {
-        renderTreeMessage('PDFファイルが見つかりませんでした。');
-        return;
-      }
-
-      const tree = buildFileTree(pdfFiles);
-      renderTree(tree);
-      closePreview();
-    }
-
-    function buildFileTree(files) {
-      const root = { name: 'Reference_list', type: 'folder', children: [] };
-
-      files.slice()
-        .sort((a, b) => {
-          const pathA = a.webkitRelativePath || a.name;
-          const pathB = b.webkitRelativePath || b.name;
-          return pathA.localeCompare(pathB, 'ja');
-        })
-        .forEach(file => {
-          const relPath = file.webkitRelativePath || file.name;
-          const parts = relPath.split('/').filter(Boolean);
-          let current = root;
-
-          parts.forEach((part, index) => {
-            const isFile = index === parts.length - 1;
-            if (isFile) {
-              current.children.push({
-                name: part,
-                type: 'file',
-                file
-              });
-            } else {
-              let child = current.children.find(node => node.type === 'folder' && node.name === part);
-              if (!child) {
-                child = { name: part, type: 'folder', children: [] };
-                current.children.push(child);
-              }
-              current = child;
-            }
-          });
-        });
-
-      return root;
-    }
-
-    function renderTree(root) {
-      const container = document.getElementById('reference-tree');
-      container.innerHTML = '';
-
-      if (!root.children.length) {
-        container.innerHTML = '<p class="text-gray-500">PDFファイルが見つかりませんでした。</p>';
-        return;
-      }
-
-      const ul = document.createElement('ul');
-      ul.className = 'space-y-2';
-      root.children.forEach(node => appendNode(node, ul));
-      container.appendChild(ul);
-    }
-
-    function appendNode(node, parentEl) {
-      const li = document.createElement('li');
-
-      if (node.type === 'folder') {
-        const details = document.createElement('details');
-        details.className = 'group';
-
-        const summary = document.createElement('summary');
-        summary.className = 'cursor-pointer list-none font-semibold text-gray-700 py-1 select-none';
-        summary.innerHTML = `<span class="mr-2">📁</span>${escapeHtml(node.name)}`;
+    // 再帰的にGitHubのフォルダの中身を取得してHTMLを描画する関数
+    async function loadGitHubFolder(path, parentElement) {
+      const url = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/contents/${path}`;
+      
+      try {
+        const response = await fetch(url);
+        
+        if (response.status === 404) {
+          parentElement.innerHTML = `<p class="text-gray-500 italic">⚠️ 指定されたフォルダ（${path}）が見つかりません。GitHubにアップロードされているか確認してください。</p>`;
+          return;
+        }
+        
+        if (!response.ok) throw new Error("API取得エラー");
+        
+        const data = await response.json();
+        
+        // 読み込み中アニメーションを消す（初回のみ）
+        if (parentElement.id === 'reference-tree-container') {
+          parentElement.innerHTML = ''; 
+        }
 
         const ul = document.createElement('ul');
-        ul.className = 'ml-5 mt-1 space-y-1';
+        ul.className = "pl-4 mt-2 space-y-2 border-l-2 border-gray-100";
 
-        node.children.forEach(child => appendNode(child, ul));
+        // ファイルとフォルダをソート（フォルダを上に）
+        data.sort((a, b) => {
+          if (a.type === b.type) return a.name.localeCompare(b.name);
+          return a.type === 'dir' ? -1 : 1;
+        });
 
-        details.appendChild(summary);
-        details.appendChild(ul);
-        li.appendChild(details);
-      } else {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'text-left text-blue-600 hover:underline';
-        button.innerHTML = `<span class="mr-2">📄</span>${escapeHtml(node.name)}`;
-        button.addEventListener('click', () => previewPdf(node.file));
-        li.appendChild(button);
+        for (const item of data) {
+          const li = document.createElement('li');
+          
+          if (item.type === 'dir') {
+            // フォルダの場合（アイコン＋再帰呼び出し）
+            li.innerHTML = `
+              <div class="font-bold text-gray-700 flex items-center gap-1 cursor-pointer hover:text-blue-600 transition" onclick="this.nextElementSibling.classList.toggle('hidden')">
+                <span class="text-lg">📁</span> ${item.name}
+              </div>
+              <div class="folder-content ml-2 hidden">
+                 <!-- 子要素の読み込み用コンテナ -->
+                 <div class="text-xs text-gray-400 pl-4 py-1">読み込み中...</div>
+              </div>
+            `;
+            ul.appendChild(li);
+            
+            // フォルダの中身を再帰的に取得（非同期）
+            const contentContainer = li.querySelector('.folder-content');
+            loadGitHubFolder(item.path, contentContainer).then(() => {
+              // 読み込み中テキストを削除
+              if(contentContainer.firstElementChild && contentContainer.firstElementChild.textContent === '読み込み中...') {
+                contentContainer.firstElementChild.remove();
+              }
+            });
+
+          } else if (item.type === 'file') {
+            // ファイルの場合（PDFなどのアイコン）
+            let icon = "📄";
+            if (item.name.toLowerCase().endsWith('.pdf')) icon = "📕";
+            if (item.name.toLowerCase().endsWith('.csv') || item.name.toLowerCase().endsWith('.xlsx')) icon = "📊";
+
+            // GitHub Pages上の相対パスをそのままリンクとして利用
+            li.innerHTML = `
+              <a href="${item.path}" target="_blank" class="flex items-center gap-1 text-blue-600 hover:underline hover:text-blue-800 transition py-0.5">
+                <span class="text-lg">${icon}</span> ${item.name}
+              </a>
+            `;
+            ul.appendChild(li);
+          }
+        }
+        
+        parentElement.appendChild(ul);
+        
+      } catch (error) {
+        console.error("GitHub APIエラー:", error);
+        parentElement.innerHTML = `<p class="text-red-500 text-sm">フォルダの読み込みに失敗しました。</p>`;
       }
-
-      parentEl.appendChild(li);
     }
-
-    function renderTreeMessage(message) {
-      document.getElementById('reference-tree').innerHTML = `<p class="text-gray-500">${escapeHtml(message)}</p>`;
-    }
-
-    function previewPdf(file) {
-      if (selectedPdfUrl) {
-        URL.revokeObjectURL(selectedPdfUrl);
-      }
-
-      selectedPdfUrl = URL.createObjectURL(file);
-
-      document.getElementById('reference-preview-title').textContent = file.name;
-      document.getElementById('reference-pdf-frame').src = selectedPdfUrl;
-      document.getElementById('reference-preview').classList.remove('hidden');
-    }
-
-    function closePreview() {
-      const frame = document.getElementById('reference-pdf-frame');
-      if (selectedPdfUrl) {
-        URL.revokeObjectURL(selectedPdfUrl);
-        selectedPdfUrl = null;
-      }
-      frame.src = '';
-      document.getElementById('reference-preview').classList.add('hidden');
-    }
-
-    function escapeHtml(text) {
-      return String(text).replace(/[&<>"']/g, (match) => ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#39;'
-      })[match]);
-    }
-
-    window.addEventListener('beforeunload', () => {
-      if (selectedPdfUrl) {
-        URL.revokeObjectURL(selectedPdfUrl);
-      }
-    });
   </script>
 </body>
 </html>
