@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>修論・参考資料 - 試験体管理</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans min-h-screen pb-12">
+  
+  <!-- 共通ヘッダー（ハンバーガーメニュー付き） -->
+  <header class="bg-blue-600 text-white shadow-md relative z-40">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <h1 class="text-lg md:text-xl font-bold">修論・参考資料</h1>
+      
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="hidden sm:block bg-white text-blue-600 font-semibold px-4 py-2 rounded shadow hover:bg-blue-50 transition duration-150">
+          HOME
+        </a>
+        <button onclick="toggleMenu()" class="text-white hover:bg-blue-700 p-2 rounded focus:outline-none transition duration-150">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- モバイル用メニュー -->
+    <div id="mobile-menu" class="hidden absolute right-4 top-14 bg-white text-gray-800 rounded shadow-xl border border-gray-200 w-56 overflow-hidden z-50">
+      <a href="index.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm font-semibold">HOME</a>
+      <a href="form.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm font-semibold">＋ 測定・移動入力</a>
+      <a href="calendar.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm">カレンダー</a>
+      <a href="materials.html" class="block px-4 py-3 bg-blue-50 border-b text-sm font-bold text-blue-700">資料ページ</a>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-4 py-6 max-w-4xl">
+    
+    <!-- 1. 修士論文 スケジュール・計画 -->
+    <section class="mb-8">
+      <h2 class="text-xl font-bold text-gray-700 mb-4 border-b-2 border-blue-500 pb-2">📅 修士論文 スケジュール・計画</h2>
+      <div class="bg-white p-5 rounded-lg shadow-sm">
+        <p class="text-sm text-gray-600 mb-4">現在の試験計画と今後のマイルストーンです。</p>
+        <ul class="space-y-3">
+          <li class="flex items-start">
+            <span class="text-green-500 mr-2">✅</span>
+            <div>
+              <span class="font-bold">試験体の作成・初期設定</span>
+              <p class="text-xs text-gray-500">試験体の寸法測定・初期重量の記録完了</p>
+            </div>
+          </li>
+          <li class="flex items-start">
+            <span class="text-blue-500 mr-2">🔄</span>
+            <div>
+              <span class="font-bold">各環境下での暴露試験（進行中）</span>
+              <p class="text-xs text-gray-500">恒温恒湿環境、屋外暴露などでの定期的な重量測定</p>
+            </div>
+          </li>
+          <li class="flex items-start">
+            <span class="text-gray-400 mr-2">⏳</span>
+            <div>
+              <span class="font-bold">データ解析・モデル構築</span>
+              <p class="text-xs text-gray-500">蓄積されたデータを用いた劣化予測モデルの構築（〇月〜予定）</p>
+            </div>
+          </li>
+          <li class="flex items-start">
+            <span class="text-gray-400 mr-2">⏳</span>
+            <div>
+              <span class="font-bold">修士論文 執筆開始</span>
+              <p class="text-xs text-gray-500">中間発表および本論文の執筆（〇月〜予定）</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 2. 共有ドライブ・重要ドキュメント -->
+    <section class="mb-8">
+      <h2 class="text-xl font-bold text-gray-700 mb-4 border-b-2 border-blue-500 pb-2">📂 共有ドライブ・重要ドキュメント</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- ドライブリンク 1 -->
+        <a href="#" target="_blank" class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md border border-gray-200 transition duration-150 flex items-center">
+          <div class="bg-blue-100 p-3 rounded-full mr-4">
+            <span class="text-xl">📁</span>
+          </div>
+          <div>
+            <h3 class="font-bold text-gray-800">研究室 共有ドライブ</h3>
+            <p class="text-xs text-gray-500">写真や実験データの一元管理</p>
+          </div>
+        </a>
+
+        <!-- ドライブリンク 2 -->
+        <a href="#" target="_blank" class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md border border-gray-200 transition duration-150 flex items-center">
+          <div class="bg-green-100 p-3 rounded-full mr-4">
+            <span class="text-xl">📊</span>
+          </div>
+          <div>
+            <h3 class="font-bold text-gray-800">試験計画書 (Google Docs)</h3>
+            <p class="text-xs text-gray-500">試験条件や測定項目の詳細仕様</p>
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- 3. 参考文献リスト -->
+    <section class="mb-8">
+      <h2 class="text-xl font-bold text-gray-700 mb-4 border-b-2 border-blue-500 pb-2">📖 参考文献・関連論文</h2>
+      <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <ul class="divide-y divide-gray-200">
+          
+          <!-- 論文リンク 1 -->
+          <li class="p-4 hover:bg-gray-50 transition duration-150">
+            <a href="#" target="_blank" class="block">
+              <h3 class="text-sm font-bold text-blue-600 mb-1">木材の含水率変化と気象条件の相関に関する研究</h3>
+              <p class="text-xs text-gray-500">著者名 (2025) / 〇〇学会誌</p>
+            </a>
+          </li>
+
+          <!-- 論文リンク 2 -->
+          <li class="p-4 hover:bg-gray-50 transition duration-150">
+            <a href="#" target="_blank" class="block">
+              <h3 class="text-sm font-bold text-blue-600 mb-1">CLT（直交集成板）の屋外暴露における耐久性評価</h3>
+              <p class="text-xs text-gray-500">著者名 (2024) / 〇〇論文集</p>
+            </a>
+          </li>
+
+          <!-- 論文リンク 3 -->
+          <li class="p-4 hover:bg-gray-50 transition duration-150">
+            <a href="#" target="_blank" class="block">
+              <h3 class="text-sm font-bold text-blue-600 mb-1">機械学習を用いた建築材料の劣化予測モデル</h3>
+              <p class="text-xs text-gray-500">著者名 (2023) / 〇〇ジャーナル</p>
+            </a>
+          </li>
+
+        </ul>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // メニューの開閉処理
+    function toggleMenu() {
+      const menu = document.getElementById('mobile-menu');
+      menu.classList.toggle('hidden');
+    }
+
+    // メニューの外側をクリックした時に閉じる処理
+    document.addEventListener('click', function(event) {
+      const menu = document.getElementById('mobile-menu');
+      const button = event.target.closest('button[onclick="toggleMenu()"]');
+      if (!menu.classList.contains('hidden') && !button && !menu.contains(event.target)) {
+        menu.classList.add('hidden');
+      }
+    });
+  </script>
+</body>
+</html>
