@@ -35,19 +35,24 @@ window.appPassword = localStorage.getItem('app_password') || '';
   // 2. 共通ヘッダーのHTML
   const headerHtml = `
   <header class="shadow-md relative z-40 mb-6 bg-white">
-    
-    <!-- ▼ 修正：フェード対応のスライドショーエリア ▼ -->
-    <div id="header-slideshow" class="w-full h-32 md:h-48 bg-gray-800 relative overflow-hidden">
-      <!-- 2つの画像レイヤーを重ねて透明度を交互に切り替える -->
+
+    <!-- ▼ 1. 背面に敷くスライドショーエリア（絶対配置でヘッダー全体を覆う） ▼ -->
+    <div id="header-slideshow" class="absolute inset-0 w-full h-full bg-gray-800 overflow-hidden z-0">
       <div id="slide-bg-1" class="absolute inset-0 bg-cover bg-center transition-opacity duration-[2000ms] ease-in-out opacity-100"></div>
       <div id="slide-bg-2" class="absolute inset-0 bg-cover bg-center transition-opacity duration-[2000ms] ease-in-out opacity-0"></div>
-      <div class="absolute inset-0 bg-black bg-opacity-30 z-10"></div> <!-- 写真を少し暗くして落ち着かせる -->
+      <!-- 白い文字を読みやすくするための暗いフィルター -->
+      <div class="absolute inset-0 bg-black bg-opacity-40 z-10"></div>
     </div>
-
-    <!-- 従来の青いタイトルバー -->
-    <div class="bg-blue-600 text-white relative">
-      <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-        <h1 class="text-lg md:text-xl font-bold"><a href="index.html">${headerTitle}</a></h1>
+    
+    <!-- ▼ 2. 前面に重ねるタイトルバー＆メニューエリア ▼ -->
+    <div class="relative z-20 h-32 md:h-60 flex flex-col">
+      
+      <!-- タイトルバー (背景を透明にして文字に影をつける) -->
+      <div class="w-full text-white pt-2">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+        <h1 class="text-lg md:text-2xl font-bold font-serif">
+          <a href="index.html">${headerTitle}</a>
+        </h1>
         <div class="flex items-center gap-3">
           <a href='contact.html' class="bg-red-500 text-white font-semibold px-4 py-2 rounded shadow hover:bg-red-600 transition duration-150">
             連絡先
@@ -61,10 +66,11 @@ window.appPassword = localStorage.getItem('app_password') || '';
             </svg>
           </button>
         </div>
+        </div>
       </div>
 
-      <!-- 共通メニュー（現在のページを自動でハイライト） -->
-      <div id="global-mobile-menu" class="hidden absolute right-4 top-full mt-1 bg-white text-gray-800 rounded shadow-xl border border-gray-200 w-56 overflow-hidden z-50">
+      <!-- 共通メニュー (ハンバーガーボタンの下にポップアップ) -->
+      <div id="global-mobile-menu" class="hidden absolute right-4 top-14 bg-white text-gray-800 rounded shadow-xl border border-gray-200 w-56 z-50">
         <a href="index.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm font-semibold ${currentPage === 'index.html' ? 'bg-blue-50 text-blue-700 font-bold' : ''}">HOME</a>
 
         <a href="form.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm ${currentPage === 'form.html' ? 'bg-blue-50 text-blue-700 font-bold' : ''}">＋ 測定・移動入力</a>
@@ -81,8 +87,8 @@ window.appPassword = localStorage.getItem('app_password') || '';
 
         <button onclick="logout()" class="w-full text-left block px-4 py-3 hover:bg-red-50 text-red-600 text-sm font-medium">ログアウト</button>
       </div>
+      
     </div>
-
     
   </header>
   `;
@@ -96,7 +102,7 @@ window.appPassword = localStorage.getItem('app_password') || '';
   }
 })();
 
-// 3. スライドショー機能のロジック（クロスフェード対応）
+// 3. スライドショー機能のロジック（クロスフェード＆タイトル対応）
 async function startSlideshow() {
   try {
     const res = await fetch(`${window.GAS_API_URL_GLOBAL}?password=${encodeURIComponent(window.appPassword)}&action=get_photos`);
@@ -106,37 +112,52 @@ async function startSlideshow() {
       const photos = json.data;
       let currentIndex = 0;
       let activeLayer = 1;
+      
       const layer1 = document.getElementById('slide-bg-1');
       const layer2 = document.getElementById('slide-bg-2');
+      // ★追加：テキストの要素を取得
+      const text1 = document.getElementById('slide-text-1');
+      const text2 = document.getElementById('slide-text-2');
       
-      // 初回の画像をレイヤー1にセット
+      // 初回の画像とタイトルをレイヤー1にセット
       const firstUrl = `https://drive.google.com/thumbnail?id=${photos[0].id}&sz=w1000`;
       layer1.style.backgroundImage = `url('${firstUrl}')`;
+      text1.textContent = photos[0].name; // タイトルをセット
       
-      // 写真が1枚しかない場合は切り替え処理を行わない
       if (photos.length <= 1) return;
 
-      // 画像を交互にフェードイン・フェードアウトさせる関数
+      // 画像とタイトルを交互にフェードさせる関数
       function updateImage() {
         currentIndex = (currentIndex + 1) % photos.length;
-        const nextUrl = `https://drive.google.com/thumbnail?id=${photos[currentIndex].id}&sz=w1000`;
+        const nextPhoto = photos[currentIndex]; // 次の写真データ
+        const nextUrl = `https://drive.google.com/thumbnail?id=${nextPhoto.id}&sz=w1000`;
         
         if (activeLayer === 1) {
-          // レイヤー2に次の画像をセットして表示、レイヤー1を隠す
+          // レイヤー2に次の画像とタイトルをセットして表示
           layer2.style.backgroundImage = `url('${nextUrl}')`;
+          text2.textContent = nextPhoto.name;
+          
           layer2.classList.replace('opacity-0', 'opacity-100');
+          text2.classList.replace('opacity-0', 'opacity-100');
+          
           layer1.classList.replace('opacity-100', 'opacity-0');
+          text1.classList.replace('opacity-100', 'opacity-0');
           activeLayer = 2;
         } else {
-          // レイヤー1に次の画像をセットして表示、レイヤー2を隠す
+          // レイヤー1に次の画像とタイトルをセットして表示
           layer1.style.backgroundImage = `url('${nextUrl}')`;
+          text1.textContent = nextPhoto.name;
+          
           layer1.classList.replace('opacity-0', 'opacity-100');
+          text1.classList.replace('opacity-0', 'opacity-100');
+          
           layer2.classList.replace('opacity-100', 'opacity-0');
+          text2.classList.replace('opacity-100', 'opacity-0');
           activeLayer = 1;
         }
       }
       
-      setInterval(updateImage, 8000); // 10秒ごとに切り替え
+      setInterval(updateImage, 8000); // 8秒ごとに切り替え
     }
   } catch (e) {
     console.error("スライドショーの読み込みをスキップしました", e);
