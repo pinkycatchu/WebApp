@@ -9,12 +9,13 @@ window.appPassword = localStorage.getItem('app_password') || '';
   const currentPage = window.location.pathname.split('/').pop() || 'index.html';
 // ページごとのタイトルを定義しておく
   const pageTitles = {
-    'index.html': '暴露試験体管理',
+    'index.html': '暴露試験体管理システム',
     'form.html': '測定・移動 データ入力',
     'photo.html': 'ギャラリー',
     'calendar.html': '試験予定カレンダー',
     'materials.html': '修論・参考資料',
-    'howtouse.html': '使い方・注意点',
+    'howtouse.html': '使い方マニュアル',
+    'contact.html': 'お問い合わせ',
   };
   
   // 現在のページに一致するタイトルを取得（なければデフォルト名）
@@ -38,9 +39,9 @@ window.appPassword = localStorage.getItem('app_password') || '';
     <!-- ▼ 修正：フェード対応のスライドショーエリア ▼ -->
     <div id="header-slideshow" class="w-full h-32 md:h-48 bg-gray-800 relative overflow-hidden">
       <!-- 2つの画像レイヤーを重ねて透明度を交互に切り替える -->
-      <div id="slide-bg-1" class="absolute inset-0 bg-cover bg-center transition-opacity duration-2000 ease-in-out opacity-100"></div>
-      <div id="slide-bg-2" class="absolute inset-0 bg-cover bg-center transition-opacity duration-2000 ease-in-out opacity-0"></div>
-      <div class="absolute inset-0 bg-black bg-opacity-40 z-10"></div> <!-- 写真を少し暗くして落ち着かせる -->
+      <div id="slide-bg-1" class="absolute inset-0 bg-cover bg-center transition-opacity duration-[2000ms] ease-in-out opacity-100"></div>
+      <div id="slide-bg-2" class="absolute inset-0 bg-cover bg-center transition-opacity duration-[2000ms] ease-in-out opacity-0"></div>
+      <div class="absolute inset-0 bg-black bg-opacity-30 z-10"></div> <!-- 写真を少し暗くして落ち着かせる -->
     </div>
 
     <!-- 従来の青いタイトルバー -->
@@ -48,6 +49,9 @@ window.appPassword = localStorage.getItem('app_password') || '';
       <div class="container mx-auto px-4 py-3 flex justify-between items-center">
         <h1 class="text-lg md:text-xl font-bold">${headerTitle}</h1>
         <div class="flex items-center gap-3">
+          <a href='contact.html' class="hidden sm:block bg-red-500 text-white font-semibold px-4 py-2 rounded shadow hover:bg-red-600 transition duration-150">
+            連絡先
+          </a>
           <a href=${currentPage === 'index.html' ? 'form.html' : 'index.html'} class="hidden sm:block bg-white text-blue-600 font-semibold px-4 py-2 rounded shadow hover:bg-blue-50 transition duration-150">
             ${currentPage === 'index.html' ? '＋入力へ' : 'HOME'}
           </a>
@@ -72,7 +76,9 @@ window.appPassword = localStorage.getItem('app_password') || '';
 
       <a href="materials.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm ${currentPage === 'materials.html' ? 'bg-blue-50 text-blue-700 font-bold' : ''}">資料ページ</a>
 
-      <a href="howtouse.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm ${currentPage === 'howtouse.html' ? 'bg-blue-50 text-blue-700 font-bold' : ''}">使い方・注意点</a>
+      <a href="howtouse.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm ${currentPage === 'howtouse.html' ? 'bg-blue-50 text-blue-700 font-bold' : ''}">使い方マニュアル</a>
+
+      <a href="contact.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm ${currentPage === 'contact.html' ? 'bg-blue-50 text-blue-700 font-bold' : ''}">お問い合わせ</a>
 
       <button onclick="logout()" class="w-full text-left block px-4 py-3 hover:bg-red-50 text-red-600 text-sm font-medium">ログアウト</button>
     </div>
@@ -128,7 +134,7 @@ async function startSlideshow() {
         }
       }
       
-      setInterval(updateImage, 10000); // 5秒ごとに切り替え
+      setInterval(updateImage, 8000); // 10秒ごとに切り替え
     }
   } catch (e) {
     console.error("スライドショーの読み込みをスキップしました", e);
