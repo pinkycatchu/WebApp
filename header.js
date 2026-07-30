@@ -62,26 +62,28 @@ window.appPassword = localStorage.getItem('app_password') || '';
           </button>
         </div>
       </div>
+
+      <!-- 共通メニュー（現在のページを自動でハイライト） -->
+      <div id="global-mobile-menu" class="hidden absolute right-4 top-full mt-1 bg-white text-gray-800 rounded shadow-xl border border-gray-200 w-56 overflow-hidden z-50">
+        <a href="index.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm font-semibold ${currentPage === 'index.html' ? 'bg-blue-50 text-blue-700 font-bold' : ''}">HOME</a>
+
+        <a href="form.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm ${currentPage === 'form.html' ? 'bg-blue-50 text-blue-700 font-bold' : ''}">＋ 測定・移動入力</a>
+
+        <a href="photo.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm ${currentPage === 'photo.html' ? 'bg-blue-50 text-blue-700 font-bold' : ''}">ギャラリー</a>
+
+        <a href="calendar.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm ${currentPage === 'calendar.html' ? 'bg-blue-50 text-blue-700 font-bold' : ''}">カレンダー</a>
+
+        <a href="materials.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm ${currentPage === 'materials.html' ? 'bg-blue-50 text-blue-700 font-bold' : ''}">資料ページ</a>
+
+        <a href="howtouse.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm ${currentPage === 'howtouse.html' ? 'bg-blue-50 text-blue-700 font-bold' : ''}">使い方マニュアル</a>
+
+        <a href="contact.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm ${currentPage === 'contact.html' ? 'bg-blue-50 text-blue-700 font-bold' : ''}">お問い合わせ</a>
+
+        <button onclick="logout()" class="w-full text-left block px-4 py-3 hover:bg-red-50 text-red-600 text-sm font-medium">ログアウト</button>
+      </div>
     </div>
 
-    <!-- 共通メニュー（現在のページを自動でハイライト） -->
-    <div id="global-mobile-menu" class="hidden absolute right-4 top-46 bg-white text-gray-800 rounded shadow-xl border border-gray-200 w-56 overflow-hidden z-50">
-      <a href="index.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm font-semibold ${currentPage === 'index.html' ? 'bg-blue-50 text-blue-700 font-bold' : ''}">HOME</a>
-
-      <a href="form.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm ${currentPage === 'form.html' ? 'bg-blue-50 text-blue-700 font-bold' : ''}">＋ 測定・移動入力</a>
-
-      <a href="photo.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm ${currentPage === 'photo.html' ? 'bg-blue-50 text-blue-700 font-bold' : ''}">ギャラリー</a>
-
-      <a href="calendar.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm ${currentPage === 'calendar.html' ? 'bg-blue-50 text-blue-700 font-bold' : ''}">カレンダー</a>
-
-      <a href="materials.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm ${currentPage === 'materials.html' ? 'bg-blue-50 text-blue-700 font-bold' : ''}">資料ページ</a>
-
-      <a href="howtouse.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm ${currentPage === 'howtouse.html' ? 'bg-blue-50 text-blue-700 font-bold' : ''}">使い方マニュアル</a>
-
-      <a href="contact.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm ${currentPage === 'contact.html' ? 'bg-blue-50 text-blue-700 font-bold' : ''}">お問い合わせ</a>
-
-      <button onclick="logout()" class="w-full text-left block px-4 py-3 hover:bg-red-50 text-red-600 text-sm font-medium">ログアウト</button>
-    </div>
+    
   </header>
   `;
 
