@@ -47,7 +47,7 @@ window.appPassword = localStorage.getItem('app_password') || '';
     <!-- 従来の青いタイトルバー -->
     <div class="bg-blue-600 text-white relative">
       <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-        <h1 class="text-lg md:text-xl font-bold">${headerTitle}</h1>
+        <h1 class="text-lg md:text-xl font-bold"><a href="index.html">${headerTitle}</a></h1>
         <div class="flex items-center gap-3">
           <a href='contact.html' class="bg-red-500 text-white font-semibold px-4 py-2 rounded shadow hover:bg-red-600 transition duration-150">
             連絡先
