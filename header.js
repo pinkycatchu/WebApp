@@ -49,7 +49,7 @@ window.appPassword = localStorage.getItem('app_password') || '';
       <div class="container mx-auto px-4 py-3 flex justify-between items-center">
         <h1 class="text-lg md:text-xl font-bold">${headerTitle}</h1>
         <div class="flex items-center gap-3">
-          <a href='contact.html' class="hidden sm:block bg-red-500 text-white font-semibold px-4 py-2 rounded shadow hover:bg-red-600 transition duration-150">
+          <a href='contact.html' class="bg-red-500 text-white font-semibold px-4 py-2 rounded shadow hover:bg-red-600 transition duration-150">
             連絡先
           </a>
           <a href=${currentPage === 'index.html' ? 'form.html' : 'index.html'} class="hidden sm:block bg-white text-blue-600 font-semibold px-4 py-2 rounded shadow hover:bg-blue-50 transition duration-150">
