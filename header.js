@@ -45,7 +45,7 @@ window.appPassword = localStorage.getItem('app_password') || '';
     </div>
     
     <!-- ▼ 2. 前面に重ねるタイトルバー＆メニューエリア ▼ -->
-    <div class="relative z-20 h-32 md:h-60 flex flex-col">
+    <div class="relative z-20 h-40 md:h-60 flex flex-col">
       
       <!-- タイトルバー (背景を透明にして文字に影をつける) -->
       <div class="w-full text-white pt-2">
