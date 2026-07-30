@@ -14,26 +14,23 @@
 
   <main class="container mx-auto px-4 max-w-4xl">
     
-    <!-- 上部：写真撮影・アップロード機能 -->
-    <section class="bg-white p-6 rounded-lg shadow-md mb-8">
-      <h2 class="text-xl font-bold text-gray-700 mb-4 border-b-2 border-blue-500 pb-2">写真を撮影する</h2>
+    <!-- 上部：写真撮影・自動アップロード機能 -->
+    <section class="bg-white p-6 rounded-lg shadow-md mb-8 text-center relative overflow-hidden">
+      <h2 class="text-xl font-bold text-gray-700 mb-4 border-b-2 border-blue-500 pb-2 text-left">📸 写真を撮影して自動保存</h2>
       
-      <div class="flex flex-col gap-4">
-        <!-- ファイル選択 / カメラ起動 -->
-        <input type="file" id="photo-input" accept="image/*" capture="environment" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
-        
-        <!-- プレビュー表示 -->
-        <div id="preview-container" class="hidden">
-          <img id="photo-preview" class="max-w-full h-auto rounded border border-gray-300 max-h-64 object-contain">
-          
-          <div class="mt-4 flex flex-col sm:flex-row gap-2">
-            <input type="text" id="photo-name" placeholder="ファイル名 (例: CLT-01_暴露前)" class="border rounded p-2.5 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <button id="btn-upload" onclick="uploadPhoto()" class="bg-blue-600 text-white font-bold py-2.5 px-6 rounded hover:bg-blue-700 flex items-center justify-center gap-2 transition">
-              <span>アップロード</span>
-            </button>
-          </div>
-        </div>
+      <!-- アップロード中のローディング画面 -->
+      <div id="upload-overlay" class="hidden absolute inset-0 bg-white bg-opacity-90 flex flex-col justify-center items-center z-10 rounded-lg">
+        <div class="animate-spin inline-block w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full mb-2"></div>
+        <p class="text-blue-700 font-bold text-sm">クラウドに自動保存中...</p>
       </div>
+
+      <!-- カメラ起動ボタン（全体をタップ可能に） -->
+      <label class="block w-full cursor-pointer bg-blue-50 hover:bg-blue-100 border-2 border-dashed border-blue-400 rounded-lg p-10 transition duration-150 shadow-inner">
+        <span class="text-5xl mb-3 block">📷</span>
+        <span class="text-blue-700 font-bold block text-lg">ここをタップして撮影</span>
+        <span class="text-xs text-gray-500 mt-2 block">※撮影後すぐに保存されます</span>
+        <input type="file" id="photo-input" accept="image/*" capture="environment" class="hidden">
+      </label>
     </section>
 
     <!-- 下部：ギャラリー（一覧表示） -->
@@ -88,87 +85,63 @@
       loadGallery();
     });
 
-    // 1. 画像のリサイズと圧縮処理（GASへ送るため必須）
+    // 1. 画像のリサイズ・圧縮 ＆ そのまま自動アップロード
     function handleFileSelect(event) {
       const file = event.target.files[0];
       if (!file) return;
+
+      // 送信中の画面を表示
+      document.getElementById('upload-overlay').classList.remove('hidden');
 
       const reader = new FileReader();
       reader.onload = function(e) {
         const img = new Image();
         img.onload = function() {
-          // 最大サイズを1200pxに制限
-          const MAX_WIDTH = 1200;
-          const MAX_HEIGHT = 1200;
-          let width = img.width;
-          let height = img.height;
+          const MAX_WIDTH = 1200, MAX_HEIGHT = 1200;
+          let width = img.width, height = img.height;
 
-          if (width > height && width > MAX_WIDTH) {
-            height *= MAX_WIDTH / width;
-            width = MAX_WIDTH;
-          } else if (height > MAX_HEIGHT) {
-            width *= MAX_HEIGHT / height;
-            height = MAX_HEIGHT;
-          }
+          if (width > height && width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } 
+          else if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
 
           const canvas = document.createElement('canvas');
-          canvas.width = width;
-          canvas.height = height;
+          canvas.width = width; canvas.height = height;
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
 
-          // 画質を落として軽量化 (0.7 = 70%の画質)
-          compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
-
-          // プレビューの表示
-          document.getElementById('photo-preview').src = compressedBase64;
-          document.getElementById('preview-container').classList.remove('hidden');
+          // 画像を圧縮 (0.7)
+          const base64Data = canvas.toDataURL('image/jpeg', 0.7);
           
-          // 自動でファイル名の候補を入れる
-          const dateStr = new Date().toLocaleDateString('ja-JP').replace(/\//g, '');
-          document.getElementById('photo-name').value = `Photo_${dateStr}`;
+          // ファイル名を撮影時刻から自動生成 (例: Photo_20260730_153045.jpg)
+          const d = new Date();
+          const dateStr = d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0') + "_" + String(d.getHours()).padStart(2,'0') + String(d.getMinutes()).padStart(2,'0') + String(d.getSeconds()).padStart(2,'0');
+          const filename = `Photo_${dateStr}.jpg`;
+
+          // そのまま送信処理へ
+          uploadPhotoAuto(filename, base64Data);
         }
         img.src = e.target.result;
       }
       reader.readAsDataURL(file);
     }
 
-    // 2. GASへのアップロード処理
-    async function uploadPhoto() {
-      const filename = document.getElementById('photo-name').value || "無題の写真";
-      if (!compressedBase64) {
-        alert("写真が選択されていません。");
-        return;
-      }
-
-      const btn = document.getElementById('btn-upload');
-      const originalText = btn.innerHTML;
-      btn.disabled = true;
-      btn.innerHTML = `<span class="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></span>送信中...`;
-
+    // 2. GASへの自動アップロード処理
+    async function uploadPhotoAuto(filename, base64Data) {
       const payload = {
         action: "upload_photo",
         password: window.appPassword,
-        filename: filename + ".jpg",
-        base64Data: compressedBase64,
+        filename: filename,
+        base64Data: base64Data,
         contentType: "image/jpeg"
       };
 
       try {
         const response = await fetch(GAS_API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify(payload)
+          method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(payload)
         });
         const result = await response.json();
 
         if (result.status === "success") {
-          alert("✅ 写真をアップロードしました！");
-          // 入力欄のリセット
-          document.getElementById('photo-input').value = "";
-          document.getElementById('preview-container').classList.add('hidden');
-          compressedBase64 = "";
-          // ギャラリーを最新化
+          // 保存成功したらギャラリーを自動更新
           loadGallery();
         } else if (result.status === "auth_error") {
           window.logout();
@@ -178,11 +151,12 @@
       } catch (error) {
         alert("通信エラーが発生しました。");
       } finally {
-        btn.disabled = false;
-        btn.innerHTML = originalText;
+        // 送信中の画面を消し、連続撮影できるようにリセット
+        document.getElementById('upload-overlay').classList.add('hidden');
+        document.getElementById('photo-input').value = "";
       }
     }
-
+    
     // 3. ギャラリーの読み込み処理（GASからファイルリストを取得）
     async function loadGallery() {
       document.getElementById('gallery-loading').classList.remove('hidden');

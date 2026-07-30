@@ -1,3 +1,6 @@
+// ★ ご自身のGASウェブアプリURLを貼り付けてください ★
+window.GAS_API_URL_GLOBAL = "https://script.google.com/macros/s/AKfycbwYhNRKqGiB4aZslbkChTbivspwoe7yUk0w8ikYX_dyG7dC2m6kBKrkyTFg6duDy_vAFg/exec";
+
 // 全ページで共通して使えるパスワード変数
 window.appPassword = localStorage.getItem('app_password') || '';
 
@@ -10,7 +13,8 @@ window.appPassword = localStorage.getItem('app_password') || '';
     'form.html': '測定・移動 データ入力',
     'photo.html': 'ギャラリー',
     'calendar.html': '試験予定カレンダー',
-    'materials.html': '修論・参考資料'
+    'materials.html': '修論・参考資料',
+    'howtouse.html': '使い方・注意点',
   };
   
   // 現在のページに一致するタイトルを取得（なければデフォルト名）
@@ -29,18 +33,30 @@ window.appPassword = localStorage.getItem('app_password') || '';
 
   // 2. 共通ヘッダーのHTML
   const headerHtml = `
-  <header class="bg-blue-600 text-white shadow-md relative z-40 mb-6">
-    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-      <h1 class="text-lg md:text-xl font-bold">${headerTitle}</h1>
-      <div class="flex items-center gap-3">
-        <a href=${currentPage === 'index.html' ? 'form.html' : 'index.html'} class="hidden sm:block bg-white text-blue-600 font-semibold px-4 py-2 rounded shadow hover:bg-blue-50 transition duration-150">
+  <header class="shadow-md relative z-40 mb-6 bg-white">
+    
+    <!-- ▼ 修正：フェード対応のスライドショーエリア ▼ -->
+    <div id="header-slideshow" class="w-full h-32 md:h-48 bg-gray-800 relative overflow-hidden">
+      <!-- 2つの画像レイヤーを重ねて透明度を交互に切り替える -->
+      <div id="slide-bg-1" class="absolute inset-0 bg-cover bg-center transition-opacity duration-2000 ease-in-out opacity-100"></div>
+      <div id="slide-bg-2" class="absolute inset-0 bg-cover bg-center transition-opacity duration-2000 ease-in-out opacity-0"></div>
+      <div class="absolute inset-0 bg-black bg-opacity-40 z-10"></div> <!-- 写真を少し暗くして落ち着かせる -->
+    </div>
+
+    <!-- 従来の青いタイトルバー -->
+    <div class="bg-blue-600 text-white relative">
+      <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+        <h1 class="text-lg md:text-xl font-bold">${headerTitle}</h1>
+        <div class="flex items-center gap-3">
+          <a href=${currentPage === 'index.html' ? 'form.html' : 'index.html'} class="hidden sm:block bg-white text-blue-600 font-semibold px-4 py-2 rounded shadow hover:bg-blue-50 transition duration-150">
             ${currentPage === 'index.html' ? '＋入力へ' : 'HOME'}
-        </a>
-        <button onclick="toggleGlobalMenu()" class="text-white hover:bg-blue-700 p-2 rounded focus:outline-none transition duration-150">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-          </svg>
-        </button>
+          </a>
+          <button onclick="toggleGlobalMenu()" class="text-white hover:bg-blue-700 p-2 rounded focus:outline-none transition duration-150">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -56,14 +72,68 @@ window.appPassword = localStorage.getItem('app_password') || '';
 
       <a href="materials.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm ${currentPage === 'materials.html' ? 'bg-blue-50 text-blue-700 font-bold' : ''}">資料ページ</a>
 
+      <a href="howtouse.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm ${currentPage === 'howtouse.html' ? 'bg-blue-50 text-blue-700 font-bold' : ''}">使い方・注意点</a>
+
       <button onclick="logout()" class="w-full text-left block px-4 py-3 hover:bg-red-50 text-red-600 text-sm font-medium">ログアウト</button>
     </div>
   </header>
   `;
 
-// bodyの先頭にログイン画面とヘッダーを挿入
+  // bodyの先頭にログイン画面とヘッダーを挿入
   document.body.insertAdjacentHTML('afterbegin', loginHtml + headerHtml);
+
+  // パスワードがあればスライドショーを開始
+  if (window.appPassword && window.GAS_API_URL_GLOBAL) {
+    startSlideshow();
+  }
 })();
+
+// 3. スライドショー機能のロジック（クロスフェード対応）
+async function startSlideshow() {
+  try {
+    const res = await fetch(`${window.GAS_API_URL_GLOBAL}?password=${encodeURIComponent(window.appPassword)}&action=get_photos`);
+    const json = await res.json();
+    
+    if (json.status === "success" && json.data.length > 0) {
+      const photos = json.data;
+      let currentIndex = 0;
+      let activeLayer = 1;
+      const layer1 = document.getElementById('slide-bg-1');
+      const layer2 = document.getElementById('slide-bg-2');
+      
+      // 初回の画像をレイヤー1にセット
+      const firstUrl = `https://drive.google.com/thumbnail?id=${photos[0].id}&sz=w1000`;
+      layer1.style.backgroundImage = `url('${firstUrl}')`;
+      
+      // 写真が1枚しかない場合は切り替え処理を行わない
+      if (photos.length <= 1) return;
+
+      // 画像を交互にフェードイン・フェードアウトさせる関数
+      function updateImage() {
+        currentIndex = (currentIndex + 1) % photos.length;
+        const nextUrl = `https://drive.google.com/thumbnail?id=${photos[currentIndex].id}&sz=w1000`;
+        
+        if (activeLayer === 1) {
+          // レイヤー2に次の画像をセットして表示、レイヤー1を隠す
+          layer2.style.backgroundImage = `url('${nextUrl}')`;
+          layer2.classList.replace('opacity-0', 'opacity-100');
+          layer1.classList.replace('opacity-100', 'opacity-0');
+          activeLayer = 2;
+        } else {
+          // レイヤー1に次の画像をセットして表示、レイヤー2を隠す
+          layer1.style.backgroundImage = `url('${nextUrl}')`;
+          layer1.classList.replace('opacity-0', 'opacity-100');
+          layer2.classList.replace('opacity-100', 'opacity-0');
+          activeLayer = 1;
+        }
+      }
+      
+      setInterval(updateImage, 10000); // 5秒ごとに切り替え
+    }
+  } catch (e) {
+    console.error("スライドショーの読み込みをスキップしました", e);
+  }
+}
 
 // 共通ログイン関数（入力後にページを再読み込みしてデータを取得する）
 window.globalLogin = function() {
