@@ -32,13 +32,13 @@
         <label class="block text-sm font-bold text-gray-700 mb-2">試験体IDの入力方法</label>
         <div class="flex gap-4 mb-3">
           <label class="inline-flex items-center cursor-pointer">
-            <input type="radio" name="input-method" value="select" checked onchange="toggleInputMethod()" class="form-radio text-blue-600">
-            <span class="ml-2 text-sm">プルダウンで選択</span>
-          </label>
-          <label class="inline-flex items-center cursor-pointer">
-            <input type="radio" name="input-method" value="barcode" onchange="toggleInputMethod()" class="form-radio text-blue-600">
+            <input type="radio" name="input-method" value="barcode" checked onchange="toggleInputMethod()" class="form-radio text-blue-600">
             <span class="ml-2 text-sm">QRコード読み取り</span>
           </label>
+          <label class="inline-flex items-center cursor-pointer">
+            <input type="radio" name="input-method" value="select" onchange="toggleInputMethod()" class="form-radio text-blue-600">
+            <span class="ml-2 text-sm">プルダウンで選択</span>
+          </label>        
         </div>
 
         <div id="area-select">
