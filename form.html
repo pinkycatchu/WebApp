@@ -50,9 +50,6 @@
         <div id="area-barcode" class="hidden">
           <div id="reader" class="w-full bg-black rounded overflow-hidden mb-2"></div>
           <p id="barcode-result" class="text-sm font-bold text-green-600 my-1 hidden"></p>
-          <button type="button" id="btn-camera-toggle" onclick="toggleCamera()" class="w-full bg-gray-700 text-white py-1.5 rounded text-sm hover:bg-gray-800">
-            カメラを起動する
-          </button>
         </div>
       </div>
 
@@ -216,54 +213,47 @@
       } else {
         areaSelect.classList.add('hidden');
         areaBarcode.classList.remove('hidden');
-      }
-    }
-
-    async function toggleCamera() {
-      const btn = document.getElementById('btn-camera-toggle');
-      
-      if (isCameraRunning) {
-        await stopCamera();
-      } else {
-        btn.textContent = "起動中...";
-        html5QrCode = new Html5Qrcode("reader");
-        try {
-          await html5QrCode.start(
-            { facingMode: "environment" },
-            { fps: 10, qrbox: { width: 250, height: 150 } },
-            (decodedText) => {
-              scannedSpecimenId = decodedText.trim();
-              const resultEl = document.getElementById('barcode-result');
-              resultEl.textContent = `読み取り成功: ${scannedSpecimenId}`;
-              resultEl.classList.remove('hidden');
-              
-              const select = document.getElementById('specimen-select');
-              select.value = scannedSpecimenId;
-              
-              stopCamera();
-            }
-          );
-          isCameraRunning = true;
-          btn.textContent = "カメラを停止する";
-          btn.className = "w-full bg-red-600 text-white py-1.5 rounded text-sm hover:bg-red-700";
-        } catch (err) {
-          alert("カメラの起動に失敗しました。ブラウザのカメラ許可設定をご確認ください。");
-          btn.textContent = "カメラを起動する";
+        // QRモードが選ばれたら自動的にカメラを起動する
+        if (!isCameraRunning) {
+          startCamera();
         }
       }
     }
 
+    // ※ toggleCamera関数をstartCamera関数に変更し、ボタン関係の処理を削除
+    async function startCamera() {
+      html5QrCode = new Html5Qrcode("reader");
+      try {
+        await html5QrCode.start(
+          { facingMode: "environment" },
+          { fps: 10, qrbox: { width: 250, height: 150 } },
+          (decodedText) => {
+            scannedSpecimenId = decodedText.trim();
+            const resultEl = document.getElementById('barcode-result');
+            resultEl.textContent = `読み取り成功: ${scannedSpecimenId}`;
+            resultEl.classList.remove('hidden');
+            
+            const select = document.getElementById('specimen-select');
+            select.value = scannedSpecimenId;
+            
+            stopCamera();
+          }
+        );
+        isCameraRunning = true;
+      } catch (err) {
+        alert("カメラの起動に失敗しました。ブラウザのカメラ許可設定をご確認ください。");
+      }
+    }
+
+    // ボタンの文字を戻す処理を削除
     async function stopCamera() {
       if (html5QrCode && isCameraRunning) {
         await html5QrCode.stop();
         html5QrCode.clear();
         isCameraRunning = false;
-        const btn = document.getElementById('btn-camera-toggle');
-        btn.textContent = "カメラを起動する";
-        btn.className = "w-full bg-gray-700 text-white py-1.5 rounded text-sm hover:bg-gray-800";
       }
     }
-
+    
     async function submitData() {
       const method = document.querySelector('input[name="input-method"]:checked').value;
       let targetId = "";
