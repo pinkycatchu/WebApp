@@ -102,57 +102,52 @@ window.appPassword = localStorage.getItem('app_password') || '';
   }
 })();
 
-// 3. スライドショー機能のロジック（クロスフェード＆タイトル対応）
+// 3. スライドショー機能のロジック（ランダム表示＆クロスフェード対応）
 async function startSlideshow() {
   try {
     const res = await fetch(`${window.GAS_API_URL_GLOBAL}?password=${encodeURIComponent(window.appPassword)}&action=get_photos`);
     const json = await res.json();
     
     if (json.status === "success" && json.data.length > 0) {
-      const photos = json.data;
+      let photos = json.data;
+      
+      // 配列をランダムにシャッフルする処理
+      for (let i = photos.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [photos[i], photos[j]] = [photos[j], photos[i]];
+      }
+
       let currentIndex = 0;
       let activeLayer = 1;
       
       const layer1 = document.getElementById('slide-bg-1');
       const layer2 = document.getElementById('slide-bg-2');
-      // ★追加：テキストの要素を取得
-      const text1 = document.getElementById('slide-text-1');
-      const text2 = document.getElementById('slide-text-2');
       
-      // 初回の画像とタイトルをレイヤー1にセット
+      // 初回の画像をレイヤー1にセット
       const firstUrl = `https://drive.google.com/thumbnail?id=${photos[0].id}&sz=w1000`;
       layer1.style.backgroundImage = `url('${firstUrl}')`;
-      text1.textContent = photos[0].name; // タイトルをセット
       
       if (photos.length <= 1) return;
 
-      // 画像とタイトルを交互にフェードさせる関数
+      // 画像を交互にフェードさせる関数
       function updateImage() {
         currentIndex = (currentIndex + 1) % photos.length;
-        const nextPhoto = photos[currentIndex]; // 次の写真データ
+        const nextPhoto = photos[currentIndex]; 
         const nextUrl = `https://drive.google.com/thumbnail?id=${nextPhoto.id}&sz=w1000`;
         
         if (activeLayer === 1) {
-          // レイヤー2に次の画像とタイトルをセットして表示
+          // レイヤー2に次の画像をセットして表示
           layer2.style.backgroundImage = `url('${nextUrl}')`;
-          text2.textContent = nextPhoto.name;
           
           layer2.classList.replace('opacity-0', 'opacity-100');
-          text2.classList.replace('opacity-0', 'opacity-100');
-          
           layer1.classList.replace('opacity-100', 'opacity-0');
-          text1.classList.replace('opacity-100', 'opacity-0');
           activeLayer = 2;
         } else {
-          // レイヤー1に次の画像とタイトルをセットして表示
+          // レイヤー1に次の画像をセットして表示
           layer1.style.backgroundImage = `url('${nextUrl}')`;
-          text1.textContent = nextPhoto.name;
           
           layer1.classList.replace('opacity-0', 'opacity-100');
-          text1.classList.replace('opacity-0', 'opacity-100');
-          
           layer2.classList.replace('opacity-100', 'opacity-0');
-          text2.classList.replace('opacity-100', 'opacity-0');
           activeLayer = 1;
         }
       }

@@ -330,6 +330,14 @@
             
             // 状態が変更された可能性があるのでリストを再読み込み
             loadSpecimenList();
+
+            // 入力方法がQRコードモードのままであれば、カメラを再起動する
+            const currentMethod = document.querySelector('input[name="input-method"]:checked').value;
+            if (currentMethod === 'barcode') {
+              if (!isCameraRunning) {
+                startCamera();
+              }
+            }
             
           } else {
             // 従来通りダッシュボードへ戻る
