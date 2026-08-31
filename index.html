@@ -13,6 +13,34 @@
   <script src="header.js"></script>
 
   <main class="container mx-auto px-4 py-6">
+
+    <!-- ようこそ・概要セクション -->
+    <div class="mb-6">
+      <p class="text-[11px] tracking-[0.25em] text-amber-700 font-semibold mb-1">SPECIMEN TRACKING SYSTEM</p>
+      <h2 class="text-2xl md:text-3xl font-bold text-stone-900 mb-1">試験体一覧ダッシュボード</h2>
+      <p class="text-stone-500 text-sm">屋外暴露試験・促進耐候性試験の進捗をひと目で確認できます。</p>
+    </div>
+
+    <!-- 概要統計カード -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div class="bg-white rounded-xl border border-stone-200 shadow-sm p-4">
+        <p class="text-xs text-stone-500 mb-1">総試験体数</p>
+        <p id="stat-total" class="text-3xl font-bold text-stone-900">–</p>
+      </div>
+      <div class="bg-white rounded-xl border border-stone-200 shadow-sm p-4">
+        <p class="text-xs text-stone-500 mb-1">暴露期間中</p>
+        <p id="stat-active" class="text-3xl font-bold text-emerald-700">–</p>
+      </div>
+      <div class="bg-white rounded-xl border border-stone-200 shadow-sm p-4">
+        <p class="text-xs text-stone-500 mb-1">暴露終了</p>
+        <p id="stat-done" class="text-3xl font-bold text-slate-700">–</p>
+      </div>
+      <div class="bg-white rounded-xl border border-stone-200 shadow-sm p-4">
+        <p class="text-xs text-stone-500 mb-1">要確認</p>
+        <p id="stat-alert" class="text-3xl font-bold text-red-600">–</p>
+      </div>
+    </div>
+
     <div id="alert-container" class="mb-6 hidden"></div>
 
     <!-- 高機能コントロールバー（検索・各種フィルタ・更新） -->
@@ -136,6 +164,7 @@
         if (result.status === "success") {
           allSpecimens = result.data;
           renderTable();
+          updateStats();
           checkAlerts();
         } else if (result.status === "auth_error") {
           alert("パスワードが間違っています。再度ログインしてください。");
@@ -217,6 +246,12 @@
       });
     }
 
+    function updateStats() {
+      document.getElementById('stat-total').textContent = allSpecimens.length;
+      document.getElementById('stat-active').textContent = allSpecimens.filter(item => item.status === "暴露期間中").length;
+      document.getElementById('stat-done').textContent = allSpecimens.filter(item => item.status === "暴露終了").length;
+    }
+
     function exportCSV() {
       if (currentFilteredSpecimens.length === 0) {
         alert("出力するデータがありません。");
@@ -282,6 +317,8 @@
           alerts.push(`【測定日当日】試験体 <b>${item.specimen_id}</b> の重量測定日です。`);
         }
       });
+
+      document.getElementById('stat-alert').textContent = alerts.length;
 
       if (alerts.length > 0) {
         alertContainer.innerHTML = `

@@ -36,7 +36,7 @@ window.appPassword = localStorage.getItem('app_password') || '';
 
   // 2. 共通ヘッダーのHTML
   const headerHtml = `
-  <header class="shadow-md relative z-40 mb-6 bg-slate-900 overflow-hidden">
+  <header class="shadow-md relative z-40 mb-6 bg-slate-900">
 
     <!-- ▼ 1. 背面に敷くスライドショーエリア（絶対配置でヘッダー全体を覆う） ▼ -->
     <div id="header-slideshow" class="absolute inset-0 w-full h-full bg-slate-900 overflow-hidden z-0">
@@ -99,6 +99,34 @@ window.appPassword = localStorage.getItem('app_password') || '';
   </header>
   `;
 
+  // 3. 共通フッターのHTML
+  const footerHtml = `
+  <footer class="mt-16 border-t border-stone-200 bg-white">
+    <div class="container mx-auto px-4 py-10 flex flex-col md:flex-row justify-between gap-8">
+      <div class="flex items-start gap-3">
+        <img src="images/labologo.png" alt="研究室ロゴ" class="w-10 h-10 rounded shrink-0">
+        <div>
+          <p class="text-[10px] tracking-[0.2em] text-amber-700 font-semibold mb-1">WOOD MATERIALS LAB</p>
+          <p class="font-bold text-stone-800 text-sm leading-snug">東京大学大学院 農学生命科学研究科</p>
+          <p class="text-stone-500 text-sm leading-snug">木質材料学研究室 — 暴露試験体管理システム</p>
+        </div>
+      </div>
+      <nav class="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-2 text-sm text-stone-600">
+        <a href="index.html" class="hover:text-amber-700 transition">HOME</a>
+        <a href="form.html" class="hover:text-amber-700 transition">測定・移動入力</a>
+        <a href="photo.html" class="hover:text-amber-700 transition">ギャラリー</a>
+        <a href="calendar.html" class="hover:text-amber-700 transition">カレンダー</a>
+        <a href="materials.html" class="hover:text-amber-700 transition">資料ページ</a>
+        <a href="howtouse.html" class="hover:text-amber-700 transition">使い方マニュアル</a>
+        <a href="contact.html" class="hover:text-amber-700 transition">お問い合わせ</a>
+      </nav>
+    </div>
+    <div class="border-t border-stone-100 py-4 text-center text-xs text-stone-400">
+      &copy; ${new Date().getFullYear()} Wood Materials Lab, The University of Tokyo
+    </div>
+  </footer>
+  `;
+
   // bodyの先頭にログイン画面とヘッダーを挿入
   document.body.insertAdjacentHTML('afterbegin', loginHtml + headerHtml);
 
@@ -106,6 +134,11 @@ window.appPassword = localStorage.getItem('app_password') || '';
   if (window.appPassword && window.GAS_API_URL_GLOBAL) {
     startSlideshow();
   }
+
+  // ページ本文の描画が終わってからフッターを末尾に追加
+  document.addEventListener('DOMContentLoaded', () => {
+    document.body.insertAdjacentHTML('beforeend', footerHtml);
+  });
 })();
 
 // 3. スライドショー機能のロジック（ランダム表示＆クロスフェード対応）
