@@ -1,15 +1,147 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>使い方 - 試験体管理</title>
-  <link rel="icon" href="images/labologo.ico">
+  <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon-180x180.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="bg-stone-50 text-stone-800 min-h-screen">
     <script src="header.js"></script>
   <main class="container mx-auto px-4 py-6">
+    <section class="mb-8">
+      <div class="bg-white p-5 rounded-lg shadow-sm">
+        <p class="mb-4 leading-relaxed">このページでは、試験体管理システムの使い方について説明します。不明点はお問い合わせページからご連絡ください。</p>
+        <ul class="list-disc list-inside space-y-2">
+          <li><a href="#flow" class="text-blue-600 hover:underline">測定の流れ</a></li>
+          <li><a href="#formpage" class="text-blue-600 hover:underline">試験体を測定・移動する時</a></li>
+          <li><a href="#gallery" class="text-blue-600 hover:underline">写真を記録したい時</a></li>
+          <li><a href="#calendar" class="text-blue-600 hover:underline">測定日・回収日の確認方法</a></li>
+          <li><a href="#materials" class="text-blue-600 hover:underline">参考資料を見たい時</a></li>
+        </ul>
+      </div>
+
+      <h2 id="flow" class="text-2xl font-bold border-l-4 border-blue-500 mt-4 mb-4 bg-blue-50 p-3 pl-4">測定の流れ</h2>
+      <div class="relative ml-2 md:ml-4">
+        <div class="absolute left-4 top-2 bottom-2 w-0.5 bg-blue-300"></div>
+
+        <div class="relative mb-5 pl-12">
+          <div class="absolute left-0 top-1 flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white shadow">1</div>
+          <div class="rounded-lg border border-blue-200 bg-white p-4 shadow-sm">
+            <div class="flex flex-col gap-3 md:flex-row md:items-center">
+              <h3 class="font-bold text-gray-800 md:flex-1">7号館116室の鍵と重量計を持って7号館へ向かう</h3>
+              <div class="flex gap-3 flex-wrap">
+                <img src="images/especKey.jpg" alt="7号館116室の鍵の写真" class="h-24 w-24 rounded-full object-cover md:h-28 md:w-28">
+                <img src="images/weighingMachine.jpg" alt="重量計の写真" class="h-24 w-24 rounded-full object-cover md:h-28 md:w-28">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="relative mb-5 pl-12">
+          <div class="absolute left-0 top-1 flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white shadow">2</div>
+          <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+            <div class="flex flex-col gap-3 md:flex-row md:items-center">
+              <h3 class="font-bold text-gray-800 md:flex-1">
+                7号館116室の恒温恒湿チャンバーに入り、試験体を外に取り出して重量を測定する<br>
+                <strong class="text-red-500 inline-block mt-4">
+                  注意点: チャンバー内に入る時は、サンダルに履き替えてください。<br>
+                  また、室内灯と換気のスイッチを入れてから入ってください。</strong> 
+              </h3>
+              <div class="flex gap-3 flex-wrap">
+                <img src="images/espec.jpg" alt="恒温恒湿チャンバーの写真" class="h-24 w-24 rounded-full object-cover md:h-28 md:w-28">
+                <img src="images/especSandal.jpg" alt="サンダルの写真" class="h-24 w-24 rounded-full object-cover md:h-28 md:w-28">
+                <img src="images/especLightButton.jpg" alt="恒温恒湿チャンバーの室内灯のスイッチの写真" class="h-24 w-24 rounded-full object-cover md:h-28 md:w-28">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="relative mb-5 pl-12">
+          <div class="absolute left-0 top-1 flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white shadow">3</div>
+          <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+            <div class="flex flex-col gap-3 md:flex-row md:items-center">
+              <h3 class="font-bold text-gray-800 md:flex-1">
+                試験体の重量を測定する際は、<a href="form.html" class="text-blue-600 hover:underline">試験体重量入力フォーム</a>から試験体IDをQRコード読み取りで入力し、測定値を記録する
+              </h3>
+              <div class="flex gap-3 flex-wrap">
+                <img src="images/formPage.png" alt="試験体重量入力フォームの写真" class="h-24 w-24 rounded-full object-cover md:h-28 md:w-28">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="relative mb-5 pl-12">
+          <div class="absolute left-0 top-1 flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white shadow">4</div>
+          <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+            <div class="flex flex-col gap-3 md:flex-row md:items-center">
+              <h3 class="font-bold text-gray-800 md:flex-1">
+                I-REF棟に移動し、機器分析室の中にある恒温室に入り、試験体の重量を同様に測定する
+              </h3>
+              <div class="flex gap-3 flex-wrap">
+                <img src="images/iREF.jpg" alt="I-REF棟の写真" class="h-24 w-24 rounded-full object-cover md:h-28 md:w-28">
+                <img src="images/iREFRoom.jpg" alt="恒温室の写真" class="h-24 w-24 rounded-full object-cover md:h-28 md:w-28">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="relative pl-12">
+          <div class="absolute left-0 top-1 flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white shadow">5</div>
+          <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+            <div class="flex flex-col gap-3 md:flex-row md:items-center">
+              <h3 class="font-bold text-gray-800 md:flex-1">
+                余裕があれば、5号館屋上の試験体を観察し、何か変化があれば「備考・メモ」に記録する
+              </h3>
+              <div class="flex gap-3 flex-wrap">
+                <img src="images/exposurTest.jpg" alt="5号館屋上の試験体の写真" class="h-24 w-24 rounded-full object-cover md:h-28 md:w-28">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h2 id="usage" class="text-2xl font-bold border-l-4 border-blue-500 mt-4 mb-4 bg-blue-50 p-3 pl-4">使い方</h2>
+      <div id="formpage" class="mt-6">
+        <h3 class="text-xl font-bold text-gray-700 mb-4 border-b-2 border-blue-500 pb-2">試験体を測定・移動する時</h3>
+        <p class="mb-4 leading-relaxed">
+          試験体を登録するには、<a href="form.html" class="text-blue-600 hover:underline">データ入力ページ</a>にアクセスし、必要な情報を入力してください。<br>
+          測定や移動の際には、試験体のIDを入力して、測定値や移動先を記録することができます。<br>
+          試験体IDは、プルダウンメニューから選択する方法と、試験体のQRコードをスキャンして自動入力する方法 (<strong>オススメ！</strong>) があります。<br>
+          QRコードをスキャンするには、スマートフォンのカメラアプリやQRコードリーダーアプリを使用してください。<br>
+          QRコードをスキャンすると、試験体IDが自動的に入力されます。<br>
+          試験体の重量測定値や移動先を入力した後、送信ボタンをクリックしてください。<br>
+          「連続で入力する」にチェックを入れると、送信後にフォームがリセットされ、続けて次の試験体の入力が可能になります。
+        </p>
+        <p class="mb-4 leading-relaxed">
+          <strong>注意点:</strong> 測定値や移動先を入力する際には、正確な情報を入力してください。誤った情報を入力すると、試験体の管理に影響を与える可能性があります。
+        </p>
+      </div>
+      <div id="gallery" class="mt-6">
+        <h3 class="text-xl font-bold text-gray-700 mb-4 border-b-2 border-blue-500 pb-2">写真を記録したい時</h3>
+        <p class="mb-4 leading-relaxed">
+          試験体の写真を記録するには、<a href="photo.html" class="text-blue-600 hover:underline">ギャラリーページ</a>にアクセスしてください。<br>
+          ギャラリーページでは、試験体の写真をアップロードしたり、既存の写真を閲覧することができます。<br>
+          写真をアップロードする際には、アクセス権限が求められる場合がありますので、必要に応じてログインしてください。<br>
+          何か気づいた点があれば、積極的に写真を記録してください。撮った写真はヘッダーに表示されるので、自由に写真を撮ってくださいね！
+        </p>
+      </div>
+      <div id="calendar" class="mt-6">
+        <h3 class="text-xl font-bold text-gray-700 mb-4 border-b-2 border-blue-500 pb-2">測定日・回収日の確認方法</h3>
+        <p class="mb-4 leading-relaxed">
+          試験予定を確認するには、<a href="calendar.html" class="text-blue-600 hover:underline">カレンダーページ</a>にアクセスしてください。<br>
+          カレンダーページでは、試験体の測定日や回収日を確認することができます。<br>
+          次回測定日は青色で、回収日は赤色で表示されます。<br>
+          カレンダー上で日付をクリックすると、詳細な情報が表示されます。
+        </p>
+      </div>
+      <div id="materials" class="mt-6">
+        <h3 class="text-xl font-bold text-gray-700 mb-4 border-b-2 border-blue-500 pb-2">参考資料を見たい時</h3>
+        <p class="mb-4 leading-relaxed">修論や参考資料を確認するには、<a href="materials.html" class="text-blue-600 hover:underline">修論・参考資料ページ</a>にアクセスしてください。</p>
+      </div>
+    </section>
   </main>
 </body>
