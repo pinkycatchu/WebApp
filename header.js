@@ -4,6 +4,30 @@ window.GAS_API_URL_GLOBAL = "https://script.google.com/macros/s/AKfycbwYhNRKqGiB
 // 全ページで共通して使えるパスワード変数
 window.appPassword = localStorage.getItem('app_password') || '';
 
+// 全ページで共通して使う移動先の場所リスト（index.htmlのフィルタとform.htmlの選択肢の両方で使用）
+window.LOCATIONS = ["回収", "I-REF棟恒温室", "5号館恒温室", "7号館恒温恒湿室", "5号館屋上", "森林総合研究所"];
+
+// 日付文字列を YYYY/MM/DD 形式に整形する共通関数
+window.formatDateToYMD = function(dateStr) {
+  if (!dateStr) return '-';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}/${m}/${day}`;
+};
+
+// ログイン必須ページの先頭で呼ぶ共通チェック。未ログインならindex.htmlへ戻す
+window.requireLogin = function() {
+  if (!window.appPassword) {
+    alert("ログインが必要です。");
+    window.location.href = "index.html";
+    return false;
+  }
+  return true;
+};
+
 (function() {
   // 現在のファイル名を取得（アクティブなリンクを判定するため）
   const currentPage = window.location.pathname.split('/').pop() || 'index.html';

@@ -65,23 +65,16 @@
   </main>
 
   <script>
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwYhNRKqGiB4aZslbkChTbivspwoe7yUk0w8ikYX_dyG7dC2m6kBKrkyTFg6duDy_vAFg/exec";
-
     // ==========================================
     // GitHub APIを利用したフォルダツリー自動生成
     // ==========================================
-    
-    const GITHUB_USERNAME = "pinkycatchu"; 
-    const GITHUB_REPO = "WebApp"; 
+
+    const GITHUB_USERNAME = "pinkycatchu";
+    const GITHUB_REPO = "WebApp";
     const TARGET_FOLDER = "References_list";
 
     window.addEventListener('DOMContentLoaded', () => {
-      // パスワードがない場合は index.html へ戻してログインさせる
-      if (!window.appPassword) {
-        alert("ログインが必要です。");
-        window.location.href = "index.html";
-        return;
-      }
+      if (!window.requireLogin()) return;
       const container = document.getElementById('reference-tree-container');
       loadGitHubFolder(TARGET_FOLDER, container);
     });

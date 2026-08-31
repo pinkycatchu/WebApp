@@ -22,12 +22,12 @@ python -m http.server 8000
 
 ## アーキテクチャ
 
-**ページ構成**: `index.html`（ダッシュボード/一覧）、`form.html`（測定・移動の入力）、`photo.html`（ギャラリー＋カメラ撮影）、`calendar.html`（FullCalendar表示）、`materials.html`（参考資料）、`howtouse.html`、`contact.html`。各ページは自己完結しており、マークアップ・ページ固有の`<script>`ロジック・各ページ独自の`GAS_API_URL`定数を持つ（同じURL文字列が全ページに手動で重複している。GASのデプロイURLが変わった場合は、全ページ分＋`header.js`内の`window.GAS_API_URL_GLOBAL`をすべて更新する必要がある）。
+**ページ構成**: `index.html`（ダッシュボード/一覧）、`form.html`（測定・移動の入力）、`photo.html`（ギャラリー＋カメラ撮影）、`calendar.html`（FullCalendar表示）、`materials.html`（参考資料）、`howtouse.html`、`contact.html`。各ページは自己完結しており、マークアップとページ固有の`<script>`ロジックを持つ。`GAS_API_URL`は各ページで`const GAS_API_URL = window.GAS_API_URL_GLOBAL;`として`header.js`の値をそのまま使う共通化がされているので、GASのデプロイURLが変わった場合は`header.js`の`window.GAS_API_URL_GLOBAL`だけを更新すればよい。
 
-**`header.js`** は各ページの`<body>`直後に`<script src="header.js"></script>`として読み込まれ、以下の4つを担う。
+**`header.js`** は各ページの`<body>`直後に`<script src="header.js"></script>`として読み込まれ、以下を担う。
 1. ログインモーダル＋ヘッダーのHTMLを`insertAdjacentHTML('afterbegin', ...)`で同期的に挿入する。これは`<main>`がパースされる前に実行されるため、body先頭で同期的・無条件に実行する必要がある。
 2. `DOMContentLoaded`のリスナーを登録し、共通フッターを`insertAdjacentHTML('beforeend', ...)`で追加する。ページ本体のコンテンツより後に来るようにするための処置。
-3. 各ページが依存する共通のグローバル変数・関数を公開する: `window.appPassword`、`window.globalLogin()`、`window.toggleGlobalMenu()`、`window.logout()`。
+3. 各ページが依存する共通のグローバル変数・関数を公開する: `window.appPassword`、`window.GAS_API_URL_GLOBAL`、`window.LOCATIONS`（移動先の場所一覧。`index.html`のフィルタと`form.html`の選択肢が両方ともここから生成される）、`window.formatDateToYMD()`、`window.requireLogin()`（未ログインならアラート＋`index.html`へリダイレクトし`false`を返す。`index.html`以外のログイン必須ページはDOMContentLoadedの先頭で`if (!window.requireLogin()) return;`を呼ぶ規約）、`window.globalLogin()`、`window.toggleGlobalMenu()`、`window.logout()`。新しい場所や日付整形処理を増やす際はページ側に書かず、ここに足すこと。
 4. ヘッダー内の背景写真スライドショーを制御する（GASの`?action=get_photos`を取得し、2枚の絶対配置レイヤーをクロスフェードさせる）。
 
 **認証モデル**: 個別のユーザーアカウントは存在しない。共有の合言葉1つを`localStorage['app_password']`に保存し、GASへのすべての呼び出しに`?password=...`（GET）または`password`フィールド（POSTボディ）として付与する。パスワードが誤っている場合サーバーは`{status: "auth_error"}`を返し、各ページはこれを受けて`localStorage.removeItem('app_password')`のうえ`index.html`へリダイレクトする、という規約になっている。新しいページ/呼び出しを追加する際も、別の認証フローを考案せずこのパターンに従うこと。
@@ -35,6 +35,14 @@ python -m http.server 8000
 **GASとの契約**（呼び出し箇所から推測。他に文書化なし）: `action`無しのGETは`{status, data: [...]}`を返し、各要素は`specimen_id, material, status, current_location, effective_days, planned_days, next_measurements, expected_end`を持つ。POSTボディは`action`フィールドを持つJSON: `"measurement"`（weight・note）、`"episode"`（移動: new_location・condition・count_exposure・note）、`"upload_photo"`（filename・base64Data・contentType）。GET `?action=get_photos`は`{status, data: [{id, name, date}, ...]}`を返す（Driveのファイルid。`https://drive.google.com/thumbnail?id=...`で表示）。
 
 **`materials.html`**だけはメインコンテンツをGASから取得していない — 実行時にGitHub Contents API経由でこのリポジトリ自身の`References_list/`フォルダを再帰的に辿って一覧表示している（スクリプト冒頭付近の`GITHUB_USERNAME`/`GITHUB_REPO`定数）。そのため参考PDFを追加する際は`References_list/`配下にコミット＆pushするだけでよい。
+
+**index.htmlの一括操作**: 一覧テーブルの各行にチェックボックスがあり、複数選択すると`#bulk-action-bar`が表示される。「一括移動」は新しいGASアクションを追加しているわけではなく、既存の`episode`アクションを選択件数ぶん順番にPOSTしているだけ（`executeBulkMove()`）。バックエンド改修なしで複数件の移動をまとめて行える。
+
+**写真と試験体IDの紐付け**: `photo.html`は撮影前に試験体IDの選択を必須にし（`#photo-specimen`）、アップロード時のファイル名を`${specimenId}_${timestamp}.jpg`にしている（バックエンド側は任意のファイル名を受け付けるので変更不要）。ギャラリー表示側はファイル名の`_`より前を試験体IDとみなしてバッジ表示する（`Photo`始まりの古いファイルには表示しない）。
+
+**通信エラー時の送信待ちキュー**: `form.html`の`submitData()`がネットワークエラーで失敗すると、送信内容を`localStorage['pending_submissions']`に退避し（`queuePendingSubmission()`）、次回のページ読み込み時や`online`イベント発火時に自動で再送信を試みる（`flushPendingQueue()`）。屋外の電波が弱い場所での入力を想定した仕組み。
+
+**GAS本体のソースはこのリポジトリに含まれない**: バックエンドはGoogle Apps Scriptプロジェクト側で管理されており、`git clone`しても見えない。中身を確認・変更する必要がある場合はユーザーに共有してもらうこと。**Apps Scriptのウェブエディタをブラウザ自動操作で直接編集するのは避けること** — 過去に特殊キー名（例:「Page_Down」）がキー入力として認識されず、コード編集領域にリテラル文字列として挿入されてしまい、本番スクリプトを一時的に壊しかけた事故がある（`Ctrl+Z`で復旧済み）。閲覧のみ（`get_page_text`やスクリーンショット）に留め、スクロールはページ内リンクや`PageDown`ではなく安全な手段（クリック＋矢印キーなど動作確認済みの方法）を使うこと。
 
 ## デザインシステム
 

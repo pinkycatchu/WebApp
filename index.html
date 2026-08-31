@@ -65,15 +65,9 @@
           <option value="暴露終了">暴露終了</option>
         </select>
 
-        <!-- 4. 現在地フィルター -->
+        <!-- 4. 現在地フィルター（選択肢はheader.jsのLOCATIONSから生成） -->
         <select id="location-filter" class="border border-stone-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 w-full sm:w-auto bg-white">
           <option value="">-- すべての場所 --</option>
-          <option value="回収">回収</option>
-          <option value="I-REF棟恒温室">I-REF棟恒温室</option>
-          <option value="5号館恒温室">5号館恒温室</option>
-          <option value="7号館恒温恒湿室">7号館恒温恒湿室</option>
-          <option value="5号館屋上">5号館屋上</option>
-          <option value="森林総合研究所">森林総合研究所</option>
         </select>
 
         <!-- 5. 暴露日数フィルター（範囲） -->
@@ -102,10 +96,33 @@
       <p class="mt-2 text-stone-500">データを取得中...</p>
     </div>
 
+    <!-- 選択中の試験体をまとめて移動するバー（1件以上選択で表示） -->
+    <div id="bulk-action-bar" class="hidden bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4 flex flex-col lg:flex-row gap-3 items-start lg:items-center justify-between">
+      <p class="text-sm font-semibold text-amber-800"><span id="bulk-count">0</span>件を選択中</p>
+      <div class="flex flex-wrap gap-2 items-center">
+        <select id="bulk-location" class="border border-stone-300 rounded-lg px-3 py-1.5 text-sm bg-white">
+          <option value="">-- 移動先を選択 --</option>
+        </select>
+        <select id="bulk-condition" class="border border-stone-300 rounded-lg px-3 py-1.5 text-sm bg-white">
+          <option value="暴露期間中">暴露期間中</option>
+          <option value="暴露前">暴露前</option>
+          <option value="保管中">保管中</option>
+          <option value="暴露終了">暴露終了（回収）</option>
+        </select>
+        <select id="bulk-count-exposure" class="border border-stone-300 rounded-lg px-3 py-1.5 text-sm bg-white font-semibold text-amber-700">
+          <option value="含める">含める（暴露期間としてカウント）</option>
+          <option value="含めない">含めない（一時保管・恒温室・回収など）</option>
+        </select>
+        <button onclick="executeBulkMove()" id="btn-bulk-move" class="bg-amber-700 hover:bg-amber-800 text-white text-sm font-semibold px-4 py-1.5 rounded-lg shadow-sm transition">一括移動を実行</button>
+        <button onclick="clearSelection()" class="text-sm text-stone-500 hover:text-stone-700 px-2 transition">選択解除</button>
+      </div>
+    </div>
+
     <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-x-auto hidden" id="table-container">
       <table class="min-w-full text-left text-sm whitespace-nowrap">
         <thead class="bg-stone-50 border-b border-stone-200 font-semibold text-stone-500 uppercase tracking-wide text-xs">
           <tr>
+            <th class="py-3 px-4"><input type="checkbox" id="select-all-checkbox" onchange="toggleSelectAll(this)"></th>
             <th class="py-3 px-4">試験体ID</th>
             <th class="py-3 px-4">操作</th>
             <th class="py-3 px-4">素材</th>
@@ -123,16 +140,19 @@
   </main>
 
   <script>
-    // ★ ご自身のGASウェブアプリURLを貼り付けてください ★
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwYhNRKqGiB4aZslbkChTbivspwoe7yUk0w8ikYX_dyG7dC2m6kBKrkyTFg6duDy_vAFg/exec";
+    // GASウェブアプリURLはheader.jsのwindow.GAS_API_URL_GLOBALを共通利用
+    const GAS_API_URL = window.GAS_API_URL_GLOBAL;
 
     let allSpecimens = [];
+    let currentFilteredSpecimens = [];
 
     window.addEventListener('DOMContentLoaded', () => {
+      populateLocationOptions();
+
       if (window.appPassword) {
         fetchData();
       }
-      
+
       // フィルター入力欄の値が変わった時に、表を再描画するイベント設定
       document.getElementById('search-input').addEventListener('input', renderTable);
       document.getElementById('condition-filter').addEventListener('change', renderTable);
@@ -142,14 +162,14 @@
       document.getElementById('days-max').addEventListener('input', renderTable);
     });
 
-    function formatDateToYMD(dateStr) {
-      if (!dateStr) return '-';
-      const d = new Date(dateStr);
-      if (isNaN(d.getTime())) return dateStr;
-      const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      return `${y}/${m}/${day}`;
+    // 現在地フィルター／一括移動バーの選択肢を、共通のLOCATIONS一覧から生成する
+    function populateLocationOptions() {
+      const filterSelect = document.getElementById('location-filter');
+      const bulkSelect = document.getElementById('bulk-location');
+      window.LOCATIONS.forEach(loc => {
+        filterSelect.appendChild(new Option(loc, loc));
+        bulkSelect.appendChild(new Option(loc, loc));
+      });
     }
 
     async function fetchData() {
@@ -207,8 +227,11 @@
         return matchId && matchMaterial && matchCondition && matchLocation && matchDaysMin && matchDaysMax;
       });
 
+      currentFilteredSpecimens = filtered;
+
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-stone-400">該当するデータがありません</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-stone-400">該当するデータがありません</td></tr>`;
+        updateBulkBar();
         return;
       }
 
@@ -229,6 +252,7 @@
         const expectedEndFormatted = formatDateToYMD(item.expected_end);
 
         tr.innerHTML = `
+          <td class="py-3 px-4"><input type="checkbox" class="specimen-checkbox" value="${item.specimen_id || ''}" onchange="updateBulkBar()"></td>
           <td class="py-3 px-4 font-semibold text-amber-800">${item.specimen_id || '-'}</td>
           <td class="py-3 px-4">
             <a href="form.html?id=${encodeURIComponent(item.specimen_id || '')}" class="text-amber-700 hover:text-amber-900 text-xs font-medium bg-amber-50 px-2 py-1 rounded-md border border-amber-200 transition">
@@ -244,6 +268,89 @@
         `;
         tbody.appendChild(tr);
       });
+
+      updateBulkBar();
+    }
+
+    // ===== 一括移動機能 =====
+    function toggleSelectAll(checkbox) {
+      document.querySelectorAll('.specimen-checkbox').forEach(cb => cb.checked = checkbox.checked);
+      updateBulkBar();
+    }
+
+    function getSelectedIds() {
+      return Array.from(document.querySelectorAll('.specimen-checkbox:checked')).map(cb => cb.value);
+    }
+
+    function updateBulkBar() {
+      const ids = getSelectedIds();
+      document.getElementById('bulk-count').textContent = ids.length;
+      document.getElementById('bulk-action-bar').classList.toggle('hidden', ids.length === 0);
+
+      const allBoxes = document.querySelectorAll('.specimen-checkbox');
+      const selectAll = document.getElementById('select-all-checkbox');
+      selectAll.checked = allBoxes.length > 0 && ids.length === allBoxes.length;
+    }
+
+    function clearSelection() {
+      document.querySelectorAll('.specimen-checkbox').forEach(cb => cb.checked = false);
+      updateBulkBar();
+    }
+
+    async function executeBulkMove() {
+      const ids = getSelectedIds();
+      if (ids.length === 0) return;
+
+      const location = document.getElementById('bulk-location').value;
+      const condition = document.getElementById('bulk-condition').value;
+      const countExposure = document.getElementById('bulk-count-exposure').value;
+
+      if (!location) {
+        alert("移動先を選択してください。");
+        return;
+      }
+      if (!confirm(`${ids.length}件の試験体を「${location}」へ一括移動します。よろしいですか？`)) return;
+
+      const btn = document.getElementById('btn-bulk-move');
+      const originalText = btn.textContent;
+      btn.disabled = true;
+
+      let successCount = 0;
+      let failCount = 0;
+
+      for (let i = 0; i < ids.length; i++) {
+        btn.textContent = `送信中... (${i + 1}/${ids.length})`;
+        try {
+          const response = await fetch(GAS_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify({
+              action: 'episode',
+              specimen_id: ids[i],
+              new_location: location,
+              condition: condition,
+              count_exposure: countExposure,
+              note: '一括移動',
+              password: appPassword
+            })
+          });
+          const result = await response.json();
+          if (result.status === 'success') {
+            successCount++;
+          } else {
+            failCount++;
+          }
+        } catch (e) {
+          failCount++;
+        }
+      }
+
+      btn.disabled = false;
+      btn.textContent = originalText;
+
+      alert(`一括移動が完了しました。成功: ${successCount}件 / 失敗: ${failCount}件`);
+      clearSelection();
+      fetchData();
     }
 
     function updateStats() {

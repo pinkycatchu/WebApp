@@ -59,19 +59,14 @@
   </div>
 
   <script>
-    // ★ ご自身のGASウェブアプリURLを貼り付けてください ★
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwYhNRKqGiB4aZslbkChTbivspwoe7yUk0w8ikYX_dyG7dC2m6kBKrkyTFg6duDy_vAFg/exec";
+    // GASウェブアプリURLはheader.jsのwindow.GAS_API_URL_GLOBALを共通利用
+    const GAS_API_URL = window.GAS_API_URL_GLOBAL;
 
     let calendar; // カレンダーオブジェクト
 
     window.addEventListener('DOMContentLoaded', () => {
-      if (window.appPassword) {
-        fetchDataAndRenderCalendar();
-      }else{
-        alert("ログインが必要です。");
-        window.location.href = "index.html";
-        return;
-      }
+      if (!window.requireLogin()) return;
+      fetchDataAndRenderCalendar();
     });
 
     async function fetchDataAndRenderCalendar() {
