@@ -18,43 +18,52 @@ window.appPassword = localStorage.getItem('app_password') || '';
 
   // 1. 共通ログイン画面のHTML（パスワードがなければ表示）
   const loginHtml = `
-  <div id="global-login-overlay" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex justify-center items-center z-50 ${window.appPassword ? 'hidden' : ''}">
-    <div class="bg-white p-6 rounded shadow-lg max-w-sm w-full mx-4">
-      <h2 class="text-xl font-bold mb-4 text-center">システムへのログイン</h2>
-      <input type="password" id="global-login-password" placeholder="パスワードを入力" class="w-full border p-2.5 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
-      <button onclick="globalLogin()" class="w-full bg-blue-600 text-white font-bold py-2.5 rounded hover:bg-blue-700 transition">ログイン</button>
+  <div id="global-login-overlay" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex justify-center items-center z-50 ${window.appPassword ? 'hidden' : ''}">
+    <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-sm w-full mx-4 border border-stone-200">
+      <img src="images/labologo.png" alt="研究室ロゴ" class="w-12 h-12 mx-auto mb-4 rounded-md">
+      <p class="text-center text-[11px] tracking-[0.2em] text-amber-700 font-semibold mb-1">WOOD MATERIALS LAB</p>
+      <h2 class="text-lg font-bold mb-6 text-center text-slate-900">システムへのログイン</h2>
+      <input type="password" id="global-login-password" placeholder="パスワードを入力" class="w-full border border-stone-300 p-2.5 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition">
+      <button onclick="globalLogin()" class="w-full bg-amber-700 text-white font-bold py-2.5 rounded-lg hover:bg-amber-800 shadow-sm transition">ログイン</button>
     </div>
   </div>
   `;
 
   // 2. 共通ヘッダーのHTML
   const headerHtml = `
-  <header class="bg-blue-600 text-white shadow-md relative z-40 mb-6">
+  <header class="bg-gradient-to-r from-slate-900 to-slate-800 text-white shadow-md relative z-40 mb-6">
     <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-      <h1 class="text-lg md:text-xl font-bold">${headerTitle}</h1>
-      <div class="flex items-center gap-3">
-        <a href=${currentPage === 'index.html' ? 'form.html' : 'index.html'} class="hidden sm:block bg-white text-blue-600 font-semibold px-4 py-2 rounded shadow hover:bg-blue-50 transition duration-150">
+      <div class="flex items-center gap-3 min-w-0">
+        <img src="images/labologo.png" alt="研究室ロゴ" class="w-8 h-8 rounded shrink-0 hidden sm:block">
+        <div class="min-w-0">
+          <p class="text-[10px] tracking-[0.2em] text-amber-400/90 font-semibold leading-none mb-1 hidden sm:block">WOOD MATERIALS LAB</p>
+          <h1 class="text-lg md:text-xl font-bold truncate">${headerTitle}</h1>
+        </div>
+      </div>
+      <div class="flex items-center gap-3 shrink-0">
+        <a href=${currentPage === 'index.html' ? 'form.html' : 'index.html'} class="hidden sm:block bg-amber-600 text-white font-semibold px-4 py-2 rounded-lg shadow hover:bg-amber-500 transition duration-150">
             ${currentPage === 'index.html' ? '＋入力へ' : 'HOME'}
         </a>
-        <button onclick="toggleGlobalMenu()" class="text-white hover:bg-blue-700 p-2 rounded focus:outline-none transition duration-150">
+        <button onclick="toggleGlobalMenu()" class="text-white hover:bg-white/10 p-2 rounded-lg focus:outline-none transition duration-150">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
           </svg>
         </button>
       </div>
     </div>
+    <div class="grain-line"></div>
 
     <!-- 共通メニュー（現在のページを自動でハイライト） -->
-    <div id="global-mobile-menu" class="hidden absolute right-4 top-14 bg-white text-gray-800 rounded shadow-xl border border-gray-200 w-56 overflow-hidden z-50">
-      <a href="index.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm font-semibold ${currentPage === 'index.html' ? 'bg-blue-50 text-blue-700 font-bold' : ''}">HOME</a>
+    <div id="global-mobile-menu" class="hidden absolute right-4 top-16 bg-white text-stone-800 rounded-xl shadow-2xl border border-stone-200 w-56 overflow-hidden z-50">
+      <a href="index.html" class="block px-4 py-3 hover:bg-stone-50 border-b border-stone-100 text-sm font-semibold ${currentPage === 'index.html' ? 'bg-amber-50 text-amber-800 border-l-4 border-l-amber-600 font-bold' : ''}">HOME</a>
 
-      <a href="form.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm ${currentPage === 'form.html' ? 'bg-blue-50 text-blue-700 font-bold' : ''}">＋ 測定・移動入力</a>
+      <a href="form.html" class="block px-4 py-3 hover:bg-stone-50 border-b border-stone-100 text-sm ${currentPage === 'form.html' ? 'bg-amber-50 text-amber-800 border-l-4 border-l-amber-600 font-bold' : ''}">＋ 測定・移動入力</a>
 
-      <a href="photo.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm ${currentPage === 'photo.html' ? 'bg-blue-50 text-blue-700 font-bold' : ''}">ギャラリー</a>
+      <a href="photo.html" class="block px-4 py-3 hover:bg-stone-50 border-b border-stone-100 text-sm ${currentPage === 'photo.html' ? 'bg-amber-50 text-amber-800 border-l-4 border-l-amber-600 font-bold' : ''}">ギャラリー</a>
 
-      <a href="calendar.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm ${currentPage === 'calendar.html' ? 'bg-blue-50 text-blue-700 font-bold' : ''}">カレンダー</a>
+      <a href="calendar.html" class="block px-4 py-3 hover:bg-stone-50 border-b border-stone-100 text-sm ${currentPage === 'calendar.html' ? 'bg-amber-50 text-amber-800 border-l-4 border-l-amber-600 font-bold' : ''}">カレンダー</a>
 
-      <a href="materials.html" class="block px-4 py-3 hover:bg-gray-100 border-b text-sm ${currentPage === 'materials.html' ? 'bg-blue-50 text-blue-700 font-bold' : ''}">資料ページ</a>
+      <a href="materials.html" class="block px-4 py-3 hover:bg-stone-50 border-b border-stone-100 text-sm ${currentPage === 'materials.html' ? 'bg-amber-50 text-amber-800 border-l-4 border-l-amber-600 font-bold' : ''}">資料ページ</a>
 
       <button onclick="logout()" class="w-full text-left block px-4 py-3 hover:bg-red-50 text-red-600 text-sm font-medium">ログアウト</button>
     </div>

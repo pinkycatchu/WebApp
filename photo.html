@@ -6,29 +6,30 @@
   <title>ギャラリー - 試験体管理</title>
   <link rel="icon" href="images/labologo.ico">
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans min-h-screen pb-12">
-  
+<body class="bg-stone-50 text-stone-800 min-h-screen pb-12">
+
   <!-- 共通ヘッダー読み込み -->
   <script src="header.js"></script>
 
   <main class="container mx-auto px-4 max-w-4xl">
-    
+
     <!-- 上部：写真撮影・アップロード機能 -->
-    <section class="bg-white p-6 rounded-lg shadow-md mb-8">
-      <h2 class="text-xl font-bold text-gray-700 mb-4 border-b-2 border-blue-500 pb-2">写真を撮影する</h2>
-      
+    <section class="bg-white p-6 rounded-xl shadow-sm border border-stone-200 mb-8">
+      <h2 class="text-xl font-bold text-stone-800 mb-4 border-b-2 border-amber-600 pb-2">写真を撮影する</h2>
+
       <div class="flex flex-col gap-4">
         <!-- ファイル選択 / カメラ起動 -->
-        <input type="file" id="photo-input" accept="image/*" capture="environment" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
-        
+        <input type="file" id="photo-input" accept="image/*" capture="environment" class="block w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-800 hover:file:bg-amber-100 cursor-pointer">
+
         <!-- プレビュー表示 -->
         <div id="preview-container" class="hidden">
-          <img id="photo-preview" class="max-w-full h-auto rounded border border-gray-300 max-h-64 object-contain">
-          
+          <img id="photo-preview" class="max-w-full h-auto rounded-lg border border-stone-300 max-h-64 object-contain">
+
           <div class="mt-4 flex flex-col sm:flex-row gap-2">
-            <input type="text" id="photo-name" placeholder="ファイル名 (例: CLT-01_暴露前)" class="border rounded p-2.5 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <button id="btn-upload" onclick="uploadPhoto()" class="bg-blue-600 text-white font-bold py-2.5 px-6 rounded hover:bg-blue-700 flex items-center justify-center gap-2 transition">
+            <input type="text" id="photo-name" placeholder="ファイル名 (例: CLT-01_暴露前)" class="border border-stone-300 rounded-lg p-2.5 flex-1 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+            <button id="btn-upload" onclick="uploadPhoto()" class="bg-amber-700 text-white font-bold py-2.5 px-6 rounded-lg hover:bg-amber-800 flex items-center justify-center gap-2 shadow-sm transition">
               <span>アップロード</span>
             </button>
           </div>
@@ -38,14 +39,14 @@
 
     <!-- 下部：ギャラリー（一覧表示） -->
     <section>
-      <div class="flex justify-between items-center mb-4 border-b-2 border-blue-500 pb-2">
-        <h2 class="text-xl font-bold text-gray-700">写真ギャラリー</h2>
-        <button onclick="loadGallery()" class="text-sm bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded transition">🔄 更新</button>
+      <div class="flex justify-between items-center mb-4 border-b-2 border-amber-600 pb-2">
+        <h2 class="text-xl font-bold text-stone-800">写真ギャラリー</h2>
+        <button onclick="loadGallery()" class="text-sm bg-stone-100 hover:bg-stone-200 text-stone-700 px-3 py-1 rounded-lg transition">🔄 更新</button>
       </div>
 
       <div id="gallery-loading" class="text-center py-8">
-        <div class="animate-spin inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full" role="status"></div>
-        <p class="mt-2 text-gray-600 text-sm">写真を読み込み中...</p>
+        <div class="animate-spin inline-block w-8 h-8 border-4 border-amber-600 border-t-transparent rounded-full" role="status"></div>
+        <p class="mt-2 text-stone-500 text-sm">写真を読み込み中...</p>
       </div>
 
       <!-- 写真のグリッド表示 -->
@@ -55,7 +56,7 @@
 
       <!-- さらに読み込むボタン -->
       <div class="text-center mt-6">
-        <button id="btn-load-more" onclick="renderNextBatch()" class="hidden bg-gray-700 text-white px-6 py-2 rounded shadow hover:bg-gray-800 transition">
+        <button id="btn-load-more" onclick="renderNextBatch()" class="hidden bg-slate-800 text-white px-6 py-2 rounded-lg shadow-sm hover:bg-slate-700 transition">
           さらに読み込む (全 <span id="total-photo-count">0</span>枚)
         </button>
       </div>
@@ -199,7 +200,7 @@
           document.getElementById('total-photo-count').textContent = allPhotos.length;
           
           if (allPhotos.length === 0) {
-            document.getElementById('photo-grid').innerHTML = `<p class="col-span-full text-center text-gray-400 py-8">写真がまだありません</p>`;
+            document.getElementById('photo-grid').innerHTML = `<p class="col-span-full text-center text-stone-400 py-8">写真がまだありません</p>`;
           } else {
             renderNextBatch();
           }
@@ -225,14 +226,14 @@
         const thumbUrl = `https://drive.google.com/thumbnail?id=${photo.id}&sz=w500`;
 
         const div = document.createElement('div');
-        div.className = "bg-white p-2 rounded shadow-sm border border-gray-100 flex flex-col";
+        div.className = "bg-white p-2 rounded-xl shadow-sm border border-stone-200 flex flex-col";
         div.innerHTML = `
-          <a href="https://drive.google.com/file/d/${photo.id}/view" target="_blank" class="block bg-gray-100 rounded overflow-hidden relative pb-[100%] hover:opacity-80 transition">
+          <a href="https://drive.google.com/file/d/${photo.id}/view" target="_blank" class="block bg-stone-100 rounded-lg overflow-hidden relative pb-[100%] hover:opacity-80 transition">
              <img src="${thumbUrl}" loading="lazy" class="absolute inset-0 w-full h-full object-cover" alt="${photo.name}">
           </a>
           <div class="mt-2 text-xs">
-            <p class="font-bold text-gray-700 truncate" title="${photo.name}">${photo.name}</p>
-            <p class="text-gray-400">${dateStr}</p>
+            <p class="font-bold text-stone-700 truncate" title="${photo.name}">${photo.name}</p>
+            <p class="text-stone-400">${dateStr}</p>
           </div>
         `;
         grid.appendChild(div);

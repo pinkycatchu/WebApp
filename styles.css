@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap');
+
+html, body {
+  font-family: 'Zen Kaku Gothic New', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+}
+
+::selection {
+  background: #92672f;
+  color: #fff;
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #f4f1ea; }
+::-webkit-scrollbar-thumb { background: #d8cdb8; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #c2b393; }
+
+/* 木目調のアクセントライン（ヘッダー下部などで使用） */
+.grain-line {
+  height: 3px;
+  background: linear-gradient(90deg, #92672f 0%, #c9a15f 50%, #92672f 100%);
+}

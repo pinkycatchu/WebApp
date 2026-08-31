@@ -7,21 +7,22 @@
   <link rel="icon" href="images/labologo.ico">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans min-h-screen pb-12">
+<body class="bg-stone-50 text-stone-800 min-h-screen pb-12">
   <script src="header.js"></script>
 
   <main class="container mx-auto px-4 max-w-lg">
-    <div class="bg-white p-6 rounded-lg shadow-md">
-      
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+
       <!-- 1. アクション選択 -->
       <div class="mb-6">
-        <label class="block text-sm font-bold text-gray-700 mb-2">入力する作業の種類</label>
+        <label class="block text-sm font-bold text-stone-700 mb-2">入力する作業の種類</label>
         <div class="grid grid-cols-2 gap-2">
-          <button type="button" id="btn-action-measure" onclick="setAction('measurement')" class="py-2 px-4 rounded font-semibold border-2 border-blue-600 bg-blue-600 text-white text-center transition duration-150">
+          <button type="button" id="btn-action-measure" onclick="setAction('measurement')" class="py-2 px-4 rounded-lg font-semibold border-2 border-amber-700 bg-amber-700 text-white text-center transition duration-150">
             重量測定
           </button>
-          <button type="button" id="btn-action-episode" onclick="setAction('episode')" class="py-2 px-4 rounded font-semibold border-2 border-gray-300 bg-white text-gray-700 text-center hover:bg-gray-50 transition duration-150">
+          <button type="button" id="btn-action-episode" onclick="setAction('episode')" class="py-2 px-4 rounded-lg font-semibold border-2 border-stone-300 bg-white text-stone-700 text-center hover:bg-stone-50 transition duration-150">
             試験体移動
           </button>
         </div>
@@ -29,54 +30,54 @@
 
       <!-- 2. 試験体ID選択 -->
       <div class="mb-6">
-        <label class="block text-sm font-bold text-gray-700 mb-2">試験体IDの入力方法</label>
+        <label class="block text-sm font-bold text-stone-700 mb-2">試験体IDの入力方法</label>
         <div class="flex gap-4 mb-3">
           <label class="inline-flex items-center cursor-pointer">
-            <input type="radio" name="input-method" value="select" checked onchange="toggleInputMethod()" class="form-radio text-blue-600">
+            <input type="radio" name="input-method" value="select" checked onchange="toggleInputMethod()" class="form-radio text-amber-700">
             <span class="ml-2 text-sm">プルダウンで選択</span>
           </label>
           <label class="inline-flex items-center cursor-pointer">
-            <input type="radio" name="input-method" value="barcode" onchange="toggleInputMethod()" class="form-radio text-blue-600">
+            <input type="radio" name="input-method" value="barcode" onchange="toggleInputMethod()" class="form-radio text-amber-700">
             <span class="ml-2 text-sm">QRコード読み取り</span>
           </label>
         </div>
 
         <div id="area-select">
-          <select id="specimen-select" class="w-full border border-gray-300 rounded p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+          <select id="specimen-select" class="w-full border border-stone-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white">
             <option value="">データを読み込み中...</option>
           </select>
         </div>
 
         <div id="area-barcode" class="hidden">
-          <div id="reader" class="w-full bg-black rounded overflow-hidden mb-2"></div>
-          <p id="barcode-result" class="text-sm font-bold text-green-600 my-1 hidden"></p>
-          <button type="button" id="btn-camera-toggle" onclick="toggleCamera()" class="w-full bg-gray-700 text-white py-1.5 rounded text-sm hover:bg-gray-800">
+          <div id="reader" class="w-full bg-black rounded-lg overflow-hidden mb-2"></div>
+          <p id="barcode-result" class="text-sm font-bold text-emerald-600 my-1 hidden"></p>
+          <button type="button" id="btn-camera-toggle" onclick="toggleCamera()" class="w-full bg-slate-800 text-white py-1.5 rounded-lg text-sm hover:bg-slate-700 transition">
             カメラを起動する
           </button>
         </div>
       </div>
 
-      <hr class="my-6 border-gray-200">
+      <hr class="my-6 border-stone-200">
 
       <!-- 3. 重量測定用フォーム -->
       <div id="form-measurement">
         <div class="mb-4">
-          <label class="block text-sm font-bold text-gray-700 mb-1">重量 (g) <span class="text-red-500">*</span></label>
-          <input type="number" id="input-weight" step="0.01" placeholder="例: 1250.50" class="w-full border border-gray-300 rounded p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <label class="block text-sm font-bold text-stone-700 mb-1">重量 (g) <span class="text-red-500">*</span></label>
+          <input type="number" id="input-weight" step="0.01" placeholder="例: 1250.50" class="w-full border border-stone-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
         </div>
         <div class="mb-6">
-          <label class="block text-sm font-bold text-gray-700 mb-1">備考・メモ (任意)</label>
-          <input type="text" id="input-note-measure" placeholder="状態の変化などがあれば記録" class="w-full border border-gray-300 rounded p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <label class="block text-sm font-bold text-stone-700 mb-1">備考・メモ (任意)</label>
+          <input type="text" id="input-note-measure" placeholder="状態の変化などがあれば記録" class="w-full border border-stone-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
         </div>
       </div>
 
       <!-- 4. 試験体移動用フォーム -->
       <div id="form-episode" class="hidden">
-        
+
         <!-- 【変更】移動先をプルダウン化 -->
         <div class="mb-4">
-          <label class="block text-sm font-bold text-gray-700 mb-1">新しい移動場所 <span class="text-red-500">*</span></label>
-          <select id="input-location" class="w-full border border-gray-300 rounded p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+          <label class="block text-sm font-bold text-stone-700 mb-1">新しい移動場所 <span class="text-red-500">*</span></label>
+          <select id="input-location" class="w-full border border-stone-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white">
             <option value="">-- 移動場所を選択 --</option>
             <option value="回収">回収</option>
             <option value="I-REF棟恒温室">I-REF棟恒温室</option>
@@ -88,8 +89,8 @@
         </div>
 
         <div class="mb-4">
-          <label class="block text-sm font-bold text-gray-700 mb-1">更新後の状態 <span class="text-red-500">*</span></label>
-          <select id="input-condition" class="w-full border border-gray-300 rounded p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+          <label class="block text-sm font-bold text-stone-700 mb-1">更新後の状態 <span class="text-red-500">*</span></label>
+          <select id="input-condition" class="w-full border border-stone-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white">
             <option value="暴露期間中">暴露期間中</option>
             <option value="暴露前">暴露前</option>
             <option value="保管中">保管中</option>
@@ -99,27 +100,27 @@
 
         <!-- 暴露日数に含めるかどうかの選択 -->
         <div class="mb-4">
-          <label class="block text-sm font-bold text-gray-700 mb-1">この移動先の期間を暴露日数に含めますか？ <span class="text-red-500">*</span></label>
-          <select id="input-count-exposure" class="w-full border border-gray-300 rounded p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white font-semibold text-blue-700">
+          <label class="block text-sm font-bold text-stone-700 mb-1">この移動先の期間を暴露日数に含めますか？ <span class="text-red-500">*</span></label>
+          <select id="input-count-exposure" class="w-full border border-stone-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white font-semibold text-amber-700">
             <option value="含める">含める（暴露期間としてカウント）</option>
             <option value="含めない">含めない（一時保管・恒温室・回収など）</option>
           </select>
-          <p class="text-xs text-gray-500 mt-1">※自動計算バッチ処理がこの設定を読み取り、夜間に残り日数と終了予定日を更新します。</p>
+          <p class="text-xs text-stone-500 mt-1">※自動計算バッチ処理がこの設定を読み取り、夜間に残り日数と終了予定日を更新します。</p>
         </div>
 
         <div class="mb-6">
-          <label class="block text-sm font-bold text-gray-700 mb-1">備考・メモ (任意)</label>
-          <input type="text" id="input-note-episode" placeholder="移動の理由や作業者名など" class="w-full border border-gray-300 rounded p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <label class="block text-sm font-bold text-stone-700 mb-1">備考・メモ (任意)</label>
+          <input type="text" id="input-note-episode" placeholder="移動の理由や作業者名など" class="w-full border border-stone-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
         </div>
       </div>
 
       <!-- 連続入力モードのチェックボックス -->
-      <div class="mb-4 bg-blue-50 p-3 rounded border border-blue-200 flex items-center">
-        <input type="checkbox" id="continuous-mode" class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer" checked>
-        <label for="continuous-mode" class="ml-2 font-bold text-blue-800 cursor-pointer text-sm">連続で入力する</label>
+      <div class="mb-4 bg-amber-50 p-3 rounded-lg border border-amber-200 flex items-center">
+        <input type="checkbox" id="continuous-mode" class="w-5 h-5 text-amber-700 border-stone-300 rounded focus:ring-amber-500 cursor-pointer" checked>
+        <label for="continuous-mode" class="ml-2 font-bold text-amber-800 cursor-pointer text-sm">連続で入力する</label>
       </div>
 
-      <button type="button" id="btn-submit" onclick="submitData()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded shadow transition duration-150 flex justify-center items-center">
+      <button type="button" id="btn-submit" onclick="submitData()" class="w-full bg-amber-700 hover:bg-amber-800 text-white font-bold py-3 px-4 rounded-lg shadow-sm transition duration-150 flex justify-center items-center">
         <span>この内容で登録する</span>
       </button>
 
@@ -192,13 +193,13 @@
       const formEpisode = document.getElementById('form-episode');
 
       if (action === 'measurement') {
-        btnMeasure.className = "py-2 px-4 rounded font-semibold border-2 border-blue-600 bg-blue-600 text-white text-center transition duration-150";
-        btnEpisode.className = "py-2 px-4 rounded font-semibold border-2 border-gray-300 bg-white text-gray-700 text-center hover:bg-gray-50 transition duration-150";
+        btnMeasure.className = "py-2 px-4 rounded-lg font-semibold border-2 border-amber-700 bg-amber-700 text-white text-center transition duration-150";
+        btnEpisode.className = "py-2 px-4 rounded-lg font-semibold border-2 border-stone-300 bg-white text-stone-700 text-center hover:bg-stone-50 transition duration-150";
         formMeasure.classList.remove('hidden');
         formEpisode.classList.add('hidden');
       } else {
-        btnEpisode.className = "py-2 px-4 rounded font-semibold border-2 border-blue-600 bg-blue-600 text-white text-center transition duration-150";
-        btnMeasure.className = "py-2 px-4 rounded font-semibold border-2 border-gray-300 bg-white text-gray-700 text-center hover:bg-gray-50 transition duration-150";
+        btnEpisode.className = "py-2 px-4 rounded-lg font-semibold border-2 border-amber-700 bg-amber-700 text-white text-center transition duration-150";
+        btnMeasure.className = "py-2 px-4 rounded-lg font-semibold border-2 border-stone-300 bg-white text-stone-700 text-center hover:bg-stone-50 transition duration-150";
         formEpisode.classList.remove('hidden');
         formMeasure.classList.add('hidden');
       }
@@ -245,7 +246,7 @@
           );
           isCameraRunning = true;
           btn.textContent = "カメラを停止する";
-          btn.className = "w-full bg-red-600 text-white py-1.5 rounded text-sm hover:bg-red-700";
+          btn.className = "w-full bg-red-600 text-white py-1.5 rounded-lg text-sm hover:bg-red-700 transition";
         } catch (err) {
           alert("カメラの起動に失敗しました。ブラウザのカメラ許可設定をご確認ください。");
           btn.textContent = "カメラを起動する";
@@ -260,7 +261,7 @@
         isCameraRunning = false;
         const btn = document.getElementById('btn-camera-toggle');
         btn.textContent = "カメラを起動する";
-        btn.className = "w-full bg-gray-700 text-white py-1.5 rounded text-sm hover:bg-gray-800";
+        btn.className = "w-full bg-slate-800 text-white py-1.5 rounded-lg text-sm hover:bg-slate-700 transition";
       }
     }
 
