@@ -7,6 +7,7 @@
   <link rel="icon" href="images/favicon.ico" type="image/x-icon">
   <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon-180x180.png">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="bg-stone-50 text-stone-800 min-h-screen">
@@ -139,6 +140,35 @@
     </div>
   </main>
 
+  <!-- 重量測定履歴グラフのモーダル -->
+  <div id="history-dialog" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center z-[60] hidden p-4">
+    <div class="bg-white rounded-xl shadow-2xl border border-stone-200 max-w-2xl w-full p-6 max-h-[85vh] overflow-y-auto">
+      <div class="flex justify-between items-start mb-4">
+        <h3 id="history-dialog-title" class="text-lg font-bold text-stone-900">重量測定履歴</h3>
+        <button onclick="closeHistoryDialog()" class="text-stone-400 hover:text-stone-600 transition" aria-label="閉じる">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div id="history-loading" class="text-center py-8">
+        <div class="animate-spin inline-block w-8 h-8 border-4 border-amber-600 border-t-transparent rounded-full"></div>
+      </div>
+      <div id="history-content" class="hidden">
+        <canvas id="history-chart" height="200"></canvas>
+        <div class="mt-4 overflow-x-auto">
+          <table class="min-w-full text-left text-xs whitespace-nowrap">
+            <thead class="text-stone-500 border-b border-stone-200">
+              <tr><th class="py-2 pr-4">測定日時</th><th class="py-2 pr-4">重量(g)</th><th class="py-2">備考</th></tr>
+            </thead>
+            <tbody id="history-table-body" class="divide-y divide-stone-100"></tbody>
+          </table>
+        </div>
+      </div>
+      <p id="history-empty" class="hidden text-center text-stone-400 py-8">測定履歴がまだありません</p>
+    </div>
+  </div>
+
   <script>
     // GASウェブアプリURLはheader.jsのwindow.GAS_API_URL_GLOBALを共通利用
     const GAS_API_URL = window.GAS_API_URL_GLOBAL;
@@ -183,6 +213,7 @@
 
         if (result.status === "success") {
           allSpecimens = result.data;
+          allMeasurements = null; // 履歴グラフのキャッシュも更新時にクリア
           renderTable();
           updateStats();
           checkAlerts();
@@ -255,9 +286,14 @@
           <td class="py-3 px-4"><input type="checkbox" class="specimen-checkbox" value="${item.specimen_id || ''}" onchange="updateBulkBar()"></td>
           <td class="py-3 px-4 font-semibold text-amber-800">${item.specimen_id || '-'}</td>
           <td class="py-3 px-4">
-            <a href="form.html?id=${encodeURIComponent(item.specimen_id || '')}" class="text-amber-700 hover:text-amber-900 text-xs font-medium bg-amber-50 px-2 py-1 rounded-md border border-amber-200 transition">
-              記録する
-            </a>
+            <div class="flex gap-1">
+              <a href="form.html?id=${encodeURIComponent(item.specimen_id || '')}" class="text-amber-700 hover:text-amber-900 text-xs font-medium bg-amber-50 px-2 py-1 rounded-md border border-amber-200 transition">
+                記録する
+              </a>
+              <button onclick="showHistory('${item.specimen_id || ''}')" class="text-slate-700 hover:text-slate-900 text-xs font-medium bg-slate-50 px-2 py-1 rounded-md border border-slate-200 transition">
+                📈 履歴
+              </button>
+            </div>
           </td>
           <td class="py-3 px-4">${item.material || '-'}</td>
           <td class="py-3 px-4"><span class="px-2 py-1 rounded-full text-xs ${badgeStyle}">${item.status || '-'}</span></td>
@@ -271,6 +307,92 @@
 
       updateBulkBar();
     }
+
+    // ===== 重量測定履歴グラフ =====
+    let allMeasurements = null; // 初回表示時に取得してキャッシュ
+    let historyChart = null;
+
+    async function showHistory(specimenId) {
+      document.getElementById('history-dialog-title').textContent = `重量測定履歴: ${specimenId}`;
+      document.getElementById('history-dialog').classList.remove('hidden');
+      document.getElementById('history-loading').classList.remove('hidden');
+      document.getElementById('history-content').classList.add('hidden');
+      document.getElementById('history-empty').classList.add('hidden');
+
+      if (allMeasurements === null) {
+        try {
+          const res = await fetch(`${GAS_API_URL}?password=${encodeURIComponent(appPassword)}&action=get_measurements`);
+          const json = await res.json();
+          allMeasurements = (json.status === "success") ? json.data : [];
+        } catch (e) {
+          allMeasurements = [];
+        }
+      }
+
+      document.getElementById('history-loading').classList.add('hidden');
+
+      const rows = allMeasurements
+        .filter(m => m.specimen_id === specimenId)
+        .sort((a, b) => new Date(a['測定日時']) - new Date(b['測定日時']));
+
+      if (rows.length === 0) {
+        document.getElementById('history-empty').classList.remove('hidden');
+        return;
+      }
+
+      document.getElementById('history-content').classList.remove('hidden');
+      renderHistoryChart(rows);
+      renderHistoryTable(rows);
+    }
+
+    function renderHistoryChart(rows) {
+      const ctx = document.getElementById('history-chart').getContext('2d');
+      if (historyChart) historyChart.destroy();
+      historyChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: rows.map(r => r['測定日時']),
+          datasets: [{
+            label: '重量 (g)',
+            data: rows.map(r => Number(r['重量(g)'])),
+            borderColor: '#92672f',
+            backgroundColor: 'rgba(146, 103, 47, 0.1)',
+            tension: 0.2,
+            pointBackgroundColor: '#92672f',
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { title: { display: true, text: '重量 (g)' } }
+          }
+        }
+      });
+    }
+
+    function renderHistoryTable(rows) {
+      const tbody = document.getElementById('history-table-body');
+      tbody.innerHTML = rows.slice().reverse().map(r => `
+        <tr>
+          <td class="py-2 pr-4">${r['測定日時'] || '-'}</td>
+          <td class="py-2 pr-4">${r['重量(g)'] || '-'}</td>
+          <td class="py-2 text-stone-500">${r['備考'] || ''}</td>
+        </tr>
+      `).join('');
+    }
+
+    function closeHistoryDialog() {
+      document.getElementById('history-dialog').classList.add('hidden');
+    }
+
+    document.addEventListener('click', function(event) {
+      const dialog = document.getElementById('history-dialog');
+      if (!dialog.classList.contains('hidden') && event.target === dialog) {
+        closeHistoryDialog();
+      }
+    });
 
     // ===== 一括移動機能 =====
     function toggleSelectAll(checkbox) {

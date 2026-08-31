@@ -32,7 +32,12 @@ python -m http.server 8000
 
 **認証モデル**: 個別のユーザーアカウントは存在しない。共有の合言葉1つを`localStorage['app_password']`に保存し、GASへのすべての呼び出しに`?password=...`（GET）または`password`フィールド（POSTボディ）として付与する。パスワードが誤っている場合サーバーは`{status: "auth_error"}`を返し、各ページはこれを受けて`localStorage.removeItem('app_password')`のうえ`index.html`へリダイレクトする、という規約になっている。新しいページ/呼び出しを追加する際も、別の認証フローを考案せずこのパターンに従うこと。
 
-**GASとの契約**（呼び出し箇所から推測。他に文書化なし）: `action`無しのGETは`{status, data: [...]}`を返し、各要素は`specimen_id, material, status, current_location, effective_days, planned_days, next_measurements, expected_end`を持つ。POSTボディは`action`フィールドを持つJSON: `"measurement"`（weight・note）、`"episode"`（移動: new_location・condition・count_exposure・note）、`"upload_photo"`（filename・base64Data・contentType）。GET `?action=get_photos`は`{status, data: [{id, name, date}, ...]}`を返す（Driveのファイルid。`https://drive.google.com/thumbnail?id=...`で表示）。
+**GASとの契約**（呼び出し箇所とスプレッドシート実物から確認済み）: バックエンドのスプレッドシート「ExposureTest」には`Specimens`・`Episodes`・`Measurements`・`Embedment Test`・`Block-shear Test`・`Compression Test`のシートがあるが、GAS API（`doGet`/`doPost`、`sheet2API.gs`）が今のところ読み書きしているのは`Specimens`と`Measurements`のみ。他のシートはまだAPI/フロントエンドに繋がっていない。
+
+- GET（`action`無し）: `{status, data: [...]}`。各要素は`Specimens`シートの列そのまま＝`specimen_id, material, status, current_location, effective_days, planned_days, next_measurements, expected_end`など。
+- GET `?action=get_photos`: `{status, data: [{id, name, date}, ...]}`（Driveのファイルid。`https://drive.google.com/thumbnail?id=...`で表示）。
+- GET `?action=get_measurements`: `{status, data: [{specimen_id, 測定日時, "重量(g)", 備考}, ...]}`。`Measurements`シートを丸ごと返す（specimen_id等の絞り込みはフロント側で行う）。index.htmlの重量推移グラフ（`showHistory()`）用に2026-09-01に追加。
+- POST（`action`フィールドを持つJSON）: `"measurement"`（weight・note。`Measurements`シートに1行追記し、`Specimens`の`next_measurements`を1週間後に更新）、`"episode"`（移動: new_location・condition・count_exposure・note）、`"upload_photo"`（filename・base64Data・contentType）。
 
 **`materials.html`**だけはメインコンテンツをGASから取得していない — 実行時にGitHub Contents API経由でこのリポジトリ自身の`References_list/`フォルダを再帰的に辿って一覧表示している（スクリプト冒頭付近の`GITHUB_USERNAME`/`GITHUB_REPO`定数）。そのため参考PDFを追加する際は`References_list/`配下にコミット＆pushするだけでよい。
 
@@ -41,6 +46,8 @@ python -m http.server 8000
 **写真と試験体IDの紐付け**: `photo.html`は撮影前に試験体IDの選択を必須にし（`#photo-specimen`）、アップロード時のファイル名を`${specimenId}_${timestamp}.jpg`にしている（バックエンド側は任意のファイル名を受け付けるので変更不要）。ギャラリー表示側はファイル名の`_`より前を試験体IDとみなしてバッジ表示する（`Photo`始まりの古いファイルには表示しない）。
 
 **通信エラー時の送信待ちキュー**: `form.html`の`submitData()`がネットワークエラーで失敗すると、送信内容を`localStorage['pending_submissions']`に退避し（`queuePendingSubmission()`）、次回のページ読み込み時や`online`イベント発火時に自動で再送信を試みる（`flushPendingQueue()`）。屋外の電波が弱い場所での入力を想定した仕組み。
+
+**重量推移グラフ**: index.htmlの各行にある「📈 履歴」ボタン（`showHistory(specimenId)`）から、Chart.js（CDN）で試験体ごとの重量推移を線グラフ表示する。データはGET `?action=get_measurements`で取得し、`let allMeasurements`にページ内キャッシュ（初回クリック時に1回だけ取得、「データを更新」ボタンでクリアされ次回取得し直す）。GAS側のこのアクションは2026-09-01にユーザー自身がスプレッドシートの実データを見ながら追加・デプロイした。
 
 **GAS本体のソースはこのリポジトリに含まれない**: バックエンドはGoogle Apps Scriptプロジェクト側で管理されており、`git clone`しても見えない。中身を確認・変更する必要がある場合はユーザーに共有してもらうこと。**Apps Scriptのウェブエディタをブラウザ自動操作で直接編集するのは避けること** — 過去に特殊キー名（例:「Page_Down」）がキー入力として認識されず、コード編集領域にリテラル文字列として挿入されてしまい、本番スクリプトを一時的に壊しかけた事故がある（`Ctrl+Z`で復旧済み）。閲覧のみ（`get_page_text`やスクリーンショット）に留め、スクロールはページ内リンクや`PageDown`ではなく安全な手段（クリック＋矢印キーなど動作確認済みの方法）を使うこと。
 
