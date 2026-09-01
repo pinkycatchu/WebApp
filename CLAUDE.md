@@ -56,3 +56,12 @@ python -m http.server 8000
 - `styles.css`は全ページで読み込まれ、Googleフォント「Inter」「Inter Tight」（`DESIGN.md`のSeline系デザインシステムにおけるRoobertの代替、大見出しには`.font-display`クラスを付与）と、いくつかの小さな自作ユーティリティ（`.grain-line`、選択範囲/スクロールバーの配色）を定義している。それ以外はすべてインラインのTailwindユーティリティクラスで、コンポーネントライブラリや`tailwind.config`は存在しない。
 - 配色は`DESIGN.md`のトークンに準拠（2026-09-01に全ページ移行済み）: 中立色はTailwindの`stone-*`スケールがそのままトークンと一致する（`stone-50`=Stone Canvas、`stone-300`=Stone Muted、`stone-400`=Ash Gray、`stone-500`=Warm Gray、`stone-900`=Soot、`stone-950`=Ink Black）ためTailwindクラスをそのまま使う。唯一の彩度アクセントはシアン（`bg-[#3ba6f1]`＝Cyan Signal、`text-[#3398e1]`＝Cyan Edge、`bg-[#c1e1f7]`＝Sky Wash）で、旧来のamber/slate系クラスの代わりに使う。ボタンは`rounded-full`のピル型、カードは`rounded-[10px]`、入力欄は`rounded-[6px]`、カード影は`shadow-[0_4px_16px_rgba(0,0,0,0.05)]`、モーダル等の強調影は`shadow-[0_12px_45px_rgba(17,12,46,0.12)]`。ただし状態バッジ・警告文・緊急連絡ボタンなど意味を持つ色（`emerald-*`=正常稼働、`red-*`=警告・危険・緊急）はDESIGN.mdの単色主義の例外として残してある — 新しい装飾用アクセントとしてこれらを増やさないこと。`blue-*`/`indigo-*`/`gray-*`クラス（Tailwindのデフォルト彩度違い）は使わず、シアンは必ず上記の`#3ba6f1`/`#3398e1`のアービトラリ値で指定すること。
 - ヘッダー（`header.js`）は固定高さ（`h-40 md:h-60`）の`position: relative`要素で、タイトルバーの背面に絶対配置の写真スライドショーがあり、ドロップダウンメニュー（`#global-mobile-menu`）はその固定高さの下にはみ出す前提で配置されている。**外側の`<header>`要素に`overflow-hidden`を付けないこと** — メニュー下半分がクリップされてクリックできなくなる。何かをクリップする必要がある場合（スライドショー写真など）は、既に`overflow-hidden`を持つ内側の`#header-slideshow`div側に限定すること。
+
+## 更新履歴
+
+### 2026-09-01: DESIGN.md（Seline系デザインシステム）に基づくUI刷新
+- リポジトリ直下に追加された`DESIGN.md`（Selineというアナリティクス系SaaSの配色・タイポグラフィ・コンポーネント仕様）に沿って、全ページ（`index.html`/`form.html`/`photo.html`/`calendar.html`/`materials.html`/`howtouse.html`/`contact.html`）と`header.js`/`styles.css`の配色・角丸・シャドウ・フォントを刷新した。詳細なトークン運用ルールは上の「デザインシステム」節に反映済み。
+- 判断: 状態バッジ（暴露期間中=emerald）・警告文・緊急連絡先ボタンなど**意味を持つ色**（emerald/red）はDESIGN.mdの単色主義（シアンのみが彩度アクセント）の例外として維持し、装飾目的のamber/slateアクセントのみシアンに統一した。
+- `theme.css`・`variables.css`・`tokens.json`（同時に追加された未追跡ファイル）はDESIGN.mdと同一トークンをTailwind v4/CSS変数/Design Tokens JSON形式でエクスポートしただけの添付ファイルで、どのHTMLからも読み込まれていないことを確認済み（今回リポジトリに追加）。
+- パスワード認証後の実画面（一覧テーブル・一括移動バー・重量測定履歴モーダル・ドロップダウンメニュー・form/photo/calendar/materials/contact各ページ）をローカルサーバー＋ブラウザ操作で目視確認済み。
+- コミット`cb02714`でpush済み。
