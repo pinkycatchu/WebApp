@@ -81,14 +81,14 @@
           renderCalendar(result.data);
         } else if (result.status === "auth_error") {
           localStorage.removeItem('app_password');
-          alert("パスワードが間違っています。再度ログインしてください。");
+          await window.showAlert("パスワードが間違っています。再度ログインしてください。");
           location.reload();
         } else {
-          alert("エラー: " + result.message);
+          await window.showAlert("エラー: " + result.message);
         }
       } catch (error) {
         console.error("エラー:", error);
-        alert("通信エラーが発生しました。");
+        await window.showAlert("通信エラーが発生しました。");
       } finally {
         document.getElementById('loading').classList.add('hidden');
       }

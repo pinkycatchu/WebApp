@@ -19,6 +19,12 @@
 html, body {
   font-family: var(--font-body);
   background-color: var(--color-stone-canvas);
+  /* 無地の白地が寂しく見えないよう、方眼紙のような極薄グリッドを敷く（DESIGN.mdの"paper-textured"路線を維持しつつ彩度は増やさない） */
+  background-image:
+    linear-gradient(rgba(28, 25, 23, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(28, 25, 23, 0.035) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-attachment: fixed;
 }
 
 /* 大見出し用: Roobertの代替としてInter Tight・weight 400・タイトなトラッキング */

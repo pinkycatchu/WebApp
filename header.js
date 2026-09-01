@@ -21,11 +21,49 @@ window.formatDateToYMD = function(dateStr) {
 // ログイン必須ページの先頭で呼ぶ共通チェック。未ログインならindex.htmlへ戻す
 window.requireLogin = function() {
   if (!window.appPassword) {
-    alert("ログインが必要です。");
-    window.location.href = "index.html";
+    window.showAlert("ログインが必要です。").then(() => {
+      window.location.href = "index.html";
+    });
     return false;
   }
   return true;
+};
+
+// 自作アラート／確認ダイアログ（ブラウザ標準alert/confirmはページのオリジンが
+// タイトルに出てしまうため、デザインシステムに合わせた自前モーダルで代替する）
+function showCustomDialog(message, showCancel) {
+  return new Promise((resolve) => {
+    const overlay = document.getElementById('custom-dialog-overlay');
+    const messageEl = document.getElementById('custom-dialog-message');
+    const okBtn = document.getElementById('custom-dialog-ok');
+    const cancelBtn = document.getElementById('custom-dialog-cancel');
+
+    messageEl.textContent = message;
+    cancelBtn.classList.toggle('hidden', !showCancel);
+    overlay.classList.remove('hidden');
+
+    function cleanup(result) {
+      overlay.classList.add('hidden');
+      okBtn.removeEventListener('click', onOk);
+      cancelBtn.removeEventListener('click', onCancel);
+      resolve(result);
+    }
+    function onOk() { cleanup(true); }
+    function onCancel() { cleanup(false); }
+
+    okBtn.addEventListener('click', onOk);
+    cancelBtn.addEventListener('click', onCancel);
+  });
+}
+
+// alert()の代替。OKボタンが押されたら解決するPromiseを返す
+window.showAlert = function(message) {
+  return showCustomDialog(message, false);
+};
+
+// confirm()の代替。OK/キャンセルの選択結果（真偽値）で解決するPromiseを返す
+window.showConfirm = function(message) {
+  return showCustomDialog(message, true);
 };
 
 (function() {
@@ -58,6 +96,19 @@ window.requireLogin = function() {
   </div>
   `;
 
+  // 1.5 共通アラート／確認ダイアログのHTML（alert()・confirm()の代替）
+  const dialogHtml = `
+  <div id="custom-dialog-overlay" class="fixed inset-0 bg-stone-900/70 backdrop-blur-sm flex justify-center items-center z-[60] hidden">
+    <div class="bg-white p-6 rounded-[10px] shadow-[0_12px_45px_rgba(17,12,46,0.12)] max-w-sm w-full mx-4 border border-stone-200">
+      <p id="custom-dialog-message" class="text-stone-800 text-sm whitespace-pre-line leading-relaxed mb-6"></p>
+      <div class="flex justify-end gap-2">
+        <button id="custom-dialog-cancel" class="hidden px-4 py-2 rounded-full text-sm font-medium border border-stone-300 text-stone-700 hover:bg-stone-50 transition">キャンセル</button>
+        <button id="custom-dialog-ok" class="px-4 py-2 rounded-full text-sm font-medium bg-[#3ba6f1] border border-[#3398e1] text-white hover:bg-[#3398e1] shadow-sm transition">OK</button>
+      </div>
+    </div>
+  </div>
+  `;
+
   // 2. 共通ヘッダーのHTML
   const headerHtml = `
   <header class="shadow-sm relative z-40 mb-6 bg-stone-900">
@@ -71,7 +122,8 @@ window.requireLogin = function() {
     </div>
 
     <!-- ▼ 2. 前面に重ねるタイトルバー＆メニューエリア ▼ -->
-    <div class="relative z-20 h-40 md:h-60 flex flex-col">
+    <!-- z-30固定: 同z-indexだと後述の.grain-lineがDOM順で上に来て開いたメニューを横切ってしまうため -->
+    <div class="relative z-30 h-40 md:h-60 flex flex-col">
 
       <!-- タイトルバー -->
       <div class="w-full text-white pt-2">
@@ -151,8 +203,8 @@ window.requireLogin = function() {
   </footer>
   `;
 
-  // bodyの先頭にログイン画面とヘッダーを挿入
-  document.body.insertAdjacentHTML('afterbegin', loginHtml + headerHtml);
+  // bodyの先頭にログイン画面・ダイアログ・ヘッダーを挿入
+  document.body.insertAdjacentHTML('afterbegin', loginHtml + dialogHtml + headerHtml);
 
   // パスワードがあればスライドショーを開始
   if (window.appPassword && window.GAS_API_URL_GLOBAL) {

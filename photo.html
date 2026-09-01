@@ -119,7 +119,7 @@
 
       const specimenId = document.getElementById('photo-specimen').value;
       if (!specimenId) {
-        alert("先に試験体IDを選択してください。");
+        window.showAlert("先に試験体IDを選択してください。");
         event.target.value = "";
         return;
       }
@@ -180,10 +180,10 @@
         } else if (result.status === "auth_error") {
           window.logout();
         } else {
-          alert("エラー: " + result.message);
+          window.showAlert("エラー: " + result.message);
         }
       } catch (error) {
-        alert("通信エラーが発生しました。");
+        window.showAlert("通信エラーが発生しました。");
       } finally {
         // 送信中の画面を消し、連続撮影できるようにリセット
         document.getElementById('upload-overlay').classList.add('hidden');

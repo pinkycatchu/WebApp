@@ -32,6 +32,8 @@ python -m http.server 8000
 
 **認証モデル**: 個別のユーザーアカウントは存在しない。共有の合言葉1つを`localStorage['app_password']`に保存し、GASへのすべての呼び出しに`?password=...`（GET）または`password`フィールド（POSTボディ）として付与する。パスワードが誤っている場合サーバーは`{status: "auth_error"}`を返し、各ページはこれを受けて`localStorage.removeItem('app_password')`のうえ`index.html`へリダイレクトする、という規約になっている。新しいページ/呼び出しを追加する際も、別の認証フローを考案せずこのパターンに従うこと。
 
+**アラート／確認ダイアログ**: ブラウザ標準の`alert()`/`confirm()`は使わない（オリジン名がタイトルに出てしまうため）。代わりに`header.js`が公開する`window.showAlert(message)` / `window.showConfirm(message)`（いずれもPromiseを返す自作モーダル、デザイントークン準拠）を使う。呼び出し元が非同期関数内でメッセージ表示後に画面遷移やリダイレクトを行う場合は`await`すること（表示直後に遷移してしまうのを防ぐため）。新しいページで確認・通知が必要になっても`alert()`/`confirm()`を直書きしないこと。
+
 **GASとの契約**（呼び出し箇所とスプレッドシート実物から確認済み）: バックエンドのスプレッドシート「ExposureTest」には`Specimens`・`Episodes`・`Measurements`・`Embedment Test`・`Block-shear Test`・`Compression Test`のシートがあるが、GAS API（`doGet`/`doPost`、`sheet2API.gs`）が今のところ読み書きしているのは`Specimens`と`Measurements`のみ。他のシートはまだAPI/フロントエンドに繋がっていない。
 
 - GET（`action`無し）: `{status, data: [...]}`。各要素は`Specimens`シートの列そのまま＝`specimen_id, material, status, current_location, effective_days, planned_days, next_measurements, expected_end`など。
@@ -55,7 +57,8 @@ python -m http.server 8000
 
 - `styles.css`は全ページで読み込まれ、Googleフォント「Inter」「Inter Tight」（`DESIGN.md`のSeline系デザインシステムにおけるRoobertの代替、大見出しには`.font-display`クラスを付与）と、いくつかの小さな自作ユーティリティ（`.grain-line`、選択範囲/スクロールバーの配色）を定義している。それ以外はすべてインラインのTailwindユーティリティクラスで、コンポーネントライブラリや`tailwind.config`は存在しない。
 - 配色は`DESIGN.md`のトークンに準拠（2026-09-01に全ページ移行済み）: 中立色はTailwindの`stone-*`スケールがそのままトークンと一致する（`stone-50`=Stone Canvas、`stone-300`=Stone Muted、`stone-400`=Ash Gray、`stone-500`=Warm Gray、`stone-900`=Soot、`stone-950`=Ink Black）ためTailwindクラスをそのまま使う。唯一の彩度アクセントはシアン（`bg-[#3ba6f1]`＝Cyan Signal、`text-[#3398e1]`＝Cyan Edge、`bg-[#c1e1f7]`＝Sky Wash）で、旧来のamber/slate系クラスの代わりに使う。ボタンは`rounded-full`のピル型、カードは`rounded-[10px]`、入力欄は`rounded-[6px]`、カード影は`shadow-[0_4px_16px_rgba(0,0,0,0.05)]`、モーダル等の強調影は`shadow-[0_12px_45px_rgba(17,12,46,0.12)]`。ただし状態バッジ・警告文・緊急連絡ボタンなど意味を持つ色（`emerald-*`=正常稼働、`red-*`=警告・危険・緊急）はDESIGN.mdの単色主義の例外として残してある — 新しい装飾用アクセントとしてこれらを増やさないこと。`blue-*`/`indigo-*`/`gray-*`クラス（Tailwindのデフォルト彩度違い）は使わず、シアンは必ず上記の`#3ba6f1`/`#3398e1`のアービトラリ値で指定すること。
-- ヘッダー（`header.js`）は固定高さ（`h-40 md:h-60`）の`position: relative`要素で、タイトルバーの背面に絶対配置の写真スライドショーがあり、ドロップダウンメニュー（`#global-mobile-menu`）はその固定高さの下にはみ出す前提で配置されている。**外側の`<header>`要素に`overflow-hidden`を付けないこと** — メニュー下半分がクリップされてクリックできなくなる。何かをクリップする必要がある場合（スライドショー写真など）は、既に`overflow-hidden`を持つ内側の`#header-slideshow`div側に限定すること。
+- ヘッダー（`header.js`）は固定高さ（`h-40 md:h-60`）の`position: relative`要素で、タイトルバーの背面に絶対配置の写真スライドショーがあり、ドロップダウンメニュー（`#global-mobile-menu`）はその固定高さの下にはみ出す前提で配置されている。**外側の`<header>`要素に`overflow-hidden`を付けないこと** — メニュー下半分がクリップされてクリックできなくなる。何かをクリップする必要がある場合（スライドショー写真など）は、既に`overflow-hidden`を持つ内側の`#header-slideshow`div側に限定すること。タイトルバー＋メニューを内包するラッパーdivは、直後に続く`.grain-line`（ヘッダー下端のシアン区切り線）より必ず高いz-index（`z-30`）を持たせること — 同値だとDOM順で後にある`.grain-line`が（子要素の`z-50`に関わらず）ラッパー全体の上に重なり、開いたメニューを線が横切って見えるバグになる。
+- ページ背景（`html, body`、全ページ共通）には方眼紙風の極薄グリッド（`rgba(28,25,23,0.035)`の1pxライン、32px間隔）を敷いている。DESIGN.mdの単色主義・パターンは「グラデーション/グラスモーフィズム/装飾的なカラーウォッシュ禁止」だが、これは無彩色の構造的テクスチャなのでその制約には抵触しない、という判断。新たな装飾（別のグラデーションや彩度のある背景）を足す前にこの制約を思い出すこと。
 
 ## 更新履歴
 
@@ -65,3 +68,9 @@ python -m http.server 8000
 - `theme.css`・`variables.css`・`tokens.json`（同時に追加された未追跡ファイル）はDESIGN.mdと同一トークンをTailwind v4/CSS変数/Design Tokens JSON形式でエクスポートしただけの添付ファイルで、どのHTMLからも読み込まれていないことを確認済み（今回リポジトリに追加）。
 - パスワード認証後の実画面（一覧テーブル・一括移動バー・重量測定履歴モーダル・ドロップダウンメニュー・form/photo/calendar/materials/contact各ページ）をローカルサーバー＋ブラウザ操作で目視確認済み。
 - コミット`cb02714`でpush済み。
+
+### 2026-09-01: 背景テクスチャ追加・ヘッダーメニューのz-index修正・alert/confirmの自作モーダル化
+- 「白背景が寂しい」というフィードバックを受け、`styles.css`の`html, body`に方眼紙風の極薄グリッド背景を追加（詳細は「デザインシステム」節）。DESIGN.mdのグラデーション/カラーウォッシュ禁止ルールには抵触しない無彩色テクスチャとして採用。
+- ハンバーガーメニューを開いたときにヘッダー下端の`.grain-line`（シアンの区切り線）がメニューの上に重なって見えるバグを修正。原因はタイトルバー＋メニューのラッパーdivと`.grain-line`が同じ`z-20`だったため、DOM順で後にある`.grain-line`側が全体を覆っていたこと。ラッパー側を`z-30`に上げて解消（`header.js`）。
+- ブラウザ標準の`alert()`/`confirm()`はページのオリジン名（例:「pinkycatchu.github.io says」）がダイアログタイトルに出てしまい消せないため、`header.js`に自作の`window.showAlert()`/`window.showConfirm()`（Promiseベース、デザイントークン準拠のモーダル）を追加し、全ページの呼び出し箇所を置き換えた。運用ルールは上の「アーキテクチャ」節に追記済み。
+- ローカルサーバー＋ブラウザ操作で、背景グリッドの表示・ハンバーガーメニューの重なり解消・自作アラートダイアログの表示（オリジン名タイトルが出ないこと）を目視確認済み。

@@ -218,14 +218,14 @@
           updateStats();
           checkAlerts();
         } else if (result.status === "auth_error") {
-          alert("パスワードが間違っています。再度ログインしてください。");
+          await window.showAlert("パスワードが間違っています。再度ログインしてください。");
           logout();
         } else {
-          alert("エラー: " + result.message);
+          await window.showAlert("エラー: " + result.message);
         }
       } catch (error) {
         console.error("エラー:", error);
-        alert("通信エラーが発生しました。");
+        await window.showAlert("通信エラーが発生しました。");
       } finally {
         document.getElementById('loading').classList.add('hidden');
         document.getElementById('table-container').classList.remove('hidden');
@@ -428,10 +428,10 @@
       const countExposure = document.getElementById('bulk-count-exposure').value;
 
       if (!location) {
-        alert("移動先を選択してください。");
+        await window.showAlert("移動先を選択してください。");
         return;
       }
-      if (!confirm(`${ids.length}件の試験体を「${location}」へ一括移動します。よろしいですか？`)) return;
+      if (!await window.showConfirm(`${ids.length}件の試験体を「${location}」へ一括移動します。よろしいですか？`)) return;
 
       const btn = document.getElementById('btn-bulk-move');
       const originalText = btn.textContent;
@@ -470,7 +470,7 @@
       btn.disabled = false;
       btn.textContent = originalText;
 
-      alert(`一括移動が完了しました。成功: ${successCount}件 / 失敗: ${failCount}件`);
+      await window.showAlert(`一括移動が完了しました。成功: ${successCount}件 / 失敗: ${failCount}件`);
       clearSelection();
       fetchData();
     }
@@ -483,7 +483,7 @@
 
     function exportCSV() {
       if (currentFilteredSpecimens.length === 0) {
-        alert("出力するデータがありません。");
+        window.showAlert("出力するデータがありません。");
         return;
       }
       

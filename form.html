@@ -231,7 +231,7 @@
         } else if (json.status === "auth_error") {
            // 認証エラー時は localStorage を消去してダッシュボードへ戻す
            localStorage.removeItem('app_password');
-           alert("認証の有効期限が切れました。再度ログインしてください。");
+           await window.showAlert("認証の有効期限が切れました。再度ログインしてください。");
            window.location.href = "index.html";
         }
       } catch (e) {
@@ -299,7 +299,7 @@
         );
         isCameraRunning = true;
       } catch (err) {
-        alert("カメラの起動に失敗しました。ブラウザのカメラ許可設定をご確認ください。");
+        window.showAlert("カメラの起動に失敗しました。ブラウザのカメラ許可設定をご確認ください。");
       }
     }
 
@@ -323,7 +323,7 @@
       }
 
       if (!targetId) {
-        alert("試験体IDを選択するか、バーコードを読み取ってください。");
+        window.showAlert("試験体IDを選択するか、バーコードを読み取ってください。");
         return;
       }
 
@@ -336,7 +336,7 @@
       if (currentAction === 'measurement') {
         const weight = document.getElementById('input-weight').value;
         if (!weight) {
-          alert("重量を入力してください。");
+          window.showAlert("重量を入力してください。");
           return;
         }
         payload.weight = weight;
@@ -344,7 +344,7 @@
       } else {
         const loc = document.getElementById('input-location').value;
         if (!loc) {
-          alert("新しい移動場所を選択してください。");
+          window.showAlert("新しい移動場所を選択してください。");
           return;
         }
         payload.new_location = loc;
@@ -374,7 +374,7 @@
           
           if (isContinuous) {
             // ダッシュボードに戻らず、入力欄だけをリセットする
-            alert("✅ 登録が完了しました！\n続けて次の試験体を入力できます。");
+            window.showAlert("✅ 登録が完了しました！\n続けて次の試験体を入力できます。");
             
             scannedSpecimenId = "";
             document.getElementById('specimen-select').value = "";
@@ -397,20 +397,20 @@
             
           } else {
             // 従来通りダッシュボードへ戻る
-            alert("✅ 登録が完了しました！\n" + result.message);
+            await window.showAlert("✅ 登録が完了しました！\n" + result.message);
             window.location.href = "index.html";
           }
         } else if (result.status === "auth_error") {
           localStorage.removeItem('app_password');
-          alert("認証エラーです。再度ログインしてください。");
+          await window.showAlert("認証エラーです。再度ログインしてください。");
           window.location.href = "index.html";
         } else {
-          alert("エラーが発生しました: " + result.message);
+          window.showAlert("エラーが発生しました: " + result.message);
         }
       } catch (error) {
         console.error("送信エラー:", error);
         queuePendingSubmission(payload);
-        alert("通信エラーのため送信待ちに登録しました。\nオンラインに戻ると自動で再送信されるので、このまま次の試験体に進んでも大丈夫です。");
+        window.showAlert("通信エラーのため送信待ちに登録しました。\nオンラインに戻ると自動で再送信されるので、このまま次の試験体に進んでも大丈夫です。");
 
         // 連続入力モード同様、入力欄をリセットして次の作業に進めるようにする
         const isContinuous = document.getElementById('continuous-mode').checked;
