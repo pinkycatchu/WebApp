@@ -118,7 +118,7 @@ window.showConfirm = function(message) {
       <div id="slide-bg-1" class="absolute inset-0 bg-cover bg-center transition-opacity duration-[2000ms] ease-in-out opacity-100"></div>
       <div id="slide-bg-2" class="absolute inset-0 bg-cover bg-center transition-opacity duration-[2000ms] ease-in-out opacity-0"></div>
       <!-- 文字を読みやすくするための暗いフィルター（フラットなsoot半透明スクリム） -->
-      <div class="absolute inset-0 bg-stone-900/80 z-10"></div>
+      <div class="absolute inset-0 bg-stone-900/65 z-10"></div>
     </div>
 
     <!-- ▼ 2. 前面に重ねるタイトルバー＆メニューエリア ▼ -->
