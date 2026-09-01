@@ -17,28 +17,28 @@
   <main class="container mx-auto px-4 max-w-4xl">
 
     <!-- 上部：写真撮影・自動アップロード機能 -->
-    <section class="bg-white p-6 rounded-xl shadow-sm border border-stone-200 mb-8 text-center relative overflow-hidden">
-      <h2 class="text-xl font-bold text-stone-800 mb-4 border-b-2 border-amber-600 pb-2 text-left">📸 写真を撮影して自動保存</h2>
+    <section class="bg-white p-6 rounded-[10px] shadow-[0_4px_16px_rgba(0,0,0,0.05)] border border-stone-200 mb-8 text-center relative overflow-hidden">
+      <h2 class="font-display text-xl text-stone-950 mb-4 border-b-2 border-[#3ba6f1] pb-2 text-left">📸 写真を撮影して自動保存</h2>
 
       <!-- アップロード中のローディング画面 -->
-      <div id="upload-overlay" class="hidden absolute inset-0 bg-white/90 flex flex-col justify-center items-center z-10 rounded-xl">
-        <div class="animate-spin inline-block w-10 h-10 border-4 border-amber-600 border-t-transparent rounded-full mb-2"></div>
-        <p class="text-amber-800 font-bold text-sm">クラウドに自動保存中...</p>
+      <div id="upload-overlay" class="hidden absolute inset-0 bg-white/90 flex flex-col justify-center items-center z-10 rounded-[10px]">
+        <div class="animate-spin inline-block w-10 h-10 border-4 border-[#3ba6f1] border-t-transparent rounded-full mb-2"></div>
+        <p class="text-[#3398e1] font-bold text-sm">クラウドに自動保存中...</p>
       </div>
 
       <!-- どの試験体の写真かをファイル名に紐付けるための選択欄 -->
       <div class="mb-4 text-left">
         <label class="block text-sm font-bold text-stone-700 mb-1">試験体ID <span class="text-red-500">*</span></label>
-        <select id="photo-specimen" class="w-full border border-stone-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white">
+        <select id="photo-specimen" class="w-full border border-stone-300 rounded-[6px] p-2.5 focus:outline-none focus:ring-2 focus:ring-[#3ba6f1] focus:border-[#3ba6f1] bg-white">
           <option value="">データを読み込み中...</option>
         </select>
         <p class="text-xs text-stone-500 mt-1">選択した試験体IDがファイル名に自動で付与され、あとから検索・特定しやすくなります。</p>
       </div>
 
       <!-- カメラ起動ボタン（全体をタップ可能に） -->
-      <label class="block w-full cursor-pointer bg-amber-50 hover:bg-amber-100 border-2 border-dashed border-amber-400 rounded-lg p-10 transition duration-150 shadow-inner">
+      <label class="block w-full cursor-pointer bg-[#c1e1f7]/30 hover:bg-[#c1e1f7]/50 border-2 border-dashed border-[#3ba6f1]/60 rounded-[10px] p-10 transition duration-150">
         <span class="text-5xl mb-3 block">📷</span>
-        <span class="text-amber-800 font-bold block text-lg">ここをタップして撮影</span>
+        <span class="text-[#3398e1] font-bold block text-lg">ここをタップして撮影</span>
         <span class="text-xs text-stone-500 mt-2 block">※撮影後すぐに保存されます</span>
         <input type="file" id="photo-input" accept="image/*" capture="environment" class="hidden">
       </label>
@@ -46,13 +46,13 @@
 
     <!-- 下部：ギャラリー（一覧表示） -->
     <section>
-      <div class="flex justify-between items-center mb-4 border-b-2 border-amber-600 pb-2">
-        <h2 class="text-xl font-bold text-stone-800">写真ギャラリー</h2>
-        <button onclick="loadGallery()" class="text-sm bg-stone-100 hover:bg-stone-200 text-stone-700 px-3 py-1 rounded-lg transition">🔄 更新</button>
+      <div class="flex justify-between items-center mb-4 border-b-2 border-[#3ba6f1] pb-2">
+        <h2 class="font-display text-xl text-stone-950">写真ギャラリー</h2>
+        <button onclick="loadGallery()" class="text-sm bg-white hover:bg-stone-50 border border-stone-300 text-stone-800 px-3 py-1 rounded-full transition">🔄 更新</button>
       </div>
 
       <div id="gallery-loading" class="text-center py-8">
-        <div class="animate-spin inline-block w-8 h-8 border-4 border-amber-600 border-t-transparent rounded-full" role="status"></div>
+        <div class="animate-spin inline-block w-8 h-8 border-4 border-[#3ba6f1] border-t-transparent rounded-full" role="status"></div>
         <p class="mt-2 text-stone-500 text-sm">写真を読み込み中...</p>
       </div>
 
@@ -63,7 +63,7 @@
 
       <!-- さらに読み込むボタン -->
       <div class="text-center mt-6">
-        <button id="btn-load-more" onclick="renderNextBatch()" class="hidden bg-slate-800 text-white px-6 py-2 rounded-lg shadow-sm hover:bg-slate-700 transition">
+        <button id="btn-load-more" onclick="renderNextBatch()" class="hidden bg-white border border-stone-300 text-stone-800 px-6 py-2 rounded-full shadow-sm hover:bg-stone-50 transition">
           さらに読み込む (全 <span id="total-photo-count">0</span>枚)
         </button>
       </div>
@@ -235,11 +235,11 @@
         // ファイル名の先頭（試験体ID_...形式）から試験体IDを抽出して表示する
         const idPart = photo.name.split('_')[0];
         const specimenBadge = (idPart && idPart !== 'Photo')
-          ? `<span class="inline-block text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5 mb-1">${idPart}</span>`
+          ? `<span class="inline-block text-[10px] font-semibold text-[#3398e1] bg-[#c1e1f7]/40 border border-[#3398e1]/30 rounded-full px-1.5 py-0.5 mb-1">${idPart}</span>`
           : '';
 
         const div = document.createElement('div');
-        div.className = "bg-white p-2 rounded-xl shadow-sm border border-stone-200 flex flex-col";
+        div.className = "bg-white p-2 rounded-[10px] shadow-[0_4px_16px_rgba(0,0,0,0.05)] border border-stone-200 flex flex-col";
         div.innerHTML = `
           <a href="https://drive.google.com/file/d/${photo.id}/view" target="_blank" class="block bg-stone-100 rounded-lg overflow-hidden relative pb-[100%] hover:opacity-80 transition">
              <img src="${thumbUrl}" loading="lazy" class="absolute inset-0 w-full h-full object-cover" alt="${photo.name}">

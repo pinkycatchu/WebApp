@@ -17,49 +17,49 @@
 
     <!-- ようこそ・概要セクション -->
     <div class="mb-6">
-      <p class="text-[11px] tracking-[0.25em] text-amber-700 font-semibold mb-1">SPECIMEN TRACKING SYSTEM</p>
-      <h2 class="text-2xl md:text-3xl font-bold text-stone-900 mb-1">試験体一覧ダッシュボード</h2>
+      <p class="text-[11px] tracking-[0.25em] text-[#3398e1] font-semibold mb-1">SPECIMEN TRACKING SYSTEM</p>
+      <h2 class="font-display text-2xl md:text-3xl text-stone-950 mb-1">試験体一覧ダッシュボード</h2>
       <p class="text-stone-500 text-sm">屋外暴露試験・促進耐候性試験の進捗をひと目で確認できます。</p>
     </div>
 
     <!-- 概要統計カード -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <div class="bg-white rounded-xl border border-stone-200 shadow-sm p-4">
+      <div class="bg-white rounded-[10px] border border-stone-200 shadow-[0_4px_16px_rgba(0,0,0,0.05)] p-4">
         <p class="text-xs text-stone-500 mb-1">総試験体数</p>
-        <p id="stat-total" class="text-3xl font-bold text-stone-900">–</p>
+        <p id="stat-total" class="text-3xl font-medium text-stone-950">–</p>
       </div>
-      <div class="bg-white rounded-xl border border-stone-200 shadow-sm p-4">
+      <div class="bg-white rounded-[10px] border border-stone-200 shadow-[0_4px_16px_rgba(0,0,0,0.05)] p-4">
         <p class="text-xs text-stone-500 mb-1">暴露期間中</p>
-        <p id="stat-active" class="text-3xl font-bold text-emerald-700">–</p>
+        <p id="stat-active" class="text-3xl font-medium text-emerald-700">–</p>
       </div>
-      <div class="bg-white rounded-xl border border-stone-200 shadow-sm p-4">
+      <div class="bg-white rounded-[10px] border border-stone-200 shadow-[0_4px_16px_rgba(0,0,0,0.05)] p-4">
         <p class="text-xs text-stone-500 mb-1">暴露終了</p>
-        <p id="stat-done" class="text-3xl font-bold text-slate-700">–</p>
+        <p id="stat-done" class="text-3xl font-medium text-stone-700">–</p>
       </div>
-      <div class="bg-white rounded-xl border border-stone-200 shadow-sm p-4">
+      <div class="bg-white rounded-[10px] border border-stone-200 shadow-[0_4px_16px_rgba(0,0,0,0.05)] p-4">
         <p class="text-xs text-stone-500 mb-1">要確認</p>
-        <p id="stat-alert" class="text-3xl font-bold text-red-600">–</p>
+        <p id="stat-alert" class="text-3xl font-medium text-red-600">–</p>
       </div>
     </div>
 
     <div id="alert-container" class="mb-6 hidden"></div>
 
     <!-- 高機能コントロールバー（検索・各種フィルタ・更新） -->
-    <div class="bg-white p-4 rounded-xl shadow-sm border border-stone-200 mb-6 flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
+    <div class="bg-white p-4 rounded-[10px] shadow-[0_4px_16px_rgba(0,0,0,0.05)] border border-stone-200 mb-6 flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
       <div class="flex gap-3 flex-wrap items-center w-full">
 
         <!-- 1. 試験体ID検索 -->
-        <input type="text" id="search-input" placeholder="ID検索..." class="border border-stone-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 w-full sm:w-auto">
+        <input type="text" id="search-input" placeholder="ID検索..." class="border border-stone-300 rounded-[6px] px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#3ba6f1] focus:border-[#3ba6f1] w-full sm:w-auto">
 
         <!-- 2. 素材検索 -->
-        <select id="material-filter" class="border border-stone-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 w-full sm:w-auto bg-white">
+        <select id="material-filter" class="border border-stone-300 rounded-[6px] px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#3ba6f1] focus:border-[#3ba6f1] w-full sm:w-auto bg-white">
           <option value="">-- すべての素材 --</option>
           <option value="CLT">CLT</option>
           <option value="集成材">集成材</option>
         </select>
 
         <!-- 3. 状態フィルター -->
-        <select id="condition-filter" class="border border-stone-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 w-full sm:w-auto bg-white">
+        <select id="condition-filter" class="border border-stone-300 rounded-[6px] px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#3ba6f1] focus:border-[#3ba6f1] w-full sm:w-auto bg-white">
           <option value="">-- すべての状態 --</option>
           <option value="暴露前">暴露前</option>
           <option value="暴露期間中">暴露期間中</option>
@@ -67,59 +67,59 @@
         </select>
 
         <!-- 4. 現在地フィルター（選択肢はheader.jsのLOCATIONSから生成） -->
-        <select id="location-filter" class="border border-stone-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 w-full sm:w-auto bg-white">
+        <select id="location-filter" class="border border-stone-300 rounded-[6px] px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#3ba6f1] focus:border-[#3ba6f1] w-full sm:w-auto bg-white">
           <option value="">-- すべての場所 --</option>
         </select>
 
         <!-- 5. 暴露日数フィルター（範囲） -->
-        <div class="flex items-center gap-1 bg-stone-50 border border-stone-300 rounded-lg px-2 py-1 w-full sm:w-auto">
+        <div class="flex items-center gap-1 bg-stone-50 border border-stone-300 rounded-[6px] px-2 py-1 w-full sm:w-auto">
           <span class="text-sm text-stone-600 font-medium whitespace-nowrap">暴露日数:</span>
-          <input type="number" id="days-min" placeholder="Min" class="w-16 border border-stone-300 rounded-md px-1.5 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white">
+          <input type="number" id="days-min" placeholder="Min" class="w-16 border border-stone-300 rounded-[6px] px-1.5 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#3ba6f1] focus:border-[#3ba6f1] bg-white">
           <span class="text-stone-500 text-sm">〜</span>
-          <input type="number" id="days-max" placeholder="Max" class="w-16 border border-stone-300 rounded-md px-1.5 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white">
+          <input type="number" id="days-max" placeholder="Max" class="w-16 border border-stone-300 rounded-[6px] px-1.5 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#3ba6f1] focus:border-[#3ba6f1] bg-white">
           <span class="text-stone-500 text-sm">日</span>
         </div>
       </div>
 
       <!-- CSV出力ボタンと更新ボタン -->
       <div class="flex gap-2 w-full lg:w-auto mt-2 lg:mt-0 justify-end">
-        <button onclick="exportCSV()" class="bg-white text-stone-700 border border-stone-300 px-4 py-2 rounded-lg text-sm font-medium hover:bg-stone-50 flex items-center gap-1 shadow-sm whitespace-nowrap transition">
+        <button onclick="exportCSV()" class="bg-white text-stone-800 border border-stone-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-stone-50 flex items-center gap-1 shadow-sm whitespace-nowrap transition">
           <span>CSV出力</span>
         </button>
-        <button onclick="fetchData()" class="bg-slate-800 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-slate-700 flex items-center gap-1 shadow-sm whitespace-nowrap transition">
+        <button onclick="fetchData()" class="bg-white text-stone-800 border border-stone-300 px-5 py-2 rounded-full text-sm font-medium hover:bg-stone-50 flex items-center gap-1 shadow-sm whitespace-nowrap transition">
           <span>データを更新</span>
         </button>
       </div>
     </div>
 
     <div id="loading" class="text-center py-12 hidden">
-      <div class="animate-spin inline-block w-8 h-8 border-4 border-amber-600 border-t-transparent rounded-full" role="status"></div>
+      <div class="animate-spin inline-block w-8 h-8 border-4 border-[#3ba6f1] border-t-transparent rounded-full" role="status"></div>
       <p class="mt-2 text-stone-500">データを取得中...</p>
     </div>
 
     <!-- 選択中の試験体をまとめて移動するバー（1件以上選択で表示） -->
-    <div id="bulk-action-bar" class="hidden bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4 flex flex-col lg:flex-row gap-3 items-start lg:items-center justify-between">
-      <p class="text-sm font-semibold text-amber-800"><span id="bulk-count">0</span>件を選択中</p>
+    <div id="bulk-action-bar" class="hidden bg-[#c1e1f7]/30 border border-[#3398e1]/30 rounded-[10px] p-4 mb-4 flex flex-col lg:flex-row gap-3 items-start lg:items-center justify-between">
+      <p class="text-sm font-semibold text-[#3398e1]"><span id="bulk-count">0</span>件を選択中</p>
       <div class="flex flex-wrap gap-2 items-center">
-        <select id="bulk-location" class="border border-stone-300 rounded-lg px-3 py-1.5 text-sm bg-white">
+        <select id="bulk-location" class="border border-stone-300 rounded-[6px] px-3 py-1.5 text-sm bg-white">
           <option value="">-- 移動先を選択 --</option>
         </select>
-        <select id="bulk-condition" class="border border-stone-300 rounded-lg px-3 py-1.5 text-sm bg-white">
+        <select id="bulk-condition" class="border border-stone-300 rounded-[6px] px-3 py-1.5 text-sm bg-white">
           <option value="暴露期間中">暴露期間中</option>
           <option value="暴露前">暴露前</option>
           <option value="保管中">保管中</option>
           <option value="暴露終了">暴露終了（回収）</option>
         </select>
-        <select id="bulk-count-exposure" class="border border-stone-300 rounded-lg px-3 py-1.5 text-sm bg-white font-semibold text-amber-700">
+        <select id="bulk-count-exposure" class="border border-stone-300 rounded-[6px] px-3 py-1.5 text-sm bg-white font-semibold text-[#3398e1]">
           <option value="含める">含める（暴露期間としてカウント）</option>
           <option value="含めない">含めない（一時保管・恒温室・回収など）</option>
         </select>
-        <button onclick="executeBulkMove()" id="btn-bulk-move" class="bg-amber-700 hover:bg-amber-800 text-white text-sm font-semibold px-4 py-1.5 rounded-lg shadow-sm transition">一括移動を実行</button>
+        <button onclick="executeBulkMove()" id="btn-bulk-move" class="bg-[#3ba6f1] border border-[#3398e1] hover:bg-[#3398e1] text-white text-sm font-medium px-4 py-1.5 rounded-full shadow-sm transition">一括移動を実行</button>
         <button onclick="clearSelection()" class="text-sm text-stone-500 hover:text-stone-700 px-2 transition">選択解除</button>
       </div>
     </div>
 
-    <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-x-auto hidden" id="table-container">
+    <div class="bg-white rounded-[10px] shadow-[0_4px_16px_rgba(0,0,0,0.05)] border border-stone-200 overflow-x-auto hidden" id="table-container">
       <table class="min-w-full text-left text-sm whitespace-nowrap">
         <thead class="bg-stone-50 border-b border-stone-200 font-semibold text-stone-500 uppercase tracking-wide text-xs">
           <tr>
@@ -141,10 +141,10 @@
   </main>
 
   <!-- 重量測定履歴グラフのモーダル -->
-  <div id="history-dialog" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center z-[60] hidden p-4">
-    <div class="bg-white rounded-xl shadow-2xl border border-stone-200 max-w-2xl w-full p-6 max-h-[85vh] overflow-y-auto">
+  <div id="history-dialog" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm flex items-center justify-center z-[60] hidden p-4">
+    <div class="bg-white rounded-[16px] shadow-[0_12px_45px_rgba(17,12,46,0.12)] border border-stone-200 max-w-2xl w-full p-6 max-h-[85vh] overflow-y-auto">
       <div class="flex justify-between items-start mb-4">
-        <h3 id="history-dialog-title" class="text-lg font-bold text-stone-900">重量測定履歴</h3>
+        <h3 id="history-dialog-title" class="font-display text-lg text-stone-950">重量測定履歴</h3>
         <button onclick="closeHistoryDialog()" class="text-stone-400 hover:text-stone-600 transition" aria-label="閉じる">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -152,7 +152,7 @@
         </button>
       </div>
       <div id="history-loading" class="text-center py-8">
-        <div class="animate-spin inline-block w-8 h-8 border-4 border-amber-600 border-t-transparent rounded-full"></div>
+        <div class="animate-spin inline-block w-8 h-8 border-4 border-[#3ba6f1] border-t-transparent rounded-full"></div>
       </div>
       <div id="history-content" class="hidden">
         <canvas id="history-chart" height="200"></canvas>
@@ -268,12 +268,12 @@
 
       filtered.forEach(item => {
         const tr = document.createElement('tr');
-        tr.className = "hover:bg-amber-50/40 transition duration-150";
+        tr.className = "hover:bg-[#c1e1f7]/20 transition duration-150";
 
         let badgeStyle = "bg-stone-100 text-stone-600";
         // バッジの判定を status に戻しました
         if (item.status === "暴露期間中") badgeStyle = "bg-emerald-100 text-emerald-800 font-semibold";
-        if (item.status === "暴露終了") badgeStyle = "bg-slate-100 text-slate-700";
+        if (item.status === "暴露終了") badgeStyle = "bg-stone-100 text-stone-700";
 
         const effective = Number(item.effective_days) || 0;
         const planned = Number(item.planned_days) || 0;
@@ -284,13 +284,13 @@
 
         tr.innerHTML = `
           <td class="py-3 px-4"><input type="checkbox" class="specimen-checkbox" value="${item.specimen_id || ''}" onchange="updateBulkBar()"></td>
-          <td class="py-3 px-4 font-semibold text-amber-800">${item.specimen_id || '-'}</td>
+          <td class="py-3 px-4 font-semibold text-[#3398e1]">${item.specimen_id || '-'}</td>
           <td class="py-3 px-4">
             <div class="flex gap-1">
-              <a href="form.html?id=${encodeURIComponent(item.specimen_id || '')}" class="text-amber-700 hover:text-amber-900 text-xs font-medium bg-amber-50 px-2 py-1 rounded-md border border-amber-200 transition">
+              <a href="form.html?id=${encodeURIComponent(item.specimen_id || '')}" class="text-[#3398e1] hover:text-stone-950 text-xs font-medium bg-[#c1e1f7]/40 px-2 py-1 rounded-full border border-[#3398e1]/30 transition">
                 記録する
               </a>
-              <button onclick="showHistory('${item.specimen_id || ''}')" class="text-slate-700 hover:text-slate-900 text-xs font-medium bg-slate-50 px-2 py-1 rounded-md border border-slate-200 transition">
+              <button onclick="showHistory('${item.specimen_id || ''}')" class="text-stone-700 hover:text-stone-950 text-xs font-medium bg-stone-50 px-2 py-1 rounded-full border border-stone-200 transition">
                 📈 履歴
               </button>
             </div>
@@ -355,10 +355,10 @@
           datasets: [{
             label: '重量 (g)',
             data: rows.map(r => Number(r['重量(g)'])),
-            borderColor: '#92672f',
-            backgroundColor: 'rgba(146, 103, 47, 0.1)',
+            borderColor: '#3ba6f1',
+            backgroundColor: 'rgba(59, 166, 241, 0.1)',
             tension: 0.2,
-            pointBackgroundColor: '#92672f',
+            pointBackgroundColor: '#3398e1',
             fill: true
           }]
         },

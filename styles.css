@@ -1,21 +1,45 @@
-@import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@400;500&display=swap');
+
+:root {
+  --color-stone-canvas: #fafaf9;
+  --color-pure-white: #ffffff;
+  --color-stone-border: #e8e6e5;
+  --color-stone-muted: #d6d3d1;
+  --color-ash-gray: #a8a29e;
+  --color-warm-gray: #78716c;
+  --color-ink-black: #0c0a09;
+  --color-soot: #1c1917;
+  --color-sky-wash: #c1e1f7;
+  --color-cyan-signal: #3ba6f1;
+  --color-cyan-edge: #3398e1;
+  --font-display: 'Inter Tight', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+  --font-body: 'Inter', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+}
 
 html, body {
-  font-family: 'Zen Kaku Gothic New', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+  font-family: var(--font-body);
+  background-color: var(--color-stone-canvas);
+}
+
+/* 大見出し用: Roobertの代替としてInter Tight・weight 400・タイトなトラッキング */
+.font-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.02em;
 }
 
 ::selection {
-  background: #92672f;
+  background: var(--color-cyan-signal);
   color: #fff;
 }
 
 ::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: #f4f1ea; }
-::-webkit-scrollbar-thumb { background: #d8cdb8; border-radius: 999px; }
-::-webkit-scrollbar-thumb:hover { background: #c2b393; }
+::-webkit-scrollbar-track { background: var(--color-stone-canvas); }
+::-webkit-scrollbar-thumb { background: var(--color-stone-muted); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-ash-gray); }
 
-/* 木目調のアクセントライン（ヘッダー下部などで使用） */
+/* ヘッダー下部の区切りライン（シアンのハイライン、ブランドの唯一の彩度アクセント） */
 .grain-line {
-  height: 3px;
-  background: linear-gradient(90deg, #92672f 0%, #c9a15f 50%, #92672f 100%);
+  height: 2px;
+  background: rgba(59, 166, 241, 0.45);
 }

@@ -15,18 +15,18 @@
 
   <main class="container mx-auto px-4 max-w-lg">
     <!-- 通信エラー時の送信待ちキューの状態表示 -->
-    <div id="pending-indicator" class="hidden mb-4 text-xs font-semibold text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2"></div>
+    <div id="pending-indicator" class="hidden mb-4 text-xs font-semibold text-[#3398e1] bg-[#c1e1f7]/30 border border-[#3398e1]/30 rounded-[6px] px-3 py-2"></div>
 
-    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+    <div class="bg-white p-6 rounded-[10px] shadow-[0_4px_16px_rgba(0,0,0,0.05)] border border-stone-200">
 
       <!-- 1. アクション選択 -->
       <div class="mb-6">
         <label class="block text-sm font-bold text-stone-700 mb-2">入力する作業の種類</label>
         <div class="grid grid-cols-2 gap-2">
-          <button type="button" id="btn-action-measure" onclick="setAction('measurement')" class="py-2 px-4 rounded-lg font-semibold border-2 border-amber-700 bg-amber-700 text-white text-center transition duration-150">
+          <button type="button" id="btn-action-measure" onclick="setAction('measurement')" class="py-2 px-4 rounded-full font-medium border border-[#3398e1] bg-[#3ba6f1] text-white text-center transition duration-150">
             重量測定
           </button>
-          <button type="button" id="btn-action-episode" onclick="setAction('episode')" class="py-2 px-4 rounded-lg font-semibold border-2 border-stone-300 bg-white text-stone-700 text-center hover:bg-stone-50 transition duration-150">
+          <button type="button" id="btn-action-episode" onclick="setAction('episode')" class="py-2 px-4 rounded-full font-medium border border-stone-300 bg-white text-stone-800 text-center hover:bg-stone-50 transition duration-150">
             試験体移動
           </button>
         </div>
@@ -37,23 +37,23 @@
         <label class="block text-sm font-bold text-stone-700 mb-2">試験体IDの入力方法</label>
         <div class="flex gap-4 mb-3">
           <label class="inline-flex items-center cursor-pointer">
-            <input type="radio" name="input-method" value="barcode" checked onchange="toggleInputMethod()" class="form-radio text-amber-700">
+            <input type="radio" name="input-method" value="barcode" checked onchange="toggleInputMethod()" class="form-radio text-[#3ba6f1]">
             <span class="ml-2 text-sm">QRコード読み取り</span>
           </label>
           <label class="inline-flex items-center cursor-pointer">
-            <input type="radio" name="input-method" value="select" onchange="toggleInputMethod()" class="form-radio text-amber-700">
+            <input type="radio" name="input-method" value="select" onchange="toggleInputMethod()" class="form-radio text-[#3ba6f1]">
             <span class="ml-2 text-sm">プルダウンで選択</span>
           </label>
         </div>
 
         <div id="area-select" class="hidden">
-          <select id="specimen-select" class="w-full border border-stone-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white">
+          <select id="specimen-select" class="w-full border border-stone-300 rounded-[6px] p-2.5 focus:outline-none focus:ring-2 focus:ring-[#3ba6f1] focus:border-[#3ba6f1] bg-white">
             <option value="">データを読み込み中...</option>
           </select>
         </div>
 
         <div id="area-barcode">
-          <div id="reader" class="w-full bg-black rounded-lg overflow-hidden mb-2"></div>
+          <div id="reader" class="w-full bg-black rounded-[10px] overflow-hidden mb-2"></div>
           <p id="barcode-result" class="text-sm font-bold text-emerald-600 my-1 hidden"></p>
         </div>
       </div>
@@ -64,11 +64,11 @@
       <div id="form-measurement">
         <div class="mb-4">
           <label class="block text-sm font-bold text-stone-700 mb-1">重量 (g) <span class="text-red-500">*</span></label>
-          <input type="number" id="input-weight" step="0.01" placeholder="例: 1250.50" class="w-full border border-stone-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+          <input type="number" id="input-weight" step="0.01" placeholder="例: 1250.50" class="w-full border border-stone-300 rounded-[6px] p-2.5 focus:outline-none focus:ring-2 focus:ring-[#3ba6f1] focus:border-[#3ba6f1]">
         </div>
         <div class="mb-6">
           <label class="block text-sm font-bold text-stone-700 mb-1">備考・メモ (任意)</label>
-          <input type="text" id="input-note-measure" placeholder="状態の変化などがあれば記録" class="w-full border border-stone-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+          <input type="text" id="input-note-measure" placeholder="状態の変化などがあれば記録" class="w-full border border-stone-300 rounded-[6px] p-2.5 focus:outline-none focus:ring-2 focus:ring-[#3ba6f1] focus:border-[#3ba6f1]">
         </div>
       </div>
 
@@ -78,14 +78,14 @@
         <!-- 移動先（選択肢はheader.jsのLOCATIONSから生成） -->
         <div class="mb-4">
           <label class="block text-sm font-bold text-stone-700 mb-1">新しい移動場所 <span class="text-red-500">*</span></label>
-          <select id="input-location" class="w-full border border-stone-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white">
+          <select id="input-location" class="w-full border border-stone-300 rounded-[6px] p-2.5 focus:outline-none focus:ring-2 focus:ring-[#3ba6f1] focus:border-[#3ba6f1] bg-white">
             <option value="">-- 移動場所を選択 --</option>
           </select>
         </div>
 
         <div class="mb-4">
           <label class="block text-sm font-bold text-stone-700 mb-1">更新後の状態 <span class="text-red-500">*</span></label>
-          <select id="input-condition" class="w-full border border-stone-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white">
+          <select id="input-condition" class="w-full border border-stone-300 rounded-[6px] p-2.5 focus:outline-none focus:ring-2 focus:ring-[#3ba6f1] focus:border-[#3ba6f1] bg-white">
             <option value="暴露期間中">暴露期間中</option>
             <option value="暴露前">暴露前</option>
             <option value="保管中">保管中</option>
@@ -96,7 +96,7 @@
         <!-- 暴露日数に含めるかどうかの選択 -->
         <div class="mb-4">
           <label class="block text-sm font-bold text-stone-700 mb-1">この移動先の期間を暴露日数に含めますか？ <span class="text-red-500">*</span></label>
-          <select id="input-count-exposure" class="w-full border border-stone-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white font-semibold text-amber-700">
+          <select id="input-count-exposure" class="w-full border border-stone-300 rounded-[6px] p-2.5 focus:outline-none focus:ring-2 focus:ring-[#3ba6f1] focus:border-[#3ba6f1] bg-white font-semibold text-[#3398e1]">
             <option value="含める">含める（暴露期間としてカウント）</option>
             <option value="含めない">含めない（一時保管・恒温室・回収など）</option>
           </select>
@@ -105,17 +105,17 @@
 
         <div class="mb-6">
           <label class="block text-sm font-bold text-stone-700 mb-1">備考・メモ (任意)</label>
-          <input type="text" id="input-note-episode" placeholder="移動の理由や作業者名など" class="w-full border border-stone-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+          <input type="text" id="input-note-episode" placeholder="移動の理由や作業者名など" class="w-full border border-stone-300 rounded-[6px] p-2.5 focus:outline-none focus:ring-2 focus:ring-[#3ba6f1] focus:border-[#3ba6f1]">
         </div>
       </div>
 
       <!-- 連続入力モードのチェックボックス -->
-      <div class="mb-4 bg-amber-50 p-3 rounded-lg border border-amber-200 flex items-center">
-        <input type="checkbox" id="continuous-mode" class="w-5 h-5 text-amber-700 border-stone-300 rounded focus:ring-amber-500 cursor-pointer" checked>
-        <label for="continuous-mode" class="ml-2 font-bold text-amber-800 cursor-pointer text-sm">連続で入力する</label>
+      <div class="mb-4 bg-[#c1e1f7]/30 p-3 rounded-[6px] border border-[#3398e1]/30 flex items-center">
+        <input type="checkbox" id="continuous-mode" class="w-5 h-5 text-[#3ba6f1] border-stone-300 rounded focus:ring-[#3ba6f1] cursor-pointer" checked>
+        <label for="continuous-mode" class="ml-2 font-bold text-[#3398e1] cursor-pointer text-sm">連続で入力する</label>
       </div>
 
-      <button type="button" id="btn-submit" onclick="submitData()" class="w-full bg-amber-700 hover:bg-amber-800 text-white font-bold py-3 px-4 rounded-lg shadow-sm transition duration-150 flex justify-center items-center">
+      <button type="button" id="btn-submit" onclick="submitData()" class="w-full bg-[#3ba6f1] border border-[#3398e1] hover:bg-[#3398e1] text-white font-medium py-3 px-4 rounded-full shadow-sm transition duration-150 flex justify-center items-center">
         <span>この内容で登録する</span>
       </button>
 
@@ -247,13 +247,13 @@
       const formEpisode = document.getElementById('form-episode');
 
       if (action === 'measurement') {
-        btnMeasure.className = "py-2 px-4 rounded-lg font-semibold border-2 border-amber-700 bg-amber-700 text-white text-center transition duration-150";
-        btnEpisode.className = "py-2 px-4 rounded-lg font-semibold border-2 border-stone-300 bg-white text-stone-700 text-center hover:bg-stone-50 transition duration-150";
+        btnMeasure.className = "py-2 px-4 rounded-full font-medium border border-[#3398e1] bg-[#3ba6f1] text-white text-center transition duration-150";
+        btnEpisode.className = "py-2 px-4 rounded-full font-medium border border-stone-300 bg-white text-stone-800 text-center hover:bg-stone-50 transition duration-150";
         formMeasure.classList.remove('hidden');
         formEpisode.classList.add('hidden');
       } else {
-        btnEpisode.className = "py-2 px-4 rounded-lg font-semibold border-2 border-amber-700 bg-amber-700 text-white text-center transition duration-150";
-        btnMeasure.className = "py-2 px-4 rounded-lg font-semibold border-2 border-stone-300 bg-white text-stone-700 text-center hover:bg-stone-50 transition duration-150";
+        btnEpisode.className = "py-2 px-4 rounded-full font-medium border border-[#3398e1] bg-[#3ba6f1] text-white text-center transition duration-150";
+        btnMeasure.className = "py-2 px-4 rounded-full font-medium border border-stone-300 bg-white text-stone-800 text-center hover:bg-stone-50 transition duration-150";
         formEpisode.classList.remove('hidden');
         formMeasure.classList.add('hidden');
       }
