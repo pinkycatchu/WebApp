@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>割れ撮影 - 試験体管理</title>
+  <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon-180x180.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 撮影した写真のレンズ（超広角かどうか）を確かめるためにEXIFを読む -->
+  <script src="https://cdn.jsdelivr.net/npm/exifr@7/dist/lite.umd.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-stone-50 text-stone-800 min-h-screen pb-12">
+
+  <script src="header.js"></script>
+
+  <main class="container mx-auto px-4 max-w-3xl">
+
+    <!-- 1. 撮影前のチェックリスト -->
+    <section class="bg-white p-5 rounded-[10px] shadow-[0_4px_16px_rgba(0,0,0,0.05)] border border-stone-200 mb-6">
+      <div class="flex justify-between items-center border-b-2 border-[#3ba6f1] pb-2 mb-3">
+        <h2 class="font-display text-xl text-stone-950">① 撮影前のチェック</h2>
+        <span id="checklist-status" class="text-xs font-semibold rounded-full px-2 py-0.5"></span>
+      </div>
+      <p class="text-xs text-stone-500 mb-3">全部にチェックすると撮影できます（チェックはその日のうちは保持されます）。</p>
+      <div id="checklist" class="space-y-2 text-sm"></div>
+    </section>
+
+    <!-- 2. 試験体と撮影段階 -->
+    <section class="bg-white p-5 rounded-[10px] shadow-[0_4px_16px_rgba(0,0,0,0.05)] border border-stone-200 mb-6">
+      <h2 class="font-display text-xl text-stone-950 border-b-2 border-[#3ba6f1] pb-2 mb-4">② 試験体と段階を選ぶ</h2>
+      <label class="block text-sm font-bold text-stone-700 mb-1">試験体ID <span class="text-red-500">*</span></label>
+      <select id="crack-specimen" class="w-full border border-stone-300 rounded-[6px] p-2.5 focus:outline-none focus:ring-2 focus:ring-[#3ba6f1] focus:border-[#3ba6f1] bg-white mb-4">
+        <option value="">データを読み込み中...</option>
+      </select>
+
+      <label class="block text-sm font-bold text-stone-700 mb-1">段階</label>
+      <div class="grid grid-cols-2 gap-2" id="phase-buttons">
+        <button data-phase="before" class="phase-button rounded-full border px-4 py-2 text-sm font-semibold transition">なぞる前</button>
+        <button data-phase="after" class="phase-button rounded-full border px-4 py-2 text-sm font-semibold transition">マーカーでなぞった後</button>
+      </div>
+      <p class="text-xs text-stone-500 mt-2">なぞる前・後は、三脚を動かさずに同じ位置から撮ってください（あとで割れの判定を見直すため）。</p>
+    </section>
+
+    <!-- 3. 面ごとの撮影 -->
+    <section class="bg-white p-5 rounded-[10px] shadow-[0_4px_16px_rgba(0,0,0,0.05)] border border-stone-200 mb-6 relative">
+      <div class="flex justify-between items-center border-b-2 border-[#3ba6f1] pb-2 mb-4">
+        <h2 class="font-display text-xl text-stone-950">③ 面ごとに撮影</h2>
+        <button onclick="loadProgress()" class="text-sm bg-white hover:bg-stone-50 border border-stone-300 text-stone-800 px-3 py-1 rounded-full transition">🔄 更新</button>
+      </div>
+
+      <!-- 面の名前の決め方（向かい合う面の左右反転をそろえるため、撮る順番を固定する） -->
+      <div class="flex flex-col sm:flex-row gap-4 items-center mb-5 bg-stone-50 border border-stone-200 rounded-[10px] p-4">
+        <svg viewBox="0 0 160 160" class="w-36 h-36 shrink-0" aria-label="側面A〜Dの位置">
+          <rect x="35" y="35" width="90" height="90" fill="#f5f5f4" stroke="#1c1917" stroke-width="2"/>
+          <text x="80" y="76" text-anchor="middle" font-size="12" fill="#57534e">上面</text>
+          <text x="80" y="92" text-anchor="middle" font-size="9" fill="#78716c">（上から見た図）</text>
+          <text x="80" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#3398e1">A</text>
+          <text x="140" y="85" text-anchor="middle" font-size="14" font-weight="bold" fill="#3398e1">B</text>
+          <text x="80" y="148" text-anchor="middle" font-size="14" font-weight="bold" fill="#3398e1">C</text>
+          <text x="20" y="85" text-anchor="middle" font-size="14" font-weight="bold" fill="#3398e1">D</text>
+          <path d="M 112 22 A 62 62 0 0 1 140 52" fill="none" stroke="#3ba6f1" stroke-width="2" marker-end="url(#arrow)"/>
+          <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#3ba6f1"/></marker></defs>
+        </svg>
+        <ul class="text-sm text-stone-700 space-y-1 list-disc list-inside">
+          <li>上面を上にして、<b>上から見て時計回りに A→B→C→D</b></li>
+          <li><b>A・C</b>：中層の木口が見える面　<b>B・D</b>：上層・下層の木口が見える面</li>
+          <li>A面にする辺には鉛筆で印を付けておく</li>
+          <li>側面は<b>上面が写真の上</b>になるように撮る</li>
+        </ul>
+      </div>
+
+      <div id="face-cards" class="space-y-3"></div>
+
+      <input type="file" id="crack-input" accept="image/*" capture="environment" class="hidden">
+    </section>
+
+    <!-- 撮影直後の確認（保存前に、解像度・レンズ・明るさ・ピントを確かめる） -->
+    <div id="review-overlay" class="hidden fixed inset-0 bg-stone-950/60 z-[60] overflow-y-auto">
+      <div class="bg-white max-w-2xl mx-auto my-6 rounded-[10px] shadow-[0_12px_45px_rgba(17,12,46,0.12)] p-5">
+        <h3 class="font-display text-lg text-stone-950 mb-1">撮影した写真の確認</h3>
+        <p id="review-title" class="text-sm text-stone-500 mb-3"></p>
+        <img id="review-image" class="w-full rounded-[6px] border border-stone-200 mb-3" alt="撮影した写真">
+        <p class="text-xs font-bold text-stone-700 mb-1">中央の等倍表示（ピントと、割れ・マーカーの線が見えるか確認）</p>
+        <canvas id="review-crop" class="w-full rounded-[6px] border border-stone-200 mb-3"></canvas>
+        <ul id="review-checks" class="space-y-1 text-sm mb-4"></ul>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="closeReview()" class="rounded-full border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold hover:bg-stone-50">撮り直す</button>
+          <button id="review-save" onclick="saveReviewedPhoto()" class="rounded-full bg-[#3ba6f1] border border-[#3398e1] text-white px-4 py-2.5 text-sm font-semibold hover:bg-[#3398e1]">この写真で保存</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="upload-overlay" class="hidden fixed inset-0 bg-white/90 flex flex-col justify-center items-center z-[70]">
+      <div class="animate-spin inline-block w-10 h-10 border-4 border-[#3ba6f1] border-t-transparent rounded-full mb-2"></div>
+      <p class="text-[#3398e1] font-bold text-sm">元の画質のまま保存中...（数秒〜数十秒）</p>
+    </div>
+
+  </main>
+
+  <script>
+    const GAS_API_URL = window.GAS_API_URL_GLOBAL;
+
+    // 撮影前に毎回確かめること。スマホのカメラ設定はページから変えられないので、人が確認する
+    const CHECKLIST_ITEMS = [
+      "カメラは標準レンズ（1倍か2倍）。超広角（0.5倍）は端が歪むので使わない",
+      "画面比は 4:3（16:9 は上下が切れて画素数が減る）。ポートレート・夜景・フィルタはオフ（Pixel の HDR+ は切れないのでそのままでよい）",
+      "三脚で、上面は真上から・側面は真正面から撮る（画面の中央に試験体）",
+      "試験体の四隅がすべて写り、周りに床（または背景の布）が少し見えている",
+      "日陰か室内の蛍光灯の下。直射日光・斜めの光・自分やスマホの影がない",
+      "画面をタップして試験体にピントと明るさを合わせた",
+      "マーカーは青か緑の細字の油性ペン（全試験体で同じペン）",
+    ];
+    const FACES = [
+      { code: "top",   name: "上面",  note: "366×366 mm。QRラベルが割れに重ならないように" },
+      { code: "sideA", name: "側面A", note: "中層の木口。上面を写真の上に" },
+      { code: "sideB", name: "側面B", note: "上層・下層の木口。上面を写真の上に" },
+      { code: "sideC", name: "側面C", note: "中層の木口（Aの反対側）" },
+      { code: "sideD", name: "側面D", note: "上層・下層の木口（Bの反対側）" },
+    ];
+    const PHASE_LABELS = { before: "なぞる前", after: "なぞった後" };
+
+    let currentPhase = "before";
+    let currentFace = null;
+    let reviewedFile = null;
+    let uploadedNames = [];
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (!window.requireLogin()) return;
+      renderChecklist();
+      renderPhaseButtons();
+      renderFaceCards();
+      loadSpecimenSelect();
+      loadProgress();
+      document.getElementById('crack-specimen').addEventListener('change', renderFaceCards);
+      document.getElementById('crack-input').addEventListener('change', handleCapture);
+      document.querySelectorAll('.phase-button').forEach(button => button.addEventListener('click', () => {
+        currentPhase = button.dataset.phase;
+        renderPhaseButtons();
+        renderFaceCards();
+      }));
+    });
+
+    // ---------- チェックリスト（その日のうちは保持） ----------
+    function checklistKey() { return 'crack_checklist_' + window.formatDateToYMD(new Date()); }
+
+    function loadChecked() {
+      try { return JSON.parse(localStorage.getItem(checklistKey())) || []; } catch (e) { return []; }
+    }
+
+    function renderChecklist() {
+      const checked = loadChecked();
+      const container = document.getElementById('checklist');
+      container.innerHTML = "";
+      CHECKLIST_ITEMS.forEach((text, index) => {
+        const label = document.createElement('label');
+        label.className = "flex items-start gap-2 cursor-pointer";
+        label.innerHTML = `<input type="checkbox" class="mt-1 accent-[#3ba6f1]" ${checked.includes(index) ? "checked" : ""}><span>${text}</span>`;
+        label.querySelector('input').addEventListener('change', event => {
+          const now = loadChecked().filter(item => item !== index);
+          if (event.target.checked) now.push(index);
+          try { localStorage.setItem(checklistKey(), JSON.stringify(now)); } catch (e) {}
+          updateChecklistStatus();
+          renderFaceCards();
+        });
+        container.appendChild(label);
+      });
+      updateChecklistStatus();
+    }
+
+    function checklistComplete() { return loadChecked().length === CHECKLIST_ITEMS.length; }
+
+    function updateChecklistStatus() {
+      const status = document.getElementById('checklist-status');
+      if (checklistComplete()) {
+        status.textContent = "OK";
+        status.className = "text-xs font-semibold rounded-full px-2 py-0.5 bg-emerald-100 text-emerald-700";
+      } else {
+        status.textContent = `${loadChecked().length} / ${CHECKLIST_ITEMS.length}`;
+        status.className = "text-xs font-semibold rounded-full px-2 py-0.5 bg-red-50 text-red-600";
+      }
+    }
+
+    // ---------- 試験体・段階 ----------
+    async function loadSpecimenSelect() {
+      const select = document.getElementById('crack-specimen');
+      try {
+        const res = await fetch(`${GAS_API_URL}?password=${encodeURIComponent(window.appPassword)}`);
+        const json = await res.json();
+        if (json.status === "auth_error") { window.logout(); return; }
+        select.innerHTML = '<option value="">-- 試験体を選択 --</option>';
+        json.data.forEach(item => select.appendChild(new Option(`${item.specimen_id} (${item.material})`, item.specimen_id)));
+      } catch (e) {
+        select.innerHTML = '<option value="">読み込みに失敗しました</option>';
+      }
+    }
+
+    function renderPhaseButtons() {
+      document.querySelectorAll('.phase-button').forEach(button => {
+        const active = button.dataset.phase === currentPhase;
+        button.className = "phase-button rounded-full border px-4 py-2 text-sm font-semibold transition " +
+          (active ? "bg-[#3ba6f1] border-[#3398e1] text-white" : "bg-white border-stone-300 text-stone-700 hover:bg-stone-50");
+      });
+    }
+
+    // ---------- 面のカードと進み具合 ----------
+    // ファイル名は「試験体ID_crack_面_段階_日時.jpg」。ギャラリーは先頭の試験体IDでバッジを付けるので、その形を崩さない
+    function photoPrefix(specimenId, faceCode, phase) { return `${specimenId}_crack_${faceCode}_${phase}_`; }
+
+    async function loadProgress() {
+      try {
+        const res = await fetch(`${GAS_API_URL}?password=${encodeURIComponent(window.appPassword)}&action=get_photos`);
+        const json = await res.json();
+        if (json.status === "success") uploadedNames = json.data.map(photo => photo.name);
+      } catch (e) { /* 進み具合が出ないだけで撮影はできる */ }
+      renderFaceCards();
+    }
+
+    function renderFaceCards() {
+      const specimenId = document.getElementById('crack-specimen').value;
+      const container = document.getElementById('face-cards');
+      container.innerHTML = "";
+      FACES.forEach(face => {
+        const done = specimenId ? uploadedNames.filter(name => name.startsWith(photoPrefix(specimenId, face.code, currentPhase))).length : 0;
+        const ready = specimenId && checklistComplete();
+        const card = document.createElement('div');
+        card.className = "flex items-center gap-3 border border-stone-200 rounded-[10px] p-3";
+        card.innerHTML = `
+          <div class="w-9 h-9 shrink-0 rounded-full flex items-center justify-center text-sm font-bold ${done ? "bg-emerald-100 text-emerald-700" : "bg-stone-100 text-stone-500"}">${done ? "✓" : "–"}</div>
+          <div class="flex-1 min-w-0">
+            <p class="font-bold text-stone-800">${face.name} <span class="text-xs font-normal text-stone-500">${PHASE_LABELS[currentPhase]}${done ? `・保存済み ${done}枚` : ""}</span></p>
+            <p class="text-xs text-stone-500">${face.note}</p>
+          </div>
+          <button class="shrink-0 rounded-full px-4 py-2 text-sm font-semibold ${ready ? "bg-[#3ba6f1] border border-[#3398e1] text-white hover:bg-[#3398e1]" : "bg-stone-100 text-stone-400 cursor-not-allowed"}">📷 撮影</button>`;
+        card.querySelector('button').addEventListener('click', () => startCapture(face));
+        container.appendChild(card);
+      });
+    }
+
+    async function startCapture(face) {
+      if (!checklistComplete()) { await window.showAlert("先に「① 撮影前のチェック」をすべて確認してください。"); return; }
+      if (!document.getElementById('crack-specimen').value) { await window.showAlert("先に試験体IDを選択してください。"); return; }
+      currentFace = face;
+      document.getElementById('crack-input').click();
+    }
+
+    // ---------- 撮影直後の確認 ----------
+    async function handleCapture(event) {
+      const file = event.target.files[0];
+      event.target.value = "";
+      if (!file) return;
+      reviewedFile = file;
+
+      const url = URL.createObjectURL(file);
+      const image = new Image();
+      image.onload = async () => {
+        document.getElementById('review-image').src = url;
+        document.getElementById('review-title').textContent =
+          `${document.getElementById('crack-specimen').value} / ${currentFace.name} / ${PHASE_LABELS[currentPhase]}`;
+        drawCenterCrop(image);
+        const checks = [checkResolution(image), checkFileSize(file), checkExposure(image), await checkLens(file)];
+        renderChecks(checks);
+        document.getElementById('review-overlay').classList.remove('hidden');
+      };
+      image.src = url;
+    }
+
+    function checkResolution(image) {
+      const longSide = Math.max(image.naturalWidth, image.naturalHeight);
+      const size = `${image.naturalWidth}×${image.naturalHeight}`;
+      // 上面366 mmを10 px/mm以上で写すには、長辺4000 px程度が必要
+      if (longSide >= 4000) return { level: "ok", text: `解像度 ${size}：十分` };
+      if (longSide >= 3000) return { level: "warn", text: `解像度 ${size}：やや低い。撮影サイズが最大になっているか確認` };
+      return { level: "ng", text: `解像度 ${size}：低すぎる。カメラの撮影サイズ設定か、画像が縮小されていないか確認` };
+    }
+
+    function checkFileSize(file) {
+      const megabytes = file.size / 1024 / 1024;
+      // 1 MB未満のJPEGは、どこかで圧縮されている可能性が高い
+      if (megabytes < 1) return { level: "warn", text: `ファイルサイズ ${megabytes.toFixed(1)} MB：小さい。圧縮されていないか確認` };
+      return { level: "ok", text: `ファイルサイズ ${megabytes.toFixed(1)} MB（このまま元の画質で保存）` };
+    }
+
+    function checkExposure(image) {
+      const canvas = document.createElement('canvas');
+      const scale = 400 / Math.max(image.naturalWidth, image.naturalHeight);
+      canvas.width = Math.round(image.naturalWidth * scale);
+      canvas.height = Math.round(image.naturalHeight * scale);
+      const context = canvas.getContext('2d');
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+      let bright = 0, dark = 0;
+      for (let i = 0; i < pixels.length; i += 4) {
+        const luminance = 0.299 * pixels[i] + 0.587 * pixels[i + 1] + 0.114 * pixels[i + 2];
+        if (luminance > 250) bright++;
+        if (luminance < 8) dark++;
+      }
+      const total = pixels.length / 4;
+      // 白飛びは割れやマーカーの線を消し、黒つぶれは割れと影の区別をなくす
+      if (bright / total > 0.02) return { level: "warn", text: `白飛び ${(100 * bright / total).toFixed(1)}%：明るすぎる。直射日光を避けるか、明るさを下げる` };
+      if (dark / total > 0.05) return { level: "warn", text: `黒つぶれ ${(100 * dark / total).toFixed(1)}%：暗すぎる。影が入っていないか確認` };
+      return { level: "ok", text: "明るさ：白飛び・黒つぶれなし" };
+    }
+
+    async function checkLens(file) {
+      try {
+        const exif = await exifr.parse(file, ["FocalLengthIn35mmFormat", "FocalLength", "Model"]);
+        const focal = exif && exif.FocalLengthIn35mmFormat;
+        if (!focal) return { level: "warn", text: "レンズ：情報が読めない。標準レンズ（1倍）か目で確認" };
+        // 35mm換算で20 mm未満は超広角（スマホの0.5倍）
+        if (focal < 20) return { level: "ng", text: `レンズ：35mm換算 ${focal} mm（超広角）。1倍か2倍で撮り直す` };
+        return { level: "ok", text: `レンズ：35mm換算 ${focal} mm${exif.Model ? `（${exif.Model}）` : ""}` };
+      } catch (e) {
+        return { level: "warn", text: "レンズ：情報が読めない。標準レンズ（1倍）か目で確認" };
+      }
+    }
+
+    function drawCenterCrop(image) {
+      // 中央の約800 px四方を縮小せずに見せ、ピントと線の写り具合を目で確かめてもらう
+      const size = Math.min(800, image.naturalWidth, image.naturalHeight);
+      const canvas = document.getElementById('review-crop');
+      canvas.width = size;
+      canvas.height = Math.round(size / 2);
+      canvas.getContext('2d').drawImage(image, (image.naturalWidth - size) / 2, (image.naturalHeight - canvas.height) / 2,
+        size, canvas.height, 0, 0, size, canvas.height);
+    }
+
+    function renderChecks(checks) {
+      const icons = { ok: "✅", warn: "⚠️", ng: "❌" };
+      const colors = { ok: "text-stone-700", warn: "text-stone-800", ng: "text-red-600 font-semibold" };
+      document.getElementById('review-checks').innerHTML =
+        checks.map(check => `<li class="${colors[check.level]}">${icons[check.level]} ${check.text}</li>`).join("") +
+        `<li class="text-stone-500">☑ HDR・ポートレート等の補正は写真からは判定できないので、カメラの設定画面で確認</li>`;
+    }
+
+    function closeReview() {
+      document.getElementById('review-overlay').classList.add('hidden');
+      URL.revokeObjectURL(document.getElementById('review-image').src);
+      reviewedFile = null;
+    }
+
+    // ---------- 保存（縮小・再圧縮せず、撮ったファイルをそのまま送る） ----------
+    function timestamp() {
+      const d = new Date();
+      const pad = number => String(number).padStart(2, '0');
+      return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+    }
+
+    async function saveReviewedPhoto() {
+      if (!reviewedFile) return;
+      const specimenId = document.getElementById('crack-specimen').value;
+      const extension = reviewedFile.type === "image/png" ? "png" : "jpg";
+      const filename = `${photoPrefix(specimenId, currentFace.code, currentPhase)}${timestamp()}.${extension}`;
+      const file = reviewedFile;
+      closeReview();
+      document.getElementById('upload-overlay').classList.remove('hidden');
+
+      try {
+        const base64Data = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+        const response = await fetch(GAS_API_URL, {
+          method: 'POST', headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ action: "upload_photo", password: window.appPassword, filename,
+                                 base64Data, contentType: file.type || "image/jpeg" })
+        });
+        const result = await response.json();
+        if (result.status === "success") {
+          uploadedNames.push(filename);
+          renderFaceCards();
+        } else if (result.status === "auth_error") {
+          window.logout();
+        } else {
+          await window.showAlert("エラー: " + result.message);
+        }
+      } catch (error) {
+        await window.showAlert("通信エラーが発生しました。電波の良い場所でもう一度撮影・保存してください。");
+      } finally {
+        document.getElementById('upload-overlay').classList.add('hidden');
+      }
+    }
+  </script>
+</body>
+</html>

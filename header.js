@@ -74,6 +74,7 @@ window.showConfirm = function(message) {
     'index.html': '暴露試験体管理システム',
     'form.html': '測定・移動 データ入力',
     'photo.html': 'ギャラリー',
+    'crack.html': '割れの撮影',
     'calendar.html': '試験予定カレンダー',
     'materials.html': '修論・参考資料',
     'howtouse.html': '使い方マニュアル',
@@ -159,6 +160,8 @@ window.showConfirm = function(message) {
 
         <a href="photo.html" class="block px-4 py-3 hover:bg-stone-50 border-b border-stone-100 text-sm ${currentPage === 'photo.html' ? 'bg-[#c1e1f7]/40 text-[#3398e1] border-l-4 border-l-[#3ba6f1] font-semibold' : ''}">ギャラリー</a>
 
+        <a href="crack.html" class="block px-4 py-3 hover:bg-stone-50 border-b border-stone-100 text-sm ${currentPage === 'crack.html' ? 'bg-[#c1e1f7]/40 text-[#3398e1] border-l-4 border-l-[#3ba6f1] font-semibold' : ''}">割れ撮影</a>
+
         <a href="calendar.html" class="block px-4 py-3 hover:bg-stone-50 border-b border-stone-100 text-sm ${currentPage === 'calendar.html' ? 'bg-[#c1e1f7]/40 text-[#3398e1] border-l-4 border-l-[#3ba6f1] font-semibold' : ''}">カレンダー</a>
 
         <a href="materials.html" class="block px-4 py-3 hover:bg-stone-50 border-b border-stone-100 text-sm ${currentPage === 'materials.html' ? 'bg-[#c1e1f7]/40 text-[#3398e1] border-l-4 border-l-[#3ba6f1] font-semibold' : ''}">資料ページ</a>
@@ -191,6 +194,7 @@ window.showConfirm = function(message) {
         <a href="index.html" class="hover:text-[#3398e1] transition">HOME</a>
         <a href="form.html" class="hover:text-[#3398e1] transition">測定・移動入力</a>
         <a href="photo.html" class="hover:text-[#3398e1] transition">ギャラリー</a>
+        <a href="crack.html" class="hover:text-[#3398e1] transition">割れ撮影</a>
         <a href="calendar.html" class="hover:text-[#3398e1] transition">カレンダー</a>
         <a href="materials.html" class="hover:text-[#3398e1] transition">資料ページ</a>
         <a href="howtouse.html" class="hover:text-[#3398e1] transition">使い方マニュアル</a>
