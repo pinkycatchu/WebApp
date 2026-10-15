@@ -209,10 +209,11 @@
     function photoPrefix(specimenId, faceCode, phase) { return `${specimenId}_crack_${faceCode}_${phase}_`; }
 
     async function loadProgress() {
+      // 割れの写真はギャラリーとは別のフォルダ（修論フォルダの Crack_Photos）に保存されるので、専用のアクションで一覧を取る
       try {
-        const res = await fetch(`${GAS_API_URL}?password=${encodeURIComponent(window.appPassword)}&action=get_photos`);
+        const res = await fetch(`${GAS_API_URL}?password=${encodeURIComponent(window.appPassword)}&action=get_crack_photos`);
         const json = await res.json();
-        if (json.status === "success") uploadedNames = json.data.map(photo => photo.name);
+        if (json.status === "success") uploadedNames = json.data.map(photo => photo.name).filter(Boolean);
       } catch (e) { /* 進み具合が出ないだけで撮影はできる */ }
       renderFaceCards();
     }

@@ -47,7 +47,7 @@ python -m http.server 8000
 
 **写真と試験体IDの紐付け**: `photo.html`は撮影前に試験体IDの選択を必須にし（`#photo-specimen`）、アップロード時のファイル名を`${specimenId}_${timestamp}.jpg`にしている（バックエンド側は任意のファイル名を受け付けるので変更不要）。ギャラリー表示側はファイル名の`_`より前を試験体IDとみなしてバッジ表示する（`Photo`始まりの古いファイルには表示しない）。
 
-**割れの撮影（`crack.html`）**: 暴露後の試験体の割れを写真で測るための撮影ページ（2026-10-15追加）。撮影前のチェックリスト（その日のうちは`localStorage['crack_checklist_YYYY/MM/DD']`に保持、全項目にチェックするまで撮影ボタンが押せない）→ 試験体ID・段階（なぞる前／マーカーでなぞった後）→ 面（上面・側面A〜D。上から見て時計回り）ごとに撮影 → 撮影直後に解像度・ファイルサイズ・白飛び/黒つぶれ・EXIFの35mm換算焦点距離（20mm未満＝超広角をNG）と中央の等倍表示で確認してから保存、の流れ。`photo.html`と違い**縮小・再圧縮せず元のファイルをそのまま**既存の`upload_photo`アクションで送る（割れの画像解析に解像度が要るため）。ファイル名は`試験体ID_crack_面コード_段階_日時.jpg`（例 `C3-180-H_crack_sideA_after_20261015_153000.jpg`）で、面ごとの撮影済み表示は`get_photos`のファイル名から判定している（GAS改修なし）。解析側は `L:\My Drive\Labo\Master_Thesis\script\crack_length\`。
+**割れの撮影（`crack.html`）**: 暴露後の試験体の割れを写真で測るための撮影ページ（2026-10-15追加）。撮影前のチェックリスト（その日のうちは`localStorage['crack_checklist_YYYY/MM/DD']`に保持、全項目にチェックするまで撮影ボタンが押せない）→ 試験体ID・段階（なぞる前／マーカーでなぞった後）→ 面（上面・側面A〜D。上から見て時計回り）ごとに撮影 → 撮影直後に解像度・ファイルサイズ・白飛び/黒つぶれ・EXIFの35mm換算焦点距離（20mm未満＝超広角をNG）と中央の等倍表示で確認してから保存、の流れ。`photo.html`と違い**縮小・再圧縮せず元のファイルをそのまま**既存の`upload_photo`アクションで送る（割れの画像解析に解像度が要るため）。保存先はGAS側で`_crack_`を含むファイル名だけ振り分け、修論フォルダ `Master_Thesis/data/Crack_Photos/試験体ID/`（大学アカウントのドライブ。GASを動かすGmailアカウントに編集者として共有）に入れる。一覧はGET `?action=get_crack_photos`。ファイル名は`試験体ID_crack_面コード_段階_日時.jpg`（例 `C3-180-H_crack_sideA_after_20261015_153000.jpg`）で、面ごとの撮影済み表示は`get_photos`のファイル名から判定している（GAS改修なし）。解析側は `L:\My Drive\Labo\Master_Thesis\script\crack_length\`。
 
 **通信エラー時の送信待ちキュー**: `form.html`の`submitData()`がネットワークエラーで失敗すると、送信内容を`localStorage['pending_submissions']`に退避し（`queuePendingSubmission()`）、次回のページ読み込み時や`online`イベント発火時に自動で再送信を試みる（`flushPendingQueue()`）。屋外の電波が弱い場所での入力を想定した仕組み。
 
