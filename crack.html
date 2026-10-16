@@ -100,9 +100,9 @@
     </section>
 
     <!-- ページ内のカメラ。手持ちで撮るので、ガイド枠と水平計を映像に重ねる -->
-    <div id="camera-overlay" class="hidden fixed inset-0 bg-black z-[65] flex flex-col items-center justify-center select-none">
-      <p id="camera-title" class="text-white text-sm font-bold py-2 px-3 text-center"></p>
-      <div id="camera-frame" class="relative">
+    <!-- 横向きでは、映像を大きく取るために操作部を右に回す -->
+    <div id="camera-overlay" class="hidden fixed inset-0 bg-black z-[65] flex flex-col landscape:flex-row items-center justify-center select-none">
+      <div id="camera-frame" class="relative shrink-0">
         <video id="camera-video" class="absolute inset-0 w-full h-full" autoplay playsinline muted></video>
         <svg id="camera-guide" class="absolute inset-0 w-full h-full pointer-events-none"></svg>
         <div id="camera-level" class="absolute top-2 right-2 w-20 h-20 rounded-full border-2 border-white/80 bg-black/30 pointer-events-none">
@@ -111,11 +111,14 @@
         </div>
         <p id="camera-tilt" class="absolute top-24 right-2 text-xs font-bold text-white bg-black/50 rounded px-1.5 py-0.5 pointer-events-none"></p>
       </div>
-      <p id="camera-hint" class="text-white/80 text-xs py-2 px-3 text-center"></p>
-      <div class="flex items-center justify-center gap-6 pb-4">
-        <button onclick="closeLiveCamera()" class="rounded-full border border-white/60 text-white px-4 py-2 text-sm font-semibold">やめる</button>
-        <button id="camera-shutter" onclick="takeLivePhoto()" class="w-16 h-16 rounded-full bg-white border-4 border-stone-400 active:scale-95 transition" aria-label="撮影"></button>
-        <span id="camera-resolution" class="text-white/70 text-[11px] w-24"></span>
+      <div class="flex flex-col items-center justify-center gap-2 px-3 py-2 landscape:w-44 landscape:h-full">
+        <p id="camera-title" class="text-white text-sm font-bold text-center"></p>
+        <p id="camera-hint" class="text-white/80 text-xs text-center"></p>
+        <div class="flex landscape:flex-col items-center justify-center gap-4">
+          <button onclick="closeLiveCamera()" class="rounded-full border border-white/60 text-white px-4 py-2 text-sm font-semibold">やめる</button>
+          <button id="camera-shutter" onclick="takeLivePhoto()" class="w-16 h-16 rounded-full bg-white border-4 border-stone-400 active:scale-95 transition" aria-label="撮影"></button>
+          <span id="camera-resolution" class="text-white/70 text-[11px] w-24 text-center"></span>
+        </div>
       </div>
     </div>
 
@@ -149,7 +152,7 @@
     const CHECKLIST_ITEMS = [
       "基本は「📷 撮影」（ページ内のカメラ）。予備の「カメラアプリ」で撮るときは、標準レンズ（1倍）・画面比4:3・ポートレート/夜景/フィルタはオフ",
       // 三脚がなく手持ちで撮るので、傾きはページ内カメラのガイド枠と水平計で合わせる
-      "上面も側面も、撮る面を上にして地面に置き、真上から撮る（側面はスマホを横向きに）。試験体をガイド枠に合わせ、水平計が緑になってから撮る",
+      "上面も側面も、撮る面を上にして地面に置き、真上から撮る（カメラ画面は自動で横向きに固定される）。試験体をガイド枠に合わせ、水平計が緑になってから撮る",
       "手持ちは両肘を体か台に付けて構え、シャッター後も一呼吸止める（手ブレ防止）",
       "試験体の四隅がすべて写り、周りに床（または背景の布）が少し見えている",
       "日陰か室内の蛍光灯の下。直射日光・斜めの光・自分やスマホの影がない",
@@ -367,11 +370,11 @@
         `${document.getElementById('crack-specimen').value} / ${currentFace.name} / ${PHASE_LABELS[currentPhase]}`;
       document.getElementById('camera-hint').textContent = isTopFace()
         ? "真上から。試験体の四辺を白い枠に合わせ、水平計の点を中央の円に入れる。画面をタップでピント"
-        // 地面に置くとスマホの向きの自動回転が効かなくなるので、横向きにしてから倒してもらう
-        : "側面を上にして地面に置き、スマホを横向きにしてから水平に倒して真上から。上面側が写真の上。試験体を白い枠に合わせ、水平計の点を中央の円に入れる。画面をタップでピント";
+        : "側面を上にして地面に置き、真上から。上面側を画面の上に。試験体を白い枠に合わせ、水平計の点を中央の円に入れる。画面をタップでピント";
       document.getElementById('camera-resolution').textContent = "";
       document.getElementById('camera-tilt').textContent = "";
       overlay.classList.remove('hidden');
+      await lockLandscape();
       await startMotionSensor();
       try {
         // プレビューは軽い解像度で流し、静止画は ImageCapture でセンサーの最大解像度を使う
@@ -419,7 +422,10 @@
       if (!video.videoWidth) return;
       // 映像と同じ縦横比の箱にして、ガイドの位置が写真の中の位置と一致するようにする
       const videoAspect = video.videoWidth / video.videoHeight;
-      const width = Math.min(window.innerWidth, (window.innerHeight - 170) * videoAspect);
+      const landscape = window.innerWidth > window.innerHeight;
+      const availableWidth = landscape ? window.innerWidth - 176 : window.innerWidth;
+      const availableHeight = landscape ? window.innerHeight : window.innerHeight - 200;
+      const width = Math.min(availableWidth, availableHeight * videoAspect);
       frame.style.width = `${width}px`;
       frame.style.height = `${width / videoAspect}px`;
       drawGuide(width, width / videoAspect, lastLevelOk === true);
@@ -525,7 +531,27 @@
       }
     }
 
+    async function lockLandscape() {
+      // スマホを地面と平行に寝かせると画面の自動回転が効かず、縦長のまま撮ることになる。
+      // 横向き固定は全画面のときだけ許されるので、全画面にしてから固定する（対応していなければ案内を出す）
+      try {
+        if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
+        await screen.orientation.lock("landscape");
+      } catch (e) {
+        if (window.innerWidth < window.innerHeight) {
+          document.getElementById('camera-hint').textContent =
+            "画面を横向きに固定できませんでした。スマホの「自動回転」をオンにし、横向きにして画面が横長になってから水平に倒してください。";
+        }
+      }
+    }
+
+    function unlockOrientation() {
+      try { screen.orientation.unlock(); } catch (e) {}
+      if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    }
+
     function closeLiveCamera() {
+      unlockOrientation();
       window.removeEventListener('devicemotion', handleMotion);
       lastLevelOk = null;
       if (liveStream) liveStream.getTracks().forEach(track => track.stop());
