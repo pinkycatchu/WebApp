@@ -9,6 +9,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- 撮影した写真のレンズ（超広角かどうか）を確かめるためにEXIFを読む -->
   <script src="https://cdn.jsdelivr.net/npm/exifr@7/dist/lite.umd.js"></script>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="bg-stone-50 text-stone-800 min-h-screen pb-12">
@@ -30,17 +31,39 @@
     <!-- 2. 試験体と撮影段階 -->
     <section class="bg-white p-5 rounded-[10px] shadow-[0_4px_16px_rgba(0,0,0,0.05)] border border-stone-200 mb-6">
       <h2 class="font-display text-xl text-stone-950 border-b-2 border-[#3ba6f1] pb-2 mb-4">② 試験体と段階を選ぶ</h2>
-      <label class="block text-sm font-bold text-stone-700 mb-1">試験体ID <span class="text-red-500">*</span></label>
-      <select id="crack-specimen" class="w-full border border-stone-300 rounded-[6px] p-2.5 focus:outline-none focus:ring-2 focus:ring-[#3ba6f1] focus:border-[#3ba6f1] bg-white mb-4">
-        <option value="">データを読み込み中...</option>
-      </select>
+      <label class="block text-sm font-bold text-stone-700 mb-2">試験体IDの入力方法 <span class="text-red-500">*</span></label>
+      <div class="flex gap-4 mb-3">
+        <label class="inline-flex items-center cursor-pointer">
+          <input type="radio" name="input-method" value="barcode" checked onchange="toggleInputMethod()" class="form-radio text-[#3ba6f1]">
+          <span class="ml-2 text-sm">QRコード読み取り</span>
+        </label>
+        <label class="inline-flex items-center cursor-pointer">
+          <input type="radio" name="input-method" value="select" onchange="toggleInputMethod()" class="form-radio text-[#3ba6f1]">
+          <span class="ml-2 text-sm">プルダウンで選択</span>
+        </label>
+      </div>
+
+      <!-- QRで読んだIDもこのプルダウンに入れる（以降の処理はプルダウンの値だけを見る） -->
+      <div id="area-select" class="hidden mb-4">
+        <select id="crack-specimen" class="w-full border border-stone-300 rounded-[6px] p-2.5 focus:outline-none focus:ring-2 focus:ring-[#3ba6f1] focus:border-[#3ba6f1] bg-white">
+          <option value="">データを読み込み中...</option>
+        </select>
+      </div>
+
+      <div id="area-barcode" class="mb-4">
+        <div id="reader" class="w-full bg-black rounded-[10px] overflow-hidden mb-2"></div>
+        <div id="barcode-done" class="hidden flex items-center justify-between gap-2 bg-emerald-50 border border-emerald-200 rounded-[6px] px-3 py-2">
+          <p id="barcode-result" class="text-sm font-bold text-emerald-700"></p>
+          <button type="button" onclick="startCamera()" class="shrink-0 text-sm bg-white hover:bg-stone-50 border border-stone-300 text-stone-800 px-3 py-1 rounded-full transition">次の試験体を読む</button>
+        </div>
+      </div>
 
       <label class="block text-sm font-bold text-stone-700 mb-1">段階</label>
       <div class="grid grid-cols-2 gap-2" id="phase-buttons">
         <button data-phase="before" class="phase-button rounded-full border px-4 py-2 text-sm font-semibold transition">なぞる前</button>
         <button data-phase="after" class="phase-button rounded-full border px-4 py-2 text-sm font-semibold transition">マーカーでなぞった後</button>
       </div>
-      <p class="text-xs text-stone-500 mt-2">なぞる前・後は、三脚を動かさずに同じ位置から撮ってください（あとで割れの判定を見直すため）。</p>
+      <p class="text-xs text-stone-500 mt-2">なぞる前・後は、なるべく同じ向き・同じ距離で撮ってください（多少ずれても解析で四隅に合わせて補正します）。</p>
     </section>
 
     <!-- 3. 面ごとの撮影 -->
@@ -76,6 +99,26 @@
       <input type="file" id="crack-input" accept="image/*" capture="environment" class="hidden">
     </section>
 
+    <!-- ページ内のカメラ。手持ちで撮るので、ガイド枠と水平計を映像に重ねる -->
+    <div id="camera-overlay" class="hidden fixed inset-0 bg-black z-[65] flex flex-col items-center justify-center select-none">
+      <p id="camera-title" class="text-white text-sm font-bold py-2 px-3 text-center"></p>
+      <div id="camera-frame" class="relative">
+        <video id="camera-video" class="absolute inset-0 w-full h-full" autoplay playsinline muted></video>
+        <svg id="camera-guide" class="absolute inset-0 w-full h-full pointer-events-none"></svg>
+        <div id="camera-level" class="absolute top-2 right-2 w-20 h-20 rounded-full border-2 border-white/80 bg-black/30 pointer-events-none">
+          <div class="absolute left-1/2 top-1/2 w-6 h-6 -ml-3 -mt-3 rounded-full border border-white/70"></div>
+          <div id="camera-bubble" class="absolute left-1/2 top-1/2 w-3 h-3 -ml-1.5 -mt-1.5 rounded-full bg-amber-400"></div>
+        </div>
+        <p id="camera-tilt" class="absolute top-24 right-2 text-xs font-bold text-white bg-black/50 rounded px-1.5 py-0.5 pointer-events-none"></p>
+      </div>
+      <p id="camera-hint" class="text-white/80 text-xs py-2 px-3 text-center"></p>
+      <div class="flex items-center justify-center gap-6 pb-4">
+        <button onclick="closeLiveCamera()" class="rounded-full border border-white/60 text-white px-4 py-2 text-sm font-semibold">やめる</button>
+        <button id="camera-shutter" onclick="takeLivePhoto()" class="w-16 h-16 rounded-full bg-white border-4 border-stone-400 active:scale-95 transition" aria-label="撮影"></button>
+        <span id="camera-resolution" class="text-white/70 text-[11px] w-24"></span>
+      </div>
+    </div>
+
     <!-- 撮影直後の確認（保存前に、解像度・レンズ・明るさ・ピントを確かめる） -->
     <div id="review-overlay" class="hidden fixed inset-0 bg-stone-950/60 z-[60] overflow-y-auto">
       <div class="bg-white max-w-2xl mx-auto my-6 rounded-[10px] shadow-[0_12px_45px_rgba(17,12,46,0.12)] p-5">
@@ -86,7 +129,7 @@
         <canvas id="review-crop" class="w-full rounded-[6px] border border-stone-200 mb-3"></canvas>
         <ul id="review-checks" class="space-y-1 text-sm mb-4"></ul>
         <div class="grid grid-cols-2 gap-2">
-          <button onclick="closeReview()" class="rounded-full border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold hover:bg-stone-50">撮り直す</button>
+          <button onclick="retakePhoto()" class="rounded-full border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold hover:bg-stone-50">撮り直す</button>
           <button id="review-save" onclick="saveReviewedPhoto()" class="rounded-full bg-[#3ba6f1] border border-[#3398e1] text-white px-4 py-2.5 text-sm font-semibold hover:bg-[#3398e1]">この写真で保存</button>
         </div>
       </div>
@@ -102,14 +145,15 @@
   <script>
     const GAS_API_URL = window.GAS_API_URL_GLOBAL;
 
-    // 撮影前に毎回確かめること。スマホのカメラ設定はページから変えられないので、人が確認する
+    // 撮影前に毎回確かめること。照明やペンなどはページから判定できないので、人が確認する
     const CHECKLIST_ITEMS = [
-      "カメラは標準レンズ（1倍か2倍）。超広角（0.5倍）は端が歪むので使わない",
-      "画面比は 4:3（16:9 は上下が切れて画素数が減る）。ポートレート・夜景・フィルタはオフ（Pixel の HDR+ は切れないのでそのままでよい）",
-      "三脚で、上面は真上から・側面は真正面から撮る（画面の中央に試験体）",
+      "基本は「📷 撮影」（ページ内のカメラ）。予備の「カメラアプリ」で撮るときは、標準レンズ（1倍）・画面比4:3・ポートレート/夜景/フィルタはオフ",
+      // 三脚がなく手持ちで撮るので、傾きはページ内カメラのガイド枠と水平計で合わせる
+      "上面は真上から、側面はスマホを横向きにして真正面から。試験体をガイド枠に合わせ、水平計が緑になってから撮る",
+      "手持ちは両肘を体か台に付けて構え、シャッター後も一呼吸止める（手ブレ防止）",
       "試験体の四隅がすべて写り、周りに床（または背景の布）が少し見えている",
       "日陰か室内の蛍光灯の下。直射日光・斜めの光・自分やスマホの影がない",
-      "画面をタップして試験体にピントと明るさを合わせた",
+      "画面の試験体をタップしてピントを合わせてから撮る",
       "マーカーは青か緑の細字の油性ペン（全試験体で同じペン）",
     ];
     const FACES = [
@@ -125,16 +169,22 @@
     let currentFace = null;
     let reviewedFile = null;
     let uploadedNames = [];
+    let specimenListReady = Promise.resolve();
 
     window.addEventListener('DOMContentLoaded', () => {
       if (!window.requireLogin()) return;
       renderChecklist();
       renderPhaseButtons();
       renderFaceCards();
-      loadSpecimenSelect();
+      specimenListReady = loadSpecimenSelect();
       loadProgress();
+      toggleInputMethod();
       document.getElementById('crack-specimen').addEventListener('change', renderFaceCards);
       document.getElementById('crack-input').addEventListener('change', handleCapture);
+      document.getElementById('camera-frame').addEventListener('click', focusAt);
+      // スマホを横向きにすると映像の縦横が入れ替わるので、枠を描き直す
+      document.getElementById('camera-video').addEventListener('resize', layoutCameraFrame);
+      window.addEventListener('resize', layoutCameraFrame);
       document.querySelectorAll('.phase-button').forEach(button => button.addEventListener('click', () => {
         currentPhase = button.dataset.phase;
         renderPhaseButtons();
@@ -196,6 +246,57 @@
       }
     }
 
+    // ---------- QRコード読み取り（form.html と同じ html5-qrcode） ----------
+    let html5QrCode = null;
+    let isCameraRunning = false;
+
+    function toggleInputMethod() {
+      const method = document.querySelector('input[name="input-method"]:checked').value;
+      document.getElementById('area-select').classList.toggle('hidden', method !== 'select');
+      document.getElementById('area-barcode').classList.toggle('hidden', method === 'select');
+      if (method === 'select') stopCamera();
+      else if (!document.getElementById('crack-specimen').value) startCamera();
+    }
+
+    async function startCamera() {
+      if (isCameraRunning) return;
+      document.getElementById('barcode-done').classList.add('hidden');
+      html5QrCode = new Html5Qrcode("reader");
+      try {
+        await html5QrCode.start(
+          { facingMode: "environment" },
+          { fps: 10, qrbox: { width: 250, height: 150 } },
+          async (decodedText) => {
+            const specimenId = decodedText.trim();
+            // 写真を撮るときにカメラを使うので、読めたらすぐQR用のカメラを止める
+            await stopCamera();
+            await specimenListReady;  // 一覧の読み込み前に読めた場合に「一覧にない」と誤判定しないため
+            const select = document.getElementById('crack-specimen');
+            if (![...select.options].some(option => option.value === specimenId)) {
+              await window.showAlert(`「${specimenId}」は試験体一覧にありません。もう一度読み取るか、プルダウンで選んでください。`);
+              startCamera();
+              return;
+            }
+            select.value = specimenId;
+            document.getElementById('barcode-result').textContent = `読み取り成功: ${specimenId}`;
+            document.getElementById('barcode-done').classList.remove('hidden');
+            renderFaceCards();
+          }
+        );
+        isCameraRunning = true;
+      } catch (err) {
+        window.showAlert("カメラの起動に失敗しました。ブラウザのカメラ許可設定をご確認ください。");
+      }
+    }
+
+    async function stopCamera() {
+      if (html5QrCode && isCameraRunning) {
+        isCameraRunning = false;
+        await html5QrCode.stop();
+        html5QrCode.clear();
+      }
+    }
+
     function renderPhaseButtons() {
       document.querySelectorAll('.phase-button').forEach(button => {
         const active = button.dataset.phase === currentPhase;
@@ -233,25 +334,222 @@
             <p class="font-bold text-stone-800">${face.name} <span class="text-xs font-normal text-stone-500">${PHASE_LABELS[currentPhase]}${done ? `・保存済み ${done}枚` : ""}</span></p>
             <p class="text-xs text-stone-500">${face.note}</p>
           </div>
-          <button class="shrink-0 rounded-full px-4 py-2 text-sm font-semibold ${ready ? "bg-[#3ba6f1] border border-[#3398e1] text-white hover:bg-[#3398e1]" : "bg-stone-100 text-stone-400 cursor-not-allowed"}">📷 撮影</button>`;
-        card.querySelector('button').addEventListener('click', () => startCapture(face));
+          <div class="shrink-0 flex flex-col items-end gap-1">
+            <button data-mode="live" class="rounded-full px-4 py-2 text-sm font-semibold ${ready ? "bg-[#3ba6f1] border border-[#3398e1] text-white hover:bg-[#3398e1]" : "bg-stone-100 text-stone-400 cursor-not-allowed"}">📷 撮影</button>
+            <button data-mode="app" class="text-[11px] text-stone-500 underline">カメラアプリで撮る</button>
+          </div>`;
+        card.querySelectorAll('button').forEach(button => button.addEventListener('click', () => startCapture(face, button.dataset.mode)));
         container.appendChild(card);
       });
     }
 
-    async function startCapture(face) {
+    async function startCapture(face, mode) {
       if (!checklistComplete()) { await window.showAlert("先に「① 撮影前のチェック」をすべて確認してください。"); return; }
       if (!document.getElementById('crack-specimen').value) { await window.showAlert("先に試験体IDを選択してください。"); return; }
       currentFace = face;
-      document.getElementById('crack-input').click();
+      await stopCamera();  // QR読み取りのカメラが動いたままだと、撮影用にカメラを開けない
+      if (mode === "app") document.getElementById('crack-input').click();
+      else openLiveCamera();
+    }
+
+    // ---------- ページ内カメラ（ガイド枠と水平計） ----------
+    // 側面は 366×90 mm。枠は画面の 85% に収まる最大の大きさにする
+    const GUIDE_ASPECT = { top: 1, side: 366 / 90 };
+    const LEVEL_OK_DEG = 2;  // これ以内なら緑。2°の傾きなら、台形補正の前でも端の寸法の違いはごくわずか
+    let liveStream = null;
+    let liveImageCapture = null;
+
+    function isTopFace() { return currentFace && currentFace.code === "top"; }
+
+    async function openLiveCamera() {
+      const overlay = document.getElementById('camera-overlay');
+      document.getElementById('camera-title').textContent =
+        `${document.getElementById('crack-specimen').value} / ${currentFace.name} / ${PHASE_LABELS[currentPhase]}`;
+      document.getElementById('camera-hint').textContent = isTopFace()
+        ? "真上から。試験体の四辺を白い枠に合わせ、水平計の点を中央の円に入れる。画面をタップでピント"
+        : "スマホを横向きにして真正面から。試験体を白い枠に合わせ、水平計の点を中央の円に入れる。画面をタップでピント";
+      document.getElementById('camera-resolution').textContent = "";
+      document.getElementById('camera-tilt').textContent = "";
+      overlay.classList.remove('hidden');
+      await startMotionSensor();
+      try {
+        // プレビューは軽い解像度で流し、静止画は ImageCapture でセンサーの最大解像度を使う
+        liveStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: "environment" }, width: { ideal: 1920 }, height: { ideal: 1440 } }, audio: false,
+        });
+      } catch (error) {
+        closeLiveCamera();
+        await window.showAlert("カメラを起動できませんでした。ブラウザのカメラ許可を確認するか、「カメラアプリで撮る」を使ってください。");
+        return;
+      }
+      const video = document.getElementById('camera-video');
+      video.srcObject = liveStream;
+      if (!video.videoWidth) await new Promise(resolve => video.addEventListener('loadedmetadata', resolve, { once: true }));
+      const track = liveStream.getVideoTracks()[0];
+      await resetZoom(track);
+      liveImageCapture = ("ImageCapture" in window) ? new ImageCapture(track) : null;
+      layoutCameraFrame();
+      showStillResolution();
+    }
+
+    async function resetZoom(track) {
+      // 前回のズームが残っていると画角が変わるので、1倍に戻す
+      try {
+        const capabilities = track.getCapabilities ? track.getCapabilities() : {};
+        if (capabilities.zoom) await track.applyConstraints({ advanced: [{ zoom: Math.max(1, capabilities.zoom.min) }] });
+      } catch (e) {}
+    }
+
+    async function showStillResolution() {
+      const label = document.getElementById('camera-resolution');
+      try {
+        const capabilities = await liveImageCapture.getPhotoCapabilities();
+        label.textContent = `静止画 最大 ${capabilities.imageWidth.max}×${capabilities.imageHeight.max}`;
+      } catch (e) {
+        if (!liveStream) return;
+        const settings = liveStream.getVideoTracks()[0].getSettings();
+        label.textContent = `動画から ${settings.width}×${settings.height}（低め）`;
+      }
+    }
+
+    function layoutCameraFrame() {
+      const video = document.getElementById('camera-video');
+      const frame = document.getElementById('camera-frame');
+      if (!video.videoWidth) return;
+      // 映像と同じ縦横比の箱にして、ガイドの位置が写真の中の位置と一致するようにする
+      const videoAspect = video.videoWidth / video.videoHeight;
+      const width = Math.min(window.innerWidth, (window.innerHeight - 170) * videoAspect);
+      frame.style.width = `${width}px`;
+      frame.style.height = `${width / videoAspect}px`;
+      drawGuide(width, width / videoAspect, lastLevelOk === true);
+    }
+
+    function drawGuide(width, height, level) {
+      const aspect = isTopFace() ? GUIDE_ASPECT.top : GUIDE_ASPECT.side;
+      let guideWidth = width * 0.85, guideHeight = guideWidth / aspect;
+      if (guideHeight > height * 0.85) { guideHeight = height * 0.85; guideWidth = guideHeight * aspect; }
+      const left = (width - guideWidth) / 2, top = (height - guideHeight) / 2;
+      const color = level ? "#34d399" : "#ffffff";
+      const grid = [1, 2].map(i => `
+        <line x1="${width * i / 3}" y1="0" x2="${width * i / 3}" y2="${height}" stroke="white" stroke-opacity="0.35" stroke-width="1"/>
+        <line x1="0" y1="${height * i / 3}" x2="${width}" y2="${height * i / 3}" stroke="white" stroke-opacity="0.35" stroke-width="1"/>`).join("");
+      document.getElementById('camera-guide').innerHTML = `${grid}
+        <rect x="${left}" y="${top}" width="${guideWidth}" height="${guideHeight}" fill="none" stroke="${color}" stroke-width="2.5" stroke-dasharray="10 6"/>
+        <line x1="${width / 2 - 12}" y1="${height / 2}" x2="${width / 2 + 12}" y2="${height / 2}" stroke="${color}" stroke-width="1.5"/>
+        <line x1="${width / 2}" y1="${height / 2 - 12}" x2="${width / 2}" y2="${height / 2 + 12}" stroke="${color}" stroke-width="1.5"/>`;
+    }
+
+    // 水平計：重力の向きから、カメラの向きのずれ（2方向）を角度で出す
+    let lastLevelOk = null;
+    async function startMotionSensor() {
+      try {
+        // iPhone は利用の許可が要る（Android の Chrome は不要）
+        if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
+          await DeviceMotionEvent.requestPermission();
+        }
+      } catch (e) {}
+      window.addEventListener('devicemotion', handleMotion);
+    }
+
+    function handleMotion(event) {
+      const gravity = event.accelerationIncludingGravity;
+      if (!gravity || gravity.x === null) return;
+      const magnitude = Math.hypot(gravity.x, gravity.y, gravity.z) || 1;
+      const toDegrees = radians => radians * 180 / Math.PI;
+      let horizontal, vertical;
+      if (isTopFace()) {
+        // 真上から撮るとき、スマホは水平で重力は画面に垂直。左右・前後の傾きをそれぞれ出す
+        horizontal = toDegrees(Math.asin(gravity.x / magnitude));
+        vertical = toDegrees(Math.asin(gravity.y / magnitude));
+      } else {
+        // 真正面から撮るとき、スマホは立てて持ち重力は画面に平行。
+        // 上下のあおり（重力の画面に垂直な成分）と、画面内の回転（縦横どちら持ちでも90°の倍数からのずれ）を出す
+        vertical = toDegrees(Math.asin(gravity.z / magnitude));
+        const rotation = toDegrees(Math.atan2(gravity.x, gravity.y));
+        horizontal = rotation - 90 * Math.round(rotation / 90);
+      }
+      const tilt = Math.max(Math.abs(horizontal), Math.abs(vertical));
+      const levelOk = tilt <= LEVEL_OK_DEG;
+      // 気泡は ±10° で円の端に届くようにする
+      const clamp = value => Math.max(-10, Math.min(10, value));
+      const bubble = document.getElementById('camera-bubble');
+      bubble.style.transform = `translate(${clamp(horizontal) * 3.2}px, ${clamp(vertical) * 3.2}px)`;
+      bubble.className = `absolute left-1/2 top-1/2 w-3 h-3 -ml-1.5 -mt-1.5 rounded-full ${levelOk ? "bg-emerald-400" : "bg-amber-400"}`;
+      document.getElementById('camera-tilt').textContent = `傾き ${tilt.toFixed(1)}°`;
+      if (levelOk !== lastLevelOk) {
+        lastLevelOk = levelOk;
+        const frame = document.getElementById('camera-frame');
+        drawGuide(frame.clientWidth, frame.clientHeight, levelOk);
+      }
+    }
+
+    async function focusAt(event) {
+      // タップした所にピントを合わせる（対応していない端末では何もしない）
+      if (!liveStream) return;
+      const rect = event.currentTarget.getBoundingClientRect();
+      const point = { x: (event.clientX - rect.left) / rect.width, y: (event.clientY - rect.top) / rect.height };
+      const track = liveStream.getVideoTracks()[0];
+      try {
+        const capabilities = track.getCapabilities ? track.getCapabilities() : {};
+        const constraint = { pointsOfInterest: [point] };
+        if (capabilities.focusMode && capabilities.focusMode.includes("single-shot")) constraint.focusMode = "single-shot";
+        await track.applyConstraints({ advanced: [constraint] });
+      } catch (e) {}
+    }
+
+    async function takeLivePhoto() {
+      if (!liveStream) return;
+      const shutter = document.getElementById('camera-shutter');
+      shutter.disabled = true;
+      try {
+        let blob = null;
+        if (liveImageCapture) {
+          try {
+            const capabilities = await liveImageCapture.getPhotoCapabilities();
+            blob = await liveImageCapture.takePhoto({ imageWidth: capabilities.imageWidth.max, imageHeight: capabilities.imageHeight.max });
+          } catch (e) { blob = null; }
+        }
+        if (!blob) {
+          // ImageCapture がない・失敗したとき（iPhoneなど）は動画の1コマを使う。解像度は低くなり、確認画面で警告が出る
+          const video = document.getElementById('camera-video');
+          const canvas = document.createElement('canvas');
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          canvas.getContext('2d').drawImage(video, 0, 0);
+          blob = await new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", 0.95));
+        }
+        const tiltText = document.getElementById('camera-tilt').textContent;
+        closeLiveCamera();
+        reviewPhoto(new File([blob], "live.jpg", { type: blob.type || "image/jpeg" }), { source: "live", tilt: tiltText });
+      } catch (error) {
+        await window.showAlert("撮影に失敗しました。もう一度試すか、「カメラアプリで撮る」を使ってください。");
+      } finally {
+        shutter.disabled = false;
+      }
+    }
+
+    function closeLiveCamera() {
+      window.removeEventListener('devicemotion', handleMotion);
+      lastLevelOk = null;
+      if (liveStream) liveStream.getTracks().forEach(track => track.stop());
+      liveStream = null;
+      liveImageCapture = null;
+      document.getElementById('camera-video').srcObject = null;
+      document.getElementById('camera-overlay').classList.add('hidden');
     }
 
     // ---------- 撮影直後の確認 ----------
-    async function handleCapture(event) {
+    let reviewSource = "app";
+
+    function handleCapture(event) {
       const file = event.target.files[0];
       event.target.value = "";
-      if (!file) return;
+      if (file) reviewPhoto(file, { source: "app" });
+    }
+
+    async function reviewPhoto(file, { source, tilt }) {
       reviewedFile = file;
+      reviewSource = source;
 
       const url = URL.createObjectURL(file);
       const image = new Image();
@@ -260,7 +558,11 @@
         document.getElementById('review-title').textContent =
           `${document.getElementById('crack-specimen').value} / ${currentFace.name} / ${PHASE_LABELS[currentPhase]}`;
         drawCenterCrop(image);
-        const checks = [checkResolution(image), checkFileSize(file), checkExposure(image), await checkLens(file)];
+        // ページ内カメラの写真にはEXIFが付かないので、レンズの代わりに撮影時の傾きを出す
+        const lensCheck = source === "live"
+          ? { level: "ok", text: `ページ内カメラ（背面の標準カメラ）。撮影時の${tilt || "傾き：不明"}` }
+          : await checkLens(file);
+        const checks = [checkResolution(image), checkFileSize(file), checkExposure(image), lensCheck];
         renderChecks(checks);
         document.getElementById('review-overlay').classList.remove('hidden');
       };
@@ -332,7 +634,14 @@
       const colors = { ok: "text-stone-700", warn: "text-stone-800", ng: "text-red-600 font-semibold" };
       document.getElementById('review-checks').innerHTML =
         checks.map(check => `<li class="${colors[check.level]}">${icons[check.level]} ${check.text}</li>`).join("") +
-        `<li class="text-stone-500">☑ HDR・ポートレート等の補正は写真からは判定できないので、カメラの設定画面で確認</li>`;
+        // ページ内カメラはアプリの補正がかからないので、この注意はカメラアプリで撮ったときだけ出す
+        (reviewSource === "app" ? `<li class="text-stone-500">☑ HDR・ポートレート等の補正は写真からは判定できないので、カメラの設定画面で確認</li>` : "");
+    }
+
+    function retakePhoto() {
+      closeReview();
+      if (reviewSource === "live") openLiveCamera();
+      else document.getElementById('crack-input').click();
     }
 
     function closeReview() {
