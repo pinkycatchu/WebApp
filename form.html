@@ -140,6 +140,7 @@
       });
 
       loadSpecimenList();
+      loadPreviousMeasurements();  // 送信ボタンを押したときに待たずに比べられるよう、先に取っておく
       checkUrlParams();
       toggleInputMethod();
 
@@ -312,6 +313,54 @@
       }
     }
     
+    // ===== 重量の入力ミスの検出（前回の測定から大きく変わったときだけ確認を出す） =====
+    // しきい値は2026-10時点の実測から決めた。前回からの変化の最大は、恒温恒湿が0.2%、乾湿繰り返しが2.9%、
+    // 屋外暴露が3.0%だった（恒温恒湿で2.9%増えた入力ミスが1件あり、これを見逃さないようにするのが目的）
+    const WEIGHT_CHANGE_LIMIT_PERCENT = { CS: 1, CC: 4, OD: 5 };
+    const DEFAULT_WEIGHT_CHANGE_LIMIT_PERCENT = 3;  // 暴露なし・促進耐候性など、まだ実績のない条件
+    let previousMeasurements = null;
+
+    async function loadPreviousMeasurements() {
+      if (previousMeasurements) return previousMeasurements;
+      try {
+        const res = await fetch(`${GAS_API_URL}?password=${encodeURIComponent(appPassword)}&action=get_measurements`);
+        const json = await res.json();
+        if (json.status === "success") previousMeasurements = json.data;
+      } catch (e) { /* 取れなければ確認を飛ばして送信する（オフラインでも入力できることを優先） */ }
+      return previousMeasurements;
+    }
+
+    function parseMeasuredDate(value) {
+      const date = new Date(String(value).replace(/\//g, '-'));
+      return isNaN(date) ? null : date;
+    }
+
+    async function confirmWeightChange(specimenId, weight) {
+      const measurements = await loadPreviousMeasurements();
+      if (!measurements || !(weight > 0)) return true;
+      const history = measurements
+        .filter(row => row.specimen_id === specimenId && Number(row["重量(g)"]) > 0)
+        .map(row => ({ date: parseMeasuredDate(row["測定日時"]), weight: Number(row["重量(g)"]) }))
+        .filter(row => row.date)
+        .sort((a, b) => a.date - b.date);
+      if (history.length === 0) return true;
+
+      const previous = history[history.length - 1];
+      const changePercent = (weight / previous.weight - 1) * 100;
+      const condition = specimenId.split('-')[0];
+      const limit = WEIGHT_CHANGE_LIMIT_PERCENT[condition] ?? DEFAULT_WEIGHT_CHANGE_LIMIT_PERCENT;
+      if (Math.abs(changePercent) <= limit) return true;
+
+      const sign = changePercent > 0 ? "+" : "";
+      return window.showConfirm(
+        `⚠️ 前回から重量が大きく変わっています。\n\n` +
+        `前回 ${window.formatDateToYMD(previous.date)}：${previous.weight} g\n` +
+        `今回：${weight} g（${sign}${changePercent.toFixed(1)}%）\n\n` +
+        `この条件でふだん出る変化は ±${limit}% 以内です。入力した値と試験体IDを確かめてください。\n` +
+        `正しければ「OK」で送信、直す場合は「キャンセル」。`
+      );
+    }
+
     async function submitData() {
       const method = document.querySelector('input[name="input-method"]:checked').value;
       let targetId = "";
@@ -339,6 +388,7 @@
           window.showAlert("重量を入力してください。");
           return;
         }
+        if (!(await confirmWeightChange(targetId, Number(weight)))) return;
         payload.weight = weight;
         payload.note = document.getElementById('input-note-measure').value;
       } else {
@@ -369,6 +419,10 @@
         const result = await response.json();
 
         if (result.status === "success") {
+          // 同じ試験体を続けて測ったときも、今送った値を「前回」として比べられるようにする
+          if (currentAction === 'measurement' && previousMeasurements) {
+            previousMeasurements.push({ specimen_id: targetId, 測定日時: window.formatDateToYMD(new Date()), "重量(g)": Number(payload.weight) });
+          }
           // 連続入力モードがONかどうかを判定
           const isContinuous = document.getElementById('continuous-mode').checked;
           
