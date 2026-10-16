@@ -149,7 +149,7 @@
     const CHECKLIST_ITEMS = [
       "基本は「📷 撮影」（ページ内のカメラ）。予備の「カメラアプリ」で撮るときは、標準レンズ（1倍）・画面比4:3・ポートレート/夜景/フィルタはオフ",
       // 三脚がなく手持ちで撮るので、傾きはページ内カメラのガイド枠と水平計で合わせる
-      "上面は真上から、側面はスマホを横向きにして真正面から。試験体をガイド枠に合わせ、水平計が緑になってから撮る",
+      "上面も側面も、撮る面を上にして地面に置き、真上から撮る（側面はスマホを横向きに）。試験体をガイド枠に合わせ、水平計が緑になってから撮る",
       "手持ちは両肘を体か台に付けて構え、シャッター後も一呼吸止める（手ブレ防止）",
       "試験体の四隅がすべて写り、周りに床（または背景の布）が少し見えている",
       "日陰か室内の蛍光灯の下。直射日光・斜めの光・自分やスマホの影がない",
@@ -367,7 +367,8 @@
         `${document.getElementById('crack-specimen').value} / ${currentFace.name} / ${PHASE_LABELS[currentPhase]}`;
       document.getElementById('camera-hint').textContent = isTopFace()
         ? "真上から。試験体の四辺を白い枠に合わせ、水平計の点を中央の円に入れる。画面をタップでピント"
-        : "スマホを横向きにして真正面から。試験体を白い枠に合わせ、水平計の点を中央の円に入れる。画面をタップでピント";
+        // 地面に置くとスマホの向きの自動回転が効かなくなるので、横向きにしてから倒してもらう
+        : "側面を上にして地面に置き、スマホを横向きにしてから水平に倒して真上から。上面側が写真の上。試験体を白い枠に合わせ、水平計の点を中央の円に入れる。画面をタップでピント";
       document.getElementById('camera-resolution').textContent = "";
       document.getElementById('camera-tilt').textContent = "";
       overlay.classList.remove('hidden');
@@ -456,18 +457,14 @@
       if (!gravity || gravity.x === null) return;
       const magnitude = Math.hypot(gravity.x, gravity.y, gravity.z) || 1;
       const toDegrees = radians => radians * 180 / Math.PI;
-      let horizontal, vertical;
-      if (isTopFace()) {
-        // 真上から撮るとき、スマホは水平で重力は画面に垂直。左右・前後の傾きをそれぞれ出す
-        horizontal = toDegrees(Math.asin(gravity.x / magnitude));
-        vertical = toDegrees(Math.asin(gravity.y / magnitude));
-      } else {
-        // 真正面から撮るとき、スマホは立てて持ち重力は画面に平行。
-        // 上下のあおり（重力の画面に垂直な成分）と、画面内の回転（縦横どちら持ちでも90°の倍数からのずれ）を出す
-        vertical = toDegrees(Math.asin(gravity.z / magnitude));
-        const rotation = toDegrees(Math.atan2(gravity.x, gravity.y));
-        horizontal = rotation - 90 * Math.round(rotation / 90);
-      }
+      // 上面も側面も、地面に置いた試験体を真上から撮る。スマホは水平で、重力は画面に垂直になればよい。
+      // センサーの軸は端末に固定なので、横向きで撮るときは画面の向きに合わせて左右・上下を読み替える
+      const angle = ((screen.orientation && screen.orientation.angle) || 0) * Math.PI / 180;
+      const screenRight = gravity.x * Math.cos(angle) - gravity.y * Math.sin(angle);
+      const screenUp = gravity.x * Math.sin(angle) + gravity.y * Math.cos(angle);
+      const horizontal = toDegrees(Math.asin(Math.max(-1, Math.min(1, screenRight / magnitude))));
+      // 気泡は水準器と同じく高い側へ動かす（画面の上が高いと screenUp が正、CSSのyは下向きなので符号を反転）
+      const vertical = -toDegrees(Math.asin(Math.max(-1, Math.min(1, screenUp / magnitude))));
       const tilt = Math.max(Math.abs(horizontal), Math.abs(vertical));
       const levelOk = tilt <= LEVEL_OK_DEG;
       // 気泡は ±10° で円の端に届くようにする
