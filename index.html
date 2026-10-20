@@ -353,18 +353,28 @@
         data: {
           labels: rows.map(r => r['測定日時']),
           datasets: [{
-            label: '重量 (g)',
-            data: rows.map(r => Number(r['重量(g)'])),
+            label: '暴露中',
+            data: rows.map(r => window.isConditionedMeasurement(r) ? null : Number(r['重量(g)'])),
+            spanGaps: true,
             borderColor: '#3ba6f1',
             backgroundColor: 'rgba(59, 166, 241, 0.1)',
             tension: 0.2,
             pointBackgroundColor: '#3398e1',
             fill: true
+          }, {
+            // 調湿後の値は暴露中の線とつなげず、別の印で示す
+            label: '調湿後（加工前）',
+            data: rows.map(r => window.isConditionedMeasurement(r) ? Number(r['重量(g)']) : null),
+            showLine: false,
+            pointStyle: 'rectRot',
+            pointRadius: 7,
+            pointBackgroundColor: '#1c1917',
+            borderColor: '#1c1917'
           }]
         },
         options: {
           responsive: true,
-          plugins: { legend: { display: false } },
+          plugins: { legend: { display: rows.some(r => window.isConditionedMeasurement(r)) } },
           scales: {
             y: { title: { display: true, text: '重量 (g)' } }
           }

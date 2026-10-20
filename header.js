@@ -5,6 +5,13 @@ window.GAS_API_URL_GLOBAL = "https://script.google.com/macros/s/AKfycbwYhNRKqGiB
 window.appPassword = localStorage.getItem('app_password') || '';
 
 // 全ページで共通して使う移動先の場所リスト（index.htmlのフィルタとform.htmlの選択肢の両方で使用）
+// 暴露終了後に恒温室（26℃65%RH）で調湿してから、支圧試験体へ加工する前に測る重量の目印。
+// Measurementsシートに区分の列がないので、備考の先頭に付けて見分ける（暴露中の重量変化のグラフや入力ミスの確認から外すため）
+window.CONDITIONED_NOTE_TAG = "【調湿後】";
+window.isConditionedMeasurement = function(row) {
+  return String((row && row["備考"]) || "").includes(window.CONDITIONED_NOTE_TAG);
+};
+
 window.LOCATIONS = ["回収", "I-REF棟恒温室", "5号館恒温室", "7号館恒温恒湿室", "5号館屋上", "森林総合研究所"];
 
 // 日付文字列を YYYY/MM/DD 形式に整形する共通関数

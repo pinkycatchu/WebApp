@@ -63,6 +63,20 @@
       <!-- 3. 重量測定用フォーム -->
       <div id="form-measurement">
         <div class="mb-4">
+          <label class="block text-sm font-bold text-stone-700 mb-2">測定の区分</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" id="btn-kind-regular" onclick="setMeasurementKind('regular')" class="py-2 px-3 rounded-full text-sm font-medium border border-[#3398e1] bg-[#3ba6f1] text-white text-center transition duration-150">
+              暴露中の定期測定
+            </button>
+            <button type="button" id="btn-kind-conditioned" onclick="setMeasurementKind('conditioned')" class="py-2 px-3 rounded-full text-sm font-medium border border-stone-300 bg-white text-stone-800 text-center hover:bg-stone-50 transition duration-150">
+              調湿後（加工前）
+            </button>
+          </div>
+          <p id="kind-conditioned-hint" class="hidden mt-2 text-xs text-stone-500 leading-relaxed">
+            暴露を終えて回収し、26℃65%RHの恒温室で十分に調湿した後、支圧試験体に加工する前の重量。備考に「【調湿後】」が付き、暴露中の重量変化のグラフや前回値との比較からは外れる。
+          </p>
+        </div>
+        <div class="mb-4">
           <label class="block text-sm font-bold text-stone-700 mb-1">重量 (g) <span class="text-red-500">*</span></label>
           <input type="number" id="input-weight" step="0.01" placeholder="例: 1250.50" class="w-full border border-stone-300 rounded-[6px] p-2.5 focus:outline-none focus:ring-2 focus:ring-[#3ba6f1] focus:border-[#3ba6f1]">
         </div>
@@ -127,6 +141,8 @@
     const GAS_API_URL = window.GAS_API_URL_GLOBAL;
 
     let currentAction = 'measurement';
+    // 連続入力で何体も調湿後の重量を測るときに毎回選び直さなくて済むよう、送信後もリセットしない
+    let measurementKind = 'regular';
     let html5QrCode = null;
     let isCameraRunning = false;
     let scannedSpecimenId = "";
@@ -260,6 +276,15 @@
       }
     }
 
+    function setMeasurementKind(kind) {
+      measurementKind = kind;
+      const selected = "py-2 px-3 rounded-full text-sm font-medium border border-[#3398e1] bg-[#3ba6f1] text-white text-center transition duration-150";
+      const unselected = "py-2 px-3 rounded-full text-sm font-medium border border-stone-300 bg-white text-stone-800 text-center hover:bg-stone-50 transition duration-150";
+      document.getElementById('btn-kind-regular').className = kind === 'regular' ? selected : unselected;
+      document.getElementById('btn-kind-conditioned').className = kind === 'conditioned' ? selected : unselected;
+      document.getElementById('kind-conditioned-hint').classList.toggle('hidden', kind !== 'conditioned');
+    }
+
     function toggleInputMethod() {
       const method = document.querySelector('input[name="input-method"]:checked').value;
       const areaSelect = document.getElementById('area-select');
@@ -339,7 +364,7 @@
       const measurements = await loadPreviousMeasurements();
       if (!measurements || !(weight > 0)) return true;
       const history = measurements
-        .filter(row => row.specimen_id === specimenId && Number(row["重量(g)"]) > 0)
+        .filter(row => row.specimen_id === specimenId && Number(row["重量(g)"]) > 0 && !window.isConditionedMeasurement(row))
         .map(row => ({ date: parseMeasuredDate(row["測定日時"]), weight: Number(row["重量(g)"]) }))
         .filter(row => row.date)
         .sort((a, b) => a.date - b.date);
@@ -388,9 +413,15 @@
           window.showAlert("重量を入力してください。");
           return;
         }
-        if (!(await confirmWeightChange(targetId, Number(weight)))) return;
+        const note = document.getElementById('input-note-measure').value.trim();
+        if (measurementKind === 'conditioned') {
+          // 調湿後は暴露中の最後の値と湿度条件が違い、変化が大きくて当然なので比較しない
+          payload.note = note ? `${window.CONDITIONED_NOTE_TAG} ${note}` : window.CONDITIONED_NOTE_TAG;
+        } else {
+          if (!(await confirmWeightChange(targetId, Number(weight)))) return;
+          payload.note = note;
+        }
         payload.weight = weight;
-        payload.note = document.getElementById('input-note-measure').value;
       } else {
         const loc = document.getElementById('input-location').value;
         if (!loc) {
@@ -421,7 +452,7 @@
         if (result.status === "success") {
           // 同じ試験体を続けて測ったときも、今送った値を「前回」として比べられるようにする
           if (currentAction === 'measurement' && previousMeasurements) {
-            previousMeasurements.push({ specimen_id: targetId, 測定日時: window.formatDateToYMD(new Date()), "重量(g)": Number(payload.weight) });
+            previousMeasurements.push({ specimen_id: targetId, 測定日時: window.formatDateToYMD(new Date()), "重量(g)": Number(payload.weight), 備考: payload.note });
           }
           // 連続入力モードがONかどうかを判定
           const isContinuous = document.getElementById('continuous-mode').checked;
