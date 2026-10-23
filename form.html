@@ -355,9 +355,18 @@
       return previousMeasurements;
     }
 
+    // シートの測定日時は「2026/10/23」（日付だけ）か、時刻も残すようにした後の「2026/10/23 15:17」。
+    // 「2026-10-23 15:17」の形はSafariが読めないので、数字を拾って組み立てる（タイムゾーン付きのISO文字列はそのまま読む）
     function parseMeasuredDate(value) {
-      const date = new Date(String(value).replace(/\//g, '-'));
-      return isNaN(date) ? null : date;
+      const text = String(value);
+      if (/T.*(Z|[+-]\d{2}:?\d{2})$/.test(text)) {
+        const date = new Date(text);
+        return isNaN(date) ? null : date;
+      }
+      const parts = text.match(/^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})(?:[ T](\d{1,2}):(\d{2}))?/);
+      if (!parts) return null;
+      const [, year, month, day, hour = 0, minute = 0] = parts;
+      return new Date(Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute));
     }
 
     async function confirmWeightChange(specimenId, weight) {
@@ -404,6 +413,8 @@
       let payload = {
         action: currentAction,
         specimen_id: targetId,
+        // 送信ボタンを押した時刻。通信エラーで送信待ちになり後から再送信されても、重量測定はこの時刻で記録する（GAS側で使う）
+        measured_at: new Date().toISOString(),
         password: appPassword // 【追加】送信データにもパスワードを含める
       };
 
@@ -452,7 +463,7 @@
         if (result.status === "success") {
           // 同じ試験体を続けて測ったときも、今送った値を「前回」として比べられるようにする
           if (currentAction === 'measurement' && previousMeasurements) {
-            previousMeasurements.push({ specimen_id: targetId, 測定日時: window.formatDateToYMD(new Date()), "重量(g)": Number(payload.weight), 備考: payload.note });
+            previousMeasurements.push({ specimen_id: targetId, 測定日時: payload.measured_at, "重量(g)": Number(payload.weight), 備考: payload.note });
           }
           // 連続入力モードがONかどうかを判定
           const isContinuous = document.getElementById('continuous-mode').checked;

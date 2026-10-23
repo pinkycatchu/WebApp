@@ -39,7 +39,7 @@ python -m http.server 8000
 - GET（`action`無し）: `{status, data: [...]}`。各要素は`Specimens`シートの列そのまま＝`specimen_id, material, status, current_location, effective_days, planned_days, next_measurements, expected_end`など。
 - GET `?action=get_photos`: `{status, data: [{id, name, date}, ...]}`（Driveのファイルid。`https://drive.google.com/thumbnail?id=...`で表示）。
 - GET `?action=get_measurements`: `{status, data: [{specimen_id, 測定日時, "重量(g)", 備考}, ...]}`。`Measurements`シートを丸ごと返す（specimen_id等の絞り込みはフロント側で行う）。index.htmlの重量推移グラフ（`showHistory()`）用に2026-09-01に追加。
-- POST（`action`フィールドを持つJSON）: `"measurement"`（weight・note。`Measurements`シートに1行追記し、`Specimens`の`next_measurements`を1週間後に更新）、`"episode"`（移動: new_location・condition・count_exposure・note）、`"upload_photo"`（filename・base64Data・contentType）。
+- POST（`action`フィールドを持つJSON）: `"measurement"`（weight・note・measured_at。`Measurements`シートに1行追記し、`Specimens`の`next_measurements`を1週間後に更新）、`"episode"`（移動: new_location・condition・count_exposure・note）、`"upload_photo"`（filename・base64Data・contentType）。
 
 **`materials.html`**だけはメインコンテンツをGASから取得していない — 実行時にGitHub Contents API経由でこのリポジトリ自身の`References_list/`フォルダを再帰的に辿って一覧表示している（スクリプト冒頭付近の`GITHUB_USERNAME`/`GITHUB_REPO`定数）。そのため参考PDFを追加する際は`References_list/`配下にコミット＆pushするだけでよい。
 
@@ -54,6 +54,8 @@ python -m http.server 8000
 **重量の入力ミスの確認（`form.html`）**: 重量測定を送信する前に、`get_measurements`で取った同じ試験体の前回値と比べ、変化率が条件ごとのしきい値（`WEIGHT_CHANGE_LIMIT_PERCENT`：CS 1%、CC 4%、OD 5%、その他 3%。2026-10時点の実測の最大変化から決めた）を超えたときだけ`showConfirm`で確認を出す（2026-10-16追加。恒温恒湿で+2.9%の入力ミスがあったため）。前回値はページを開いたときに1回取り、送信に成功した値もページ内で追記する。取得できないとき（オフライン）は確認を飛ばして送信する。
 
 **調湿後（加工前）の重量（`form.html`）**: 暴露を終えて回収した試験体は、26℃65%RHの恒温室で十分に調湿してから支圧試験体に加工する。その加工前の重量は、重量測定フォームの「測定の区分」で「調湿後（加工前）」を選んで送る（2026-10-20追加）。`Measurements`シートに区分の列がなく、GASも変えていないので、備考の先頭に`header.js`の`window.CONDITIONED_NOTE_TAG`（`【調湿後】`）を付けて見分ける（判定は`window.isConditionedMeasurement(row)`）。調湿後の値は入力ミスの確認をせず、前回値との比較からも外す。index.htmlの履歴グラフでは暴露中の線とつなげず、黒いひし形で示す。GASの`measurement`アクションは区分に関係なく`next_measurements`を1週間後に更新する。修論の書き出し（`Master_Thesis/script/export_exposure_data.py`）はこの目印から`測定区分`列（暴露中／調湿後）を作り、Rの重量変化グラフは「暴露中」だけを描く。目印の文字を変えるときは、この3か所をそろえる。
+
+**測定時刻の記録（2026-10-23）**: 2026-10-23までは GAS が `Utilities.formatDate(now, "Asia/Tokyo", "yyyy/MM/dd")` で日付だけを`Measurements`に書いていたため、それ以前の測定は時刻が残っていない（乾湿繰り返しの湿度切り替えと測定の前後関係を見るのに時刻が要ると分かった）。`form.html`は送信ボタンを押した時刻を`measured_at`（ISO文字列）としてPOSTに入れ、GAS（`sheet2API.gs`の`measurement`処理）がそれを`yyyy/MM/dd HH:mm`で書く。送信待ちキューから後で再送信されても、押した時刻で残すため。`Episodes`の日付は`recalcdays.gs`などが暴露日数の計算に使うので日付だけのままにしてある。測定日時を読む側（`form.html`の`parseMeasuredDate`、`index.html`、`export_exposure_data.py`の`to_jst`）は日付だけと時刻付きの両方を受ける。GAS の実行ログ（「実行数」）は過去7日分しか残らないが、doPost の開始時刻から直近の測定時刻を復元できる（10/23の9件はこれで復元した）。
 
 **重量推移グラフ**: index.htmlの各行にある「📈 履歴」ボタン（`showHistory(specimenId)`）から、Chart.js（CDN）で試験体ごとの重量推移を線グラフ表示する。データはGET `?action=get_measurements`で取得し、`let allMeasurements`にページ内キャッシュ（初回クリック時に1回だけ取得、「データを更新」ボタンでクリアされ次回取得し直す）。GAS側のこのアクションは2026-09-01にユーザー自身がスプレッドシートの実データを見ながら追加・デプロイした。
 
