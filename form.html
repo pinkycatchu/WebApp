@@ -443,7 +443,7 @@
         payload.condition = document.getElementById('input-condition').value;
         // 暴露日数に含めるかの値を取得してpayloadに追加
         payload.count_exposure = document.getElementById('input-count-exposure').value;
-        payload.note = document.getElementById('input-note-episode').value;
+        payload.note = window.withMoveTime(document.getElementById('input-note-episode').value.trim());
       }
 
       const btn = document.getElementById('btn-submit');

@@ -14,6 +14,15 @@ window.isConditionedMeasurement = function(row) {
 
 window.LOCATIONS = ["回収", "I-REF棟恒温室", "5号館恒温室", "7号館恒温恒湿室", "5号館屋上", "森林総合研究所"];
 
+// 移動（Episodes）の時刻を備考の先頭に残す。Episodesの日付列は recalcdays.gs が暴露日数の計算に使うので日付だけのままにし、
+// 時刻は備考に書く（乾湿繰り返しの取り出しが湿度切替のどの段階だったかを、チャンバーのログと照らせるようにするため）
+window.withMoveTime = function(note) {
+  const now = new Date();
+  const pad = (value) => String(value).padStart(2, '0');
+  const stamp = `【移動 ${now.getFullYear()}/${pad(now.getMonth() + 1)}/${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}】`;
+  return note ? `${stamp} ${note}` : stamp;
+};
+
 // 日付文字列を YYYY/MM/DD 形式に整形する共通関数
 window.formatDateToYMD = function(dateStr) {
   if (!dateStr) return '-';

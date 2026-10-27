@@ -450,6 +450,8 @@
       let successCount = 0;
       let failCount = 0;
 
+      // 何件あっても、ボタンを押した時刻を全件に残す
+      const moveNote = window.withMoveTime('一括移動');
       for (let i = 0; i < ids.length; i++) {
         btn.textContent = `送信中... (${i + 1}/${ids.length})`;
         try {
@@ -462,7 +464,7 @@
               new_location: location,
               condition: condition,
               count_exposure: countExposure,
-              note: '一括移動',
+              note: moveNote,
               password: appPassword
             })
           });
