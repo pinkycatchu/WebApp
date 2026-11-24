@@ -39,16 +39,29 @@
         </label>
         <label class="inline-flex items-center cursor-pointer">
           <input type="radio" name="input-method" value="select" onchange="toggleInputMethod()" class="form-radio text-[#3ba6f1]">
-          <span class="ml-2 text-sm">プルダウンで選択</span>
+          <span class="ml-2 text-sm">暴露条件から選ぶ</span>
         </label>
       </div>
 
-      <!-- QRで読んだIDもこのプルダウンに入れる（以降の処理はプルダウンの値だけを見る） -->
+      <!-- QRで読んだIDも、条件から選んだIDも、この隠しプルダウンに入れる（以降の処理はプルダウンの値だけを見る） -->
+      <select id="crack-specimen" class="hidden" aria-hidden="true">
+        <option value="">データを読み込み中...</option>
+      </select>
+
+      <!-- QRコードのない試験体（屋外暴露など）用。長いプルダウンは選び間違えやすいので、条件→材種→試験体の大きなボタンで絞る -->
       <div id="area-select" class="hidden mb-4">
-        <select id="crack-specimen" class="w-full border border-stone-300 rounded-[6px] p-2.5 focus:outline-none focus:ring-2 focus:ring-[#3ba6f1] focus:border-[#3ba6f1] bg-white">
-          <option value="">データを読み込み中...</option>
-        </select>
+        <p class="text-xs font-bold text-stone-700 mb-1">暴露条件</p>
+        <div id="picker-conditions" class="flex flex-wrap gap-2 mb-3"></div>
+        <p class="text-xs font-bold text-stone-700 mb-1">材種</p>
+        <div id="picker-materials" class="flex flex-wrap gap-2 mb-3"></div>
+        <div id="picker-specimens" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+        <div class="mt-3 space-y-1 text-xs text-stone-600">
+          <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="picker-show-done" class="accent-[#3ba6f1]"> なぞった後の5面を撮り終えた試験体も表示する</label>
+          <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="picker-show-active" class="accent-[#3ba6f1]"> 「暴露終了」になっていない試験体も表示する</label>
+        </div>
       </div>
+
+      <p id="selected-specimen" class="hidden mb-4 text-sm font-bold text-stone-800 bg-[#c1e1f7]/50 border border-[#3ba6f1]/40 rounded-[6px] px-3 py-2"></p>
 
       <div id="area-barcode" class="mb-4">
         <div id="reader" class="w-full bg-black rounded-[10px] overflow-hidden mb-2"></div>
@@ -66,10 +79,30 @@
       <p class="text-xs text-stone-500 mt-2">なぞる前・後は、なるべく同じ向き・同じ距離で撮ってください（多少ずれても解析で四隅に合わせて補正します）。</p>
     </section>
 
-    <!-- 3. 面ごとの撮影 -->
+    <!-- 3. 重量（加工すると測れなくなるので、割れの撮影と同じときに記録する） -->
+    <section class="bg-white p-5 rounded-[10px] shadow-[0_4px_16px_rgba(0,0,0,0.05)] border border-stone-200 mb-6">
+      <div class="flex justify-between items-center border-b-2 border-[#3ba6f1] pb-2 mb-3">
+        <h2 class="font-display text-xl text-stone-950">③ 重量を測る</h2>
+        <span id="weight-status" class="text-xs font-semibold rounded-full px-2 py-0.5"></span>
+      </div>
+      <p class="text-xs text-stone-500 mb-3">加工すると測れなくなるので、割れの撮影と同じときに記録します。ふだんは調湿後（加工前）、乾湿繰り返しを調湿せずに撮るときは取り出し直後を選びます。</p>
+      <div id="weight-history" class="text-sm text-stone-700 mb-3"></div>
+      <div class="grid grid-cols-2 gap-2 mb-3">
+        <button data-kind="conditioned" class="weight-kind-button rounded-full border px-3 py-2 text-sm font-semibold transition">調湿後（加工前）</button>
+        <button data-kind="exposure" class="weight-kind-button rounded-full border px-3 py-2 text-sm font-semibold transition">取り出し直後（調湿前）</button>
+      </div>
+      <div class="flex gap-2">
+        <input type="number" id="crack-weight" step="any" inputmode="decimal" placeholder="重量 [g]　例: 5320.4" class="flex-1 min-w-0 border border-stone-300 rounded-[6px] p-2.5 focus:outline-none focus:ring-2 focus:ring-[#3ba6f1] focus:border-[#3ba6f1]">
+        <button id="weight-submit" onclick="submitWeight()" class="shrink-0 rounded-full bg-[#3ba6f1] border border-[#3398e1] text-white px-5 py-2 text-sm font-semibold hover:bg-[#3398e1] disabled:opacity-40 disabled:cursor-not-allowed">記録</button>
+      </div>
+      <input type="text" id="crack-weight-note" placeholder="備考（任意）" class="w-full mt-2 border border-stone-300 rounded-[6px] p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#3ba6f1] focus:border-[#3ba6f1]">
+      <p id="weight-message" class="hidden text-sm mt-2"></p>
+    </section>
+
+    <!-- 4. 面ごとの撮影 -->
     <section class="bg-white p-5 rounded-[10px] shadow-[0_4px_16px_rgba(0,0,0,0.05)] border border-stone-200 mb-6 relative">
       <div class="flex justify-between items-center border-b-2 border-[#3ba6f1] pb-2 mb-4">
-        <h2 class="font-display text-xl text-stone-950">③ 面ごとに撮影</h2>
+        <h2 class="font-display text-xl text-stone-950">④ 面ごとに撮影</h2>
         <button onclick="loadProgress()" class="text-sm bg-white hover:bg-stone-50 border border-stone-300 text-stone-800 px-3 py-1 rounded-full transition">🔄 更新</button>
       </div>
 
@@ -95,6 +128,7 @@
         </ul>
       </div>
 
+      <p id="weight-reminder" class="hidden mb-3 text-sm font-bold text-red-600 bg-red-50 border border-red-200 rounded-[6px] px-3 py-2">⚠️ この試験体の重量がまだ記録されていません（③）。</p>
       <div id="face-cards" class="space-y-3"></div>
 
       <input type="file" id="crack-input" accept="image/*" capture="environment" class="hidden">
@@ -172,21 +206,40 @@
     ];
     const PHASE_LABELS = { before: "なぞる前", after: "なぞった後" };
 
+    // 試験体IDの先頭の記号。ボタンはこの順に並べる
+    const CONDITION_LABELS = { NE: "暴露なし", CS: "恒温恒湿", CC: "乾湿繰り返し", OD: "屋外暴露", UV: "促進耐候性" };
+    const FINISHED_STATUS = "暴露終了";
+
     let currentPhase = "before";
     let currentFace = null;
     let reviewedFile = null;
     let uploadedNames = [];
     let specimenListReady = Promise.resolve();
+    let allSpecimens = [];
+    let measurements = [];
+    let pickerCondition = "";
+    let pickerMaterial = "";
+    let weightKind = "conditioned";
 
     window.addEventListener('DOMContentLoaded', () => {
       if (!window.requireLogin()) return;
       renderChecklist();
       renderPhaseButtons();
+      renderWeightKindButtons();
       renderFaceCards();
       specimenListReady = loadSpecimenSelect();
       loadProgress();
+      loadMeasurements();
+      flushPendingQueue();
+      window.addEventListener('online', flushPendingQueue);
       toggleInputMethod();
-      document.getElementById('crack-specimen').addEventListener('change', renderFaceCards);
+      document.getElementById('crack-specimen').addEventListener('change', onSpecimenChanged);
+      document.getElementById('picker-show-done').addEventListener('change', renderPicker);
+      document.getElementById('picker-show-active').addEventListener('change', renderPicker);
+      document.querySelectorAll('.weight-kind-button').forEach(button => button.addEventListener('click', () => {
+        weightKind = button.dataset.kind;
+        renderWeightKindButtons();
+      }));
       document.getElementById('crack-input').addEventListener('change', handleCapture);
       document.getElementById('camera-frame').addEventListener('click', focusAt);
       // スマホを横向きにすると映像の縦横が入れ替わるので、枠を描き直す
@@ -246,11 +299,294 @@
         const res = await fetch(`${GAS_API_URL}?password=${encodeURIComponent(window.appPassword)}`);
         const json = await res.json();
         if (json.status === "auth_error") { window.logout(); return; }
+        allSpecimens = json.data.filter(item => item.specimen_id);
         select.innerHTML = '<option value="">-- 試験体を選択 --</option>';
-        json.data.forEach(item => select.appendChild(new Option(`${item.specimen_id} (${item.material})`, item.specimen_id)));
+        allSpecimens.forEach(item => select.appendChild(new Option(`${item.specimen_id} (${item.material})`, item.specimen_id)));
       } catch (e) {
         select.innerHTML = '<option value="">読み込みに失敗しました</option>';
       }
+      renderPicker();
+    }
+
+    // ---------- 暴露条件から選ぶ ----------
+    function conditionOf(specimenId) { return String(specimenId).split('-')[0]; }
+    function materialOf(specimenId) { return String(specimenId).split('-')[1] || ""; }
+
+    // なぞった後の5面がそろったら「割れ撮影が済んだ」とみなす（なぞる前は一部の試験体しか撮らないので見ない）
+    function afterFaceCount(specimenId) {
+      return FACES.filter(face => uploadedNames.some(name => name.startsWith(photoPrefix(specimenId, face.code, "after")))).length;
+    }
+    function crackDone(specimenId) { return afterFaceCount(specimenId) === FACES.length; }
+
+    function pickerCandidates() {
+      const showDone = document.getElementById('picker-show-done').checked;
+      const showActive = document.getElementById('picker-show-active').checked;
+      return allSpecimens.filter(item =>
+        (showActive || item.status === FINISHED_STATUS) && (showDone || !crackDone(item.specimen_id)));
+    }
+
+    function chip(label, active, onClick) {
+      const button = document.createElement('button');
+      button.type = "button";
+      button.className = "rounded-full border px-4 py-2 text-sm font-semibold transition " +
+        (active ? "bg-[#3ba6f1] border-[#3398e1] text-white" : "bg-white border-stone-300 text-stone-700 hover:bg-stone-50");
+      button.textContent = label;
+      button.addEventListener('click', onClick);
+      return button;
+    }
+
+    function renderPicker() {
+      const candidates = pickerCandidates();
+      const selectedId = document.getElementById('crack-specimen').value;
+
+      const conditionBox = document.getElementById('picker-conditions');
+      conditionBox.innerHTML = "";
+      Object.entries(CONDITION_LABELS).forEach(([code, label]) => {
+        const count = candidates.filter(item => conditionOf(item.specimen_id) === code).length;
+        if (count === 0 && pickerCondition !== code) return;
+        conditionBox.appendChild(chip(`${label}（${count}）`, pickerCondition === code, () => {
+          pickerCondition = code; pickerMaterial = ""; renderPicker();
+        }));
+      });
+      if (!conditionBox.children.length) {
+        conditionBox.innerHTML = `<p class="text-sm text-stone-500">${allSpecimens.length ? "撮影の残っている試験体はありません（下のチェックで全部表示できます）。" : "読み込み中..."}</p>`;
+      }
+
+      const inCondition = candidates.filter(item => conditionOf(item.specimen_id) === pickerCondition);
+      const materials = [...new Set(inCondition.map(item => materialOf(item.specimen_id)))].sort();
+      if (materials.length === 1) pickerMaterial = materials[0];
+      const materialBox = document.getElementById('picker-materials');
+      materialBox.innerHTML = "";
+      materials.forEach(material => materialBox.appendChild(chip(material, pickerMaterial === material, () => {
+        pickerMaterial = material; renderPicker();
+      })));
+      if (!pickerCondition) materialBox.innerHTML = '<p class="text-sm text-stone-500">先に暴露条件を選んでください。</p>';
+
+      const specimenBox = document.getElementById('picker-specimens');
+      specimenBox.innerHTML = "";
+      inCondition.filter(item => materialOf(item.specimen_id) === pickerMaterial).forEach(item => {
+        const id = item.specimen_id;
+        const button = document.createElement('button');
+        button.type = "button";
+        const active = id === selectedId;
+        button.className = "text-left rounded-[10px] border px-4 py-3 transition " +
+          (active ? "bg-[#c1e1f7] border-[#3398e1]" : "bg-white border-stone-300 hover:bg-stone-50");
+        const weightLabel = weightRecorded(id)
+          ? '<span class="text-emerald-700">重量 ✓</span>'
+          : '<span class="text-red-600">重量 未</span>';
+        button.innerHTML = `<span class="block text-lg font-bold text-stone-900">${id}</span>
+          <span class="block text-xs text-stone-500">${item.status || "-"}・なぞった後 ${afterFaceCount(id)}/${FACES.length}面・${weightLabel}</span>`;
+        button.addEventListener('click', () => selectSpecimen(id));
+        specimenBox.appendChild(button);
+      });
+    }
+
+    function selectSpecimen(specimenId) {
+      document.getElementById('crack-specimen').value = specimenId;
+      onSpecimenChanged();
+    }
+
+    function onSpecimenChanged() {
+      const specimenId = document.getElementById('crack-specimen').value;
+      const label = document.getElementById('selected-specimen');
+      label.classList.toggle('hidden', !specimenId);
+      label.textContent = specimenId ? `選択中：${specimenId}` : "";
+      // QRで読んだときも、条件のボタンをその試験体に合わせておく
+      if (specimenId) { pickerCondition = conditionOf(specimenId); pickerMaterial = materialOf(specimenId); }
+      document.getElementById('weight-message').classList.add('hidden');
+      renderPicker();
+      renderWeight();
+      renderFaceCards();
+    }
+
+    // ---------- 重量 ----------
+    async function loadMeasurements() {
+      try {
+        const res = await fetch(`${GAS_API_URL}?password=${encodeURIComponent(window.appPassword)}&action=get_measurements`);
+        const json = await res.json();
+        if (json.status === "success") measurements = json.data;
+      } catch (e) { /* 記録済みかどうかが出ないだけで、送信はできる */ }
+      renderWeight();
+      renderPicker();
+      renderFaceCards();
+    }
+
+    // form.html と同じ読み方（「2026/10/23」「2026/10/23 15:17」、送信直後に足したISO文字列の3通り）
+    function parseMeasuredDate(value) {
+      const text = String(value);
+      if (/T.*(Z|[+-]\d{2}:?\d{2})$/.test(text)) {
+        const date = new Date(text);
+        return isNaN(date) ? null : date;
+      }
+      const parts = text.match(/^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})(?:[ T](\d{1,2}):(\d{2}))?/);
+      if (!parts) return null;
+      const [, year, month, day, hour = 0, minute = 0] = parts;
+      return new Date(Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute));
+    }
+
+    function weightRows(specimenId) {
+      return measurements
+        .filter(row => row.specimen_id === specimenId && Number(row["重量(g)"]) > 0)
+        .map(row => ({ date: parseMeasuredDate(row["測定日時"]), weight: Number(row["重量(g)"]), conditioned: window.isConditionedMeasurement(row) }))
+        .filter(row => row.date)
+        .sort((a, b) => a.date - b.date);
+    }
+
+    // 割れ撮影を始めた日（写真のファイル名の日付）。まだ撮っていなければ今日
+    function crackStartDay(specimenId) {
+      const days = uploadedNames.filter(name => name.startsWith(`${specimenId}_crack_`))
+        .map(name => (name.match(/_(\d{8})_\d{6}\./) || [])[1]).filter(Boolean).sort();
+      const day = days[0];
+      return day ? new Date(Number(day.slice(0, 4)), Number(day.slice(4, 6)) - 1, Number(day.slice(6, 8)))
+                 : new Date(new Date().setHours(0, 0, 0, 0));
+    }
+
+    // 調湿後の記録があるか、割れ撮影を始めた日以降に（取り出し直後として）測っていれば記録済み
+    function weightRecorded(specimenId) {
+      const startDay = crackStartDay(specimenId);
+      return weightRows(specimenId).some(row => row.conditioned || row.date >= startDay);
+    }
+
+    function renderWeightKindButtons() {
+      document.querySelectorAll('.weight-kind-button').forEach(button => {
+        const active = button.dataset.kind === weightKind;
+        button.className = "weight-kind-button rounded-full border px-3 py-2 text-sm font-semibold transition " +
+          (active ? "bg-[#3ba6f1] border-[#3398e1] text-white" : "bg-white border-stone-300 text-stone-700 hover:bg-stone-50");
+      });
+    }
+
+    function renderWeight() {
+      const specimenId = document.getElementById('crack-specimen').value;
+      const status = document.getElementById('weight-status');
+      const history = document.getElementById('weight-history');
+      document.getElementById('weight-submit').disabled = !specimenId;
+      if (!specimenId) {
+        status.textContent = "";
+        status.className = "";
+        history.textContent = "試験体を選ぶと、これまでの記録が出ます。";
+        return;
+      }
+      const rows = weightRows(specimenId);
+      const lastExposure = [...rows].reverse().find(row => !row.conditioned);
+      const lastConditioned = [...rows].reverse().find(row => row.conditioned);
+      const format = row => `${row.weight} g（${window.formatDateToYMD(row.date)}）`;
+      history.innerHTML =
+        `<p>暴露中の最後の重量：${lastExposure ? format(lastExposure) : "なし"}</p>` +
+        `<p>調湿後の重量：${lastConditioned ? format(lastConditioned) : "なし"}</p>`;
+      const recorded = weightRecorded(specimenId);
+      status.textContent = recorded ? "記録済み" : "未記録";
+      status.className = "text-xs font-semibold rounded-full px-2 py-0.5 " +
+        (recorded ? "bg-emerald-100 text-emerald-700" : "bg-red-50 text-red-600");
+    }
+
+    // 入力ミスの確認。取り出し直後は form.html と同じしきい値で前回と比べる。
+    // 調湿後は湿度条件が変わるので差が出て当然だが、桁の打ち間違いだけは拾うために10%で確かめる
+    const WEIGHT_CHANGE_LIMIT_PERCENT = { CS: 1, CC: 4, OD: 5 };
+    const DEFAULT_WEIGHT_CHANGE_LIMIT_PERCENT = 3;
+    const CONDITIONED_CHANGE_LIMIT_PERCENT = 10;
+
+    async function confirmWeight(specimenId, weight) {
+      const rows = weightRows(specimenId);
+      if (weightKind === "conditioned" && rows.some(row => row.conditioned)) {
+        if (!(await window.showConfirm("この試験体の調湿後の重量は記録済みです。もう一度記録しますか？"))) return false;
+      }
+      const previous = [...rows].reverse().find(row => !row.conditioned);
+      if (!previous) return true;
+      const changePercent = (weight / previous.weight - 1) * 100;
+      const limit = weightKind === "conditioned" ? CONDITIONED_CHANGE_LIMIT_PERCENT
+        : (WEIGHT_CHANGE_LIMIT_PERCENT[conditionOf(specimenId)] ?? DEFAULT_WEIGHT_CHANGE_LIMIT_PERCENT);
+      if (Math.abs(changePercent) <= limit) return true;
+      const sign = changePercent > 0 ? "+" : "";
+      return window.showConfirm(
+        `⚠️ 暴露中の最後の重量から大きく変わっています。\n\n` +
+        `前回 ${window.formatDateToYMD(previous.date)}：${previous.weight} g\n` +
+        `今回：${weight} g（${sign}${changePercent.toFixed(1)}%）\n\n` +
+        `入力した値と試験体IDを確かめてください。正しければ「OK」で送信します。`
+      );
+    }
+
+    function showWeightMessage(text, ok) {
+      const message = document.getElementById('weight-message');
+      message.textContent = text;
+      message.className = "text-sm mt-2 font-bold " + (ok ? "text-emerald-700" : "text-red-600");
+    }
+
+    async function submitWeight() {
+      const specimenId = document.getElementById('crack-specimen').value;
+      const weight = Number(document.getElementById('crack-weight').value);
+      if (!specimenId) { await window.showAlert("先に試験体IDを選択してください。"); return; }
+      if (!(weight > 0)) { await window.showAlert("重量を入力してください。"); return; }
+      if (!(await confirmWeight(specimenId, weight))) return;
+
+      const note = document.getElementById('crack-weight-note').value.trim();
+      const payload = {
+        action: "measurement",
+        specimen_id: specimenId,
+        measured_at: new Date().toISOString(),  // 送信待ちから後で再送信されても、押した時刻で残す（GAS側で使う）
+        password: window.appPassword,
+        weight: String(weight),
+        // 調湿後かどうかは備考の先頭の目印で見分ける（form.html・index.html・修論の書き出しと同じ）
+        note: weightKind === "conditioned" ? (note ? `${window.CONDITIONED_NOTE_TAG} ${note}` : window.CONDITIONED_NOTE_TAG) : note,
+      };
+
+      const button = document.getElementById('weight-submit');
+      button.disabled = true;
+      try {
+        const response = await fetch(GAS_API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(payload) });
+        const result = await response.json();
+        if (result.status === "success") {
+          addLocalMeasurement(payload);
+          showWeightMessage(`✅ ${specimenId}：${weight} g を記録しました。`, true);
+        } else if (result.status === "auth_error") {
+          window.logout();
+          return;
+        } else {
+          showWeightMessage("エラー: " + result.message, false);
+          return;
+        }
+      } catch (error) {
+        // form.html と同じ送信待ちに入れる。このページか重量測定フォームを開いたときに再送信される
+        queuePendingSubmission(payload);
+        addLocalMeasurement(payload);
+        showWeightMessage("通信エラーのため送信待ちに入れました。オンラインに戻ると自動で送信します。", false);
+      } finally {
+        button.disabled = false;
+      }
+      document.getElementById('crack-weight').value = "";
+      document.getElementById('crack-weight-note').value = "";
+      renderWeight();
+      renderPicker();
+      renderFaceCards();
+    }
+
+    function addLocalMeasurement(payload) {
+      measurements.push({ specimen_id: payload.specimen_id, 測定日時: payload.measured_at, "重量(g)": Number(payload.weight), 備考: payload.note });
+    }
+
+    // ---------- 送信待ちキュー（form.html と同じ localStorage のキーを使う） ----------
+    const PENDING_KEY = 'pending_submissions';
+    function getPendingQueue() {
+      try { return JSON.parse(localStorage.getItem(PENDING_KEY) || '[]'); } catch (e) { return []; }
+    }
+    function queuePendingSubmission(payload) {
+      const queue = getPendingQueue();
+      queue.push(payload);
+      try { localStorage.setItem(PENDING_KEY, JSON.stringify(queue)); } catch (e) {}
+    }
+    async function flushPendingQueue() {
+      const queue = getPendingQueue();
+      if (queue.length === 0) return;
+      const remaining = [];
+      for (const payload of queue) {
+        try {
+          const response = await fetch(GAS_API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(payload) });
+          const result = await response.json();
+          if (result.status !== 'success') remaining.push(payload);
+        } catch (e) {
+          remaining.push(payload);
+        }
+      }
+      try { localStorage.setItem(PENDING_KEY, JSON.stringify(remaining)); } catch (e) {}
     }
 
     // ---------- QRコード読み取り（form.html と同じ html5-qrcode） ----------
@@ -280,14 +616,14 @@
             await specimenListReady;  // 一覧の読み込み前に読めた場合に「一覧にない」と誤判定しないため
             const select = document.getElementById('crack-specimen');
             if (![...select.options].some(option => option.value === specimenId)) {
-              await window.showAlert(`「${specimenId}」は試験体一覧にありません。もう一度読み取るか、プルダウンで選んでください。`);
+              await window.showAlert(`「${specimenId}」は試験体一覧にありません。もう一度読み取るか、暴露条件から選んでください。`);
               startCamera();
               return;
             }
             select.value = specimenId;
             document.getElementById('barcode-result').textContent = `読み取り成功: ${specimenId}`;
             document.getElementById('barcode-done').classList.remove('hidden');
-            renderFaceCards();
+            onSpecimenChanged();
           }
         );
         isCameraRunning = true;
@@ -324,10 +660,13 @@
         if (json.status === "success") uploadedNames = json.data.map(photo => photo.name).filter(Boolean);
       } catch (e) { /* 進み具合が出ないだけで撮影はできる */ }
       renderFaceCards();
+      renderPicker();
+      renderWeight();
     }
 
     function renderFaceCards() {
       const specimenId = document.getElementById('crack-specimen').value;
+      document.getElementById('weight-reminder').classList.toggle('hidden', !specimenId || weightRecorded(specimenId));
       const container = document.getElementById('face-cards');
       container.innerHTML = "";
       FACES.forEach(face => {
@@ -709,6 +1048,7 @@
         if (result.status === "success") {
           uploadedNames.push(filename);
           renderFaceCards();
+          renderPicker();
         } else if (result.status === "auth_error") {
           window.logout();
         } else {
