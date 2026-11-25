@@ -18,6 +18,13 @@
 
   <main class="container mx-auto px-4 max-w-3xl">
 
+    <!-- 撮るもの。カメラ・ガイド枠・水平計・画質の確認・元画質での保存は共通で、選び方と面だけが違う -->
+    <!-- 切り替えはページを読み直す（カメラやQR読み取りの状態を持ち越さないため） -->
+    <nav class="grid grid-cols-2 gap-2 mb-6" aria-label="撮影の種類">
+      <a id="mode-crack" href="crack.html" class="text-center rounded-full border px-4 py-2.5 text-sm font-semibold transition">割れ（暴露試験体）</a>
+      <a id="mode-koguchi" href="crack.html?mode=koguchi" class="text-center rounded-full border px-4 py-2.5 text-sm font-semibold transition">木口（支圧試験片）</a>
+    </nav>
+
     <!-- 1. 撮影前のチェックリスト -->
     <section class="bg-white p-5 rounded-[10px] shadow-[0_4px_16px_rgba(0,0,0,0.05)] border border-stone-200 mb-6">
       <div class="flex justify-between items-center border-b-2 border-[#3ba6f1] pb-2 mb-3">
@@ -30,7 +37,26 @@
 
     <!-- 2. 試験体と撮影段階 -->
     <section class="bg-white p-5 rounded-[10px] shadow-[0_4px_16px_rgba(0,0,0,0.05)] border border-stone-200 mb-6">
-      <h2 class="font-display text-xl text-stone-950 border-b-2 border-[#3ba6f1] pb-2 mb-4">② 試験体と段階を選ぶ</h2>
+      <h2 id="select-heading" class="font-display text-xl text-stone-950 border-b-2 border-[#3ba6f1] pb-2 mb-4">② 試験体と段階を選ぶ</h2>
+
+      <!-- 木口モード：試験片は Specimens シートにないので、data/bearing_pieces.json（試験片一覧.xlsx の支圧シート）から
+           パネル → S/W → 番号 の順に組み立てる -->
+      <div id="area-piece" class="hidden">
+        <p class="text-xs font-bold text-stone-700 mb-1">暴露条件</p>
+        <div id="piece-conditions" class="flex flex-wrap gap-2 mb-3"></div>
+        <p class="text-xs font-bold text-stone-700 mb-1">材種</p>
+        <div id="piece-materials" class="flex flex-wrap gap-2 mb-3"></div>
+        <p class="text-xs font-bold text-stone-700 mb-1">パネル（暴露試験体）</p>
+        <div id="piece-panels" class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3"></div>
+        <p class="text-xs font-bold text-stone-700 mb-1">加力方向</p>
+        <div id="piece-directions" class="flex flex-wrap gap-2 mb-3"></div>
+        <p class="text-xs font-bold text-stone-700 mb-1">番号</p>
+        <div id="piece-numbers" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
+        <label class="flex items-center gap-2 cursor-pointer mt-3 text-xs text-stone-600"><input type="checkbox" id="piece-show-done" class="accent-[#3ba6f1]"> 支圧面を撮り終えたパネルも表示する</label>
+        <p id="piece-selected" class="hidden mt-4 text-sm font-bold text-stone-800 bg-[#c1e1f7]/50 border border-[#3ba6f1]/40 rounded-[6px] px-3 py-2"></p>
+      </div>
+
+      <div id="area-crack-target">
       <label class="block text-sm font-bold text-stone-700 mb-2">試験体IDの入力方法 <span class="text-red-500">*</span></label>
       <div class="flex gap-4 mb-3">
         <label class="inline-flex items-center cursor-pointer">
@@ -77,10 +103,11 @@
         <button data-phase="after" class="phase-button rounded-full border px-4 py-2 text-sm font-semibold transition">マーカーでなぞった後</button>
       </div>
       <p class="text-xs text-stone-500 mt-2">なぞる前・後は、なるべく同じ向き・同じ距離で撮ってください（多少ずれても解析で四隅に合わせて補正します）。</p>
+      </div>
     </section>
 
     <!-- 3. 重量（加工すると測れなくなるので、割れの撮影と同じときに記録する） -->
-    <section class="bg-white p-5 rounded-[10px] shadow-[0_4px_16px_rgba(0,0,0,0.05)] border border-stone-200 mb-6">
+    <section id="weight-section" class="bg-white p-5 rounded-[10px] shadow-[0_4px_16px_rgba(0,0,0,0.05)] border border-stone-200 mb-6">
       <div class="flex justify-between items-center border-b-2 border-[#3ba6f1] pb-2 mb-3">
         <h2 class="font-display text-xl text-stone-950">③ 重量を測る</h2>
         <span id="weight-status" class="text-xs font-semibold rounded-full px-2 py-0.5"></span>
@@ -102,12 +129,24 @@
     <!-- 4. 面ごとの撮影 -->
     <section class="bg-white p-5 rounded-[10px] shadow-[0_4px_16px_rgba(0,0,0,0.05)] border border-stone-200 mb-6 relative">
       <div class="flex justify-between items-center border-b-2 border-[#3ba6f1] pb-2 mb-4">
-        <h2 class="font-display text-xl text-stone-950">④ 面ごとに撮影</h2>
+        <h2 id="faces-heading" class="font-display text-xl text-stone-950">④ 面ごとに撮影</h2>
         <button onclick="loadProgress()" class="text-sm bg-white hover:bg-stone-50 border border-stone-300 text-stone-800 px-3 py-1 rounded-full transition">🔄 更新</button>
       </div>
 
       <!-- 面の名前の決め方（向かい合う面の左右反転をそろえるため、撮る順番を固定する） -->
-      <div class="flex flex-col sm:flex-row gap-4 items-center mb-5 bg-stone-50 border border-stone-200 rounded-[10px] p-4">
+      <!-- 木口モードの説明。年輪幅は木口で読むので、強軸と弱軸で支圧面に出る層が違う -->
+      <div id="koguchi-guide" class="hidden mb-5 bg-stone-50 border border-stone-200 rounded-[10px] p-4">
+        <ul class="text-sm text-stone-700 space-y-1 list-disc list-inside">
+          <li><b>支圧面（半孔のある面）</b>を上にして置き、真上から撮る。半孔を<b>写真の上</b>にそろえる</li>
+          <li><b>強軸 S</b>：支圧面が表層ラミナの木口そのもの</li>
+          <li><b>弱軸 W</b>：支圧面に木口として出る<b>中層</b>から年輪幅を読む（表層の柾目・板目は使わない）</li>
+          <li><b>これからの試験片は試験の前に撮る</b>（試験後は半孔の周りがめり込む）</li>
+          <li>試験済みの試験片は試験後の支圧面を撮り、読みにくければ<b>反対側の面</b>も撮る</li>
+        </ul>
+        <p id="koguchi-direction-note" class="hidden mt-3 text-sm font-bold text-[#3398e1]"></p>
+      </div>
+
+      <div id="crack-guide" class="flex flex-col sm:flex-row gap-4 items-center mb-5 bg-stone-50 border border-stone-200 rounded-[10px] p-4">
         <svg viewBox="0 0 160 160" class="w-36 h-36 shrink-0" aria-label="側面A〜Dの位置">
           <rect x="35" y="35" width="90" height="90" fill="#f5f5f4" stroke="#1c1917" stroke-width="2"/>
           <text x="80" y="76" text-anchor="middle" font-size="12" fill="#57534e">上面</text>
@@ -163,7 +202,7 @@
         <h3 class="font-display text-lg text-stone-950 mb-1">撮影した写真の確認</h3>
         <p id="review-title" class="text-sm text-stone-500 mb-3"></p>
         <img id="review-image" class="w-full rounded-[6px] border border-stone-200 mb-3" alt="撮影した写真">
-        <p class="text-xs font-bold text-stone-700 mb-1">中央の等倍表示（ピントと、割れ・マーカーの線が見えるか確認）</p>
+        <p id="review-crop-label" class="text-xs font-bold text-stone-700 mb-1">中央の等倍表示（ピントと、割れ・マーカーの線が見えるか確認）</p>
         <canvas id="review-crop" class="w-full rounded-[6px] border border-stone-200 mb-3"></canvas>
         <ul id="review-checks" class="space-y-1 text-sm mb-4"></ul>
         <div class="grid grid-cols-2 gap-2">
@@ -182,9 +221,12 @@
 
   <script>
     const GAS_API_URL = window.GAS_API_URL_GLOBAL;
+    // 「crack」＝暴露試験体の割れ、「koguchi」＝支圧試験片の木口（平均年輪幅・髄の有無をGLMMの共変量にするため。2026-11-25）
+    const MODE = new URLSearchParams(location.search).get('mode') === 'koguchi' ? 'koguchi' : 'crack';
+    const IS_KOGUCHI = MODE === 'koguchi';
 
     // 撮影前に毎回確かめること。照明やペンなどはページから判定できないので、人が確認する
-    const CHECKLIST_ITEMS = [
+    const CRACK_CHECKLIST_ITEMS = [
       "基本は「📷 撮影」（ページ内のカメラ）。予備の「カメラアプリ」で撮るときは、標準レンズ（1倍）・画面比4:3・ポートレート/夜景/フィルタはオフ",
       // 三脚がなく手持ちで撮るので、傾きはページ内カメラのガイド枠と水平計で合わせる
       "上面も側面も、撮る面を上にして地面に置き、真上から撮る（カメラ画面は自動で横向きに固定される）。試験体をガイド枠に合わせ、水平計が緑になってから撮る",
@@ -197,13 +239,31 @@
       // 油性マッキーは濃い木口で沈み、割れに沿ってにじむ。不透明な顔料の桃色は木の色から遠く、色で抜き出しやすい
       "マーカーはポスカ極細（PC-1M）の濃いピンク（桃色）。上面・木口とも全試験体で同じペン",
     ];
-    const FACES = [
+    const KOGUCHI_CHECKLIST_ITEMS = [
+      "基本は「📷 撮影」（ページ内のカメラ）。予備の「カメラアプリ」で撮るときは、標準レンズ（1倍）・画面比4:3・ポートレート/夜景/フィルタはオフ",
+      // 斜めから撮ると、試験片の一辺の長さから mm に換算するときに場所によって縮尺がずれる
+      "撮る面を上にして置き、真上から撮る。水平計が緑になってから撮る",
+      // 定規の代わりに、試験片一覧の実測寸法（一辺）で mm に換算する（2026-11-25 本人）
+      "定規は写し込まない。試験片の4辺が全部写るように、白い枠いっぱいに合わせる",
+      "晩材の境目が見えにくいときは、カンナかサンドペーパーで木口を軽く整えてから撮る",
+      "マーカーは引かない",
+      "手持ちは両肘を体か台に付けて構え、シャッター後も一呼吸止める（手ブレ防止）",
+      "日陰か室内の蛍光灯の下。直射日光・斜めの光・自分やスマホの影がない",
+      "画面の試験片をタップしてピントを合わせてから撮る",
+    ];
+    const CHECKLIST_ITEMS = IS_KOGUCHI ? KOGUCHI_CHECKLIST_ITEMS : CRACK_CHECKLIST_ITEMS;
+    const KOGUCHI_FACES = [
+      { code: "bearing",  name: "支圧面",   note: "半孔のある面。約90 mm角。半孔を写真の上に" },
+      { code: "opposite", name: "反対側の面", note: "試験済みで支圧面が読みにくいときだけ。支圧面と同じ向き（半孔側の辺を写真の上）に" },
+    ];
+    const CRACK_FACES = [
       { code: "top",   name: "上面",  note: "366×366 mm。QRラベルが割れに重ならないように" },
       { code: "sideA", name: "側面A", note: "中層の木口。上面を写真の上に" },
       { code: "sideB", name: "側面B", note: "上層・下層の木口。上面を写真の上に" },
       { code: "sideC", name: "側面C", note: "中層の木口（Aの反対側）" },
       { code: "sideD", name: "側面D", note: "上層・下層の木口（Bの反対側）" },
     ];
+    const FACES = IS_KOGUCHI ? KOGUCHI_FACES : CRACK_FACES;
     const PHASE_LABELS = { before: "なぞる前", after: "なぞった後" };
 
     // 試験体IDの先頭の記号。ボタンはこの順に並べる
@@ -220,18 +280,43 @@
     let pickerCondition = "";
     let pickerMaterial = "";
     let weightKind = "conditioned";
+    // 木口モードの選択
+    let allPieces = [];
+    let piecePanel = "";
+    let pieceDirection = "";
+    let selectedPieceId = "";
+    let koguchiApiMissing = false;
+
+    // 撮影の対象（割れは試験体ID、木口は試験片ID）。写真の名前・カメラの表題・保存はこれだけを見る
+    function currentTargetId() {
+      return IS_KOGUCHI ? selectedPieceId : document.getElementById('crack-specimen').value;
+    }
+    // 表題に出す「段階」。木口には段階がない
+    function phaseLabel() { return IS_KOGUCHI ? "木口" : PHASE_LABELS[currentPhase]; }
 
     window.addEventListener('DOMContentLoaded', () => {
       if (!window.requireLogin()) return;
+      renderModeTabs();
+      // カメラまわりは割れ・木口で共通
+      document.getElementById('crack-input').addEventListener('change', handleCapture);
+      document.getElementById('camera-frame').addEventListener('click', focusAt);
+      // スマホを横向きにすると映像の縦横が入れ替わるので、枠を描き直す
+      document.getElementById('camera-video').addEventListener('resize', layoutCameraFrame);
+      window.addEventListener('resize', layoutCameraFrame);
+      // 重量の送信待ちは木口モードで開いたときも送っておく（屋外で溜まったものを早く出すため）
+      flushPendingQueue();
+      window.addEventListener('online', flushPendingQueue);
       renderChecklist();
+      if (IS_KOGUCHI) {
+        initKoguchiMode();
+        return;
+      }
       renderPhaseButtons();
       renderWeightKindButtons();
       renderFaceCards();
       specimenListReady = loadSpecimenSelect();
       loadProgress();
       loadMeasurements();
-      flushPendingQueue();
-      window.addEventListener('online', flushPendingQueue);
       toggleInputMethod();
       document.getElementById('crack-specimen').addEventListener('change', onSpecimenChanged);
       document.getElementById('picker-show-done').addEventListener('change', renderPicker);
@@ -240,11 +325,6 @@
         weightKind = button.dataset.kind;
         renderWeightKindButtons();
       }));
-      document.getElementById('crack-input').addEventListener('change', handleCapture);
-      document.getElementById('camera-frame').addEventListener('click', focusAt);
-      // スマホを横向きにすると映像の縦横が入れ替わるので、枠を描き直す
-      document.getElementById('camera-video').addEventListener('resize', layoutCameraFrame);
-      window.addEventListener('resize', layoutCameraFrame);
       document.querySelectorAll('.phase-button').forEach(button => button.addEventListener('click', () => {
         currentPhase = button.dataset.phase;
         renderPhaseButtons();
@@ -252,8 +332,19 @@
       }));
     });
 
+    function renderModeTabs() {
+      [["crack", "mode-crack"], ["koguchi", "mode-koguchi"]].forEach(([mode, id]) => {
+        const active = mode === MODE;
+        const tab = document.getElementById(id);
+        tab.className = "text-center rounded-full border px-4 py-2.5 text-sm font-semibold transition " +
+          (active ? "bg-[#3ba6f1] border-[#3398e1] text-white" : "bg-white border-stone-300 text-stone-700 hover:bg-stone-50");
+        if (active) tab.setAttribute('aria-current', 'page');
+      });
+    }
+
     // ---------- チェックリスト（その日のうちは保持） ----------
-    function checklistKey() { return 'crack_checklist_' + window.formatDateToYMD(new Date()); }
+    // 割れと木口は確かめることが違うので、別のキーで持つ（旧来の割れのキーはそのまま）
+    function checklistKey() { return (IS_KOGUCHI ? 'koguchi_checklist_' : 'crack_checklist_') + window.formatDateToYMD(new Date()); }
 
     function loadChecked() {
       try { return JSON.parse(localStorage.getItem(checklistKey())) || []; } catch (e) { return []; }
@@ -396,6 +487,150 @@
       document.getElementById('weight-message').classList.add('hidden');
       renderPicker();
       renderWeight();
+      renderFaceCards();
+    }
+
+    // ---------- 木口モード（支圧試験片） ----------
+    function initKoguchiMode() {
+      document.title = "木口撮影 - 試験体管理";
+      document.getElementById('select-heading').textContent = "② 試験片を選ぶ";
+      document.getElementById('faces-heading').textContent = "③ 撮影";
+      document.getElementById('review-crop-label').textContent = "中央の等倍表示（ピントと、年輪の境目が見えるか確認）";
+      ['area-crack-target', 'weight-section', 'crack-guide', 'weight-reminder'].forEach(id => document.getElementById(id).classList.add('hidden'));
+      ['area-piece', 'koguchi-guide'].forEach(id => document.getElementById(id).classList.remove('hidden'));
+      document.getElementById('piece-show-done').addEventListener('change', renderPiecePicker);
+      renderFaceCards();
+      renderPiecePicker();
+      loadPieces();
+      loadProgress();
+    }
+
+    async function loadPieces() {
+      try {
+        // 試験片一覧.xlsx の「支圧」シートを scripts/export_bearing_pieces.py で書き出したもの
+        const res = await fetch('data/bearing_pieces.json', { cache: 'no-cache' });
+        allPieces = (await res.json()).pieces;
+      } catch (e) {
+        document.getElementById('piece-conditions').innerHTML = '<p class="text-sm text-red-600">試験片の一覧（data/bearing_pieces.json）を読み込めませんでした。</p>';
+        return;
+      }
+      renderPiecePicker();
+    }
+
+    function pieceFaceCount(pieceId, faceCode) {
+      return uploadedNames.filter(name => name.startsWith(photoPrefix(pieceId, faceCode))).length;
+    }
+    function pieceDone(pieceId) { return pieceFaceCount(pieceId, "bearing") > 0; }
+    function panelPieces(panel) { return allPieces.filter(piece => piece.panel === panel); }
+    // 暴露条件はパネルIDではなく試験片一覧の「条件」列から取る（CC-CLT-12-0x は CC の中止分で、暴露なし「NE-CLT（追加）」扱い）
+    function panelCondition(panel) { const piece = allPieces.find(item => item.panel === panel); return conditionOf(piece ? piece.condition : panel); }
+
+    function renderPiecePicker() {
+      const showDone = document.getElementById('piece-show-done').checked;
+      // 支圧面がまだの試験片があるパネルだけ出す（選択中のパネルは消さない）
+      const panels = [...new Set(allPieces.map(piece => piece.panel))].filter(panel =>
+        showDone || panel === piecePanel || panelPieces(panel).some(piece => !pieceDone(piece.id)));
+      const remaining = panel => panelPieces(panel).filter(piece => !pieceDone(piece.id)).length;
+
+      const conditionBox = document.getElementById('piece-conditions');
+      conditionBox.innerHTML = "";
+      Object.entries(CONDITION_LABELS).forEach(([code, label]) => {
+        const inCondition = panels.filter(panel => panelCondition(panel) === code);
+        if (inCondition.length === 0 && pickerCondition !== code) return;
+        const count = inCondition.reduce((sum, panel) => sum + remaining(panel), 0);
+        conditionBox.appendChild(chip(`${label}（残り${count}片）`, pickerCondition === code, () => {
+          pickerCondition = code; pickerMaterial = ""; piecePanel = ""; pieceDirection = ""; clearPieceSelection();
+        }));
+      });
+      if (!conditionBox.children.length) {
+        conditionBox.innerHTML = `<p class="text-sm text-stone-500">${allPieces.length ? "支圧面の残っている試験片はありません（下のチェックで全部表示できます）。" : "読み込み中..."}</p>`;
+      }
+
+      const inCondition = panels.filter(panel => panelCondition(panel) === pickerCondition);
+      const materials = [...new Set(inCondition.map(materialOf))].sort();
+      if (materials.length === 1) pickerMaterial = materials[0];
+      const materialBox = document.getElementById('piece-materials');
+      materialBox.innerHTML = "";
+      materials.forEach(material => materialBox.appendChild(chip(material, pickerMaterial === material, () => {
+        pickerMaterial = material; piecePanel = ""; pieceDirection = ""; clearPieceSelection();
+      })));
+      if (!pickerCondition) materialBox.innerHTML = '<p class="text-sm text-stone-500">先に暴露条件を選んでください。</p>';
+
+      const panelBox = document.getElementById('piece-panels');
+      panelBox.innerHTML = "";
+      inCondition.filter(panel => materialOf(panel) === pickerMaterial).forEach(panel => {
+        const pieces = panelPieces(panel);
+        const done = pieces.filter(piece => pieceDone(piece.id)).length;
+        const note = pieces.find(piece => piece.note)?.note || "";
+        const button = document.createElement('button');
+        button.type = "button";
+        button.className = "text-left rounded-[10px] border px-4 py-3 transition " +
+          (panel === piecePanel ? "bg-[#c1e1f7] border-[#3398e1]" : "bg-white border-stone-300 hover:bg-stone-50");
+        button.innerHTML = `<span class="block text-lg font-bold text-stone-900">${panel}</span>
+          <span class="block text-xs text-stone-500">支圧面 ${done}/${pieces.length}片${note ? `・${note}` : ""}</span>`;
+        button.addEventListener('click', () => { piecePanel = panel; pieceDirection = ""; clearPieceSelection(); });
+        panelBox.appendChild(button);
+      });
+      if (!pickerMaterial) panelBox.innerHTML = "";
+
+      const directionBox = document.getElementById('piece-directions');
+      directionBox.innerHTML = "";
+      if (piecePanel) {
+        [["S", "強軸 S"], ["W", "弱軸 W"]].forEach(([code, label]) => {
+          const pieces = panelPieces(piecePanel).filter(piece => piece.direction === code);
+          if (!pieces.length) return;
+          const left = pieces.filter(piece => !pieceDone(piece.id)).length;
+          directionBox.appendChild(chip(`${label}（残り${left}）`, pieceDirection === code, () => {
+            pieceDirection = code; clearPieceSelection();
+          }));
+        });
+      } else {
+        directionBox.innerHTML = '<p class="text-sm text-stone-500">先にパネルを選んでください。</p>';
+      }
+
+      const numberBox = document.getElementById('piece-numbers');
+      numberBox.innerHTML = "";
+      panelPieces(piecePanel).filter(piece => piece.direction === pieceDirection)
+        .sort((a, b) => a.number - b.number)
+        .forEach(piece => {
+          const bearing = pieceFaceCount(piece.id, "bearing");
+          const opposite = pieceFaceCount(piece.id, "opposite");
+          const button = document.createElement('button');
+          button.type = "button";
+          button.className = "text-left rounded-[10px] border px-3 py-2.5 transition " +
+            (piece.id === selectedPieceId ? "bg-[#c1e1f7] border-[#3398e1]" : "bg-white border-stone-300 hover:bg-stone-50");
+          button.innerHTML = `<span class="block text-lg font-bold text-stone-900">${piece.direction}${piece.number}</span>
+            <span class="block text-[11px] text-stone-500">${piece.position}${piece.dic ? "・DIC" : ""}</span>
+            <span class="block text-[11px] ${bearing ? "text-emerald-700" : "text-stone-400"}">${bearing ? "支圧面 ✓" : "支圧面 未"}${opposite ? "・反対 ✓" : ""}</span>`;
+          button.addEventListener('click', () => selectPiece(piece.id));
+          numberBox.appendChild(button);
+        });
+
+      const selected = allPieces.find(piece => piece.id === selectedPieceId);
+      const label = document.getElementById('piece-selected');
+      label.classList.toggle('hidden', !selected);
+      if (selected) {
+        label.textContent = `選択中：${selected.id}（${selected.direction === "S" ? "強軸" : "弱軸"}・${selected.position}）`;
+      }
+      const directionNote = document.getElementById('koguchi-direction-note');
+      directionNote.classList.toggle('hidden', !selected);
+      if (selected) {
+        directionNote.textContent = selected.direction === "S"
+          ? "この試験片は強軸 S：支圧面＝表層ラミナの木口"
+          : "この試験片は弱軸 W：支圧面の中層の木口から年輪幅を読む";
+      }
+    }
+
+    // 選び直しの途中で前の試験片のまま撮ってしまわないよう、パネルや方向を変えたら選択を外す
+    function clearPieceSelection() {
+      selectedPieceId = "";
+      renderPiecePicker();
+      renderFaceCards();
+    }
+
+    function selectPiece(pieceId) {
+      selectedPieceId = pieceId;
+      renderPiecePicker();
       renderFaceCards();
     }
 
@@ -650,23 +885,34 @@
 
     // ---------- 面のカードと進み具合 ----------
     // ファイル名は「試験体ID_crack_面_段階_日時.jpg」。ギャラリーは先頭の試験体IDでバッジを付けるので、その形を崩さない
-    function photoPrefix(specimenId, faceCode, phase) { return `${specimenId}_crack_${faceCode}_${phase}_`; }
+    // 木口は「試験片ID_koguchi_面_日時.jpg」（段階なし）。GASは _koguchi_ を含む名前を Strength_Test/photos_koguchi/パネルID/ に振り分ける
+    function photoPrefix(specimenId, faceCode, phase) {
+      return IS_KOGUCHI ? `${specimenId}_koguchi_${faceCode}_` : `${specimenId}_crack_${faceCode}_${phase}_`;
+    }
 
     async function loadProgress() {
-      // 割れの写真はギャラリーとは別のフォルダ（修論フォルダの Crack_Photos）に保存されるので、専用のアクションで一覧を取る
+      // 割れ・木口の写真はギャラリーとは別のフォルダ（修論フォルダ）に保存されるので、専用のアクションで一覧を取る
+      const action = IS_KOGUCHI ? "get_koguchi_photos" : "get_crack_photos";
       try {
-        const res = await fetch(`${GAS_API_URL}?password=${encodeURIComponent(window.appPassword)}&action=get_crack_photos`);
+        const res = await fetch(`${GAS_API_URL}?password=${encodeURIComponent(window.appPassword)}&action=${action}`);
         const json = await res.json();
-        if (json.status === "success") uploadedNames = json.data.map(photo => photo.name).filter(Boolean);
+        if (json.status === "auth_error") { window.logout(); return; }
+        if (json.status === "success") {
+          // GAS が get_koguchi_photos を知らないと、action なしと同じ試験体一覧（specimen_id の行）が返る。
+          // その状態で保存すると _koguchi_ が振り分けられずギャラリーのフォルダに入るので、撮影を止める
+          koguchiApiMissing = IS_KOGUCHI && json.data.some(row => row.specimen_id !== undefined && row.name === undefined);
+          uploadedNames = json.data.map(photo => photo.name).filter(Boolean);
+        }
       } catch (e) { /* 進み具合が出ないだけで撮影はできる */ }
       renderFaceCards();
+      if (IS_KOGUCHI) { renderPiecePicker(); return; }
       renderPicker();
       renderWeight();
     }
 
     function renderFaceCards() {
-      const specimenId = document.getElementById('crack-specimen').value;
-      document.getElementById('weight-reminder').classList.toggle('hidden', !specimenId || weightRecorded(specimenId));
+      const specimenId = currentTargetId();
+      if (!IS_KOGUCHI) document.getElementById('weight-reminder').classList.toggle('hidden', !specimenId || weightRecorded(specimenId));
       const container = document.getElementById('face-cards');
       container.innerHTML = "";
       FACES.forEach(face => {
@@ -677,7 +923,7 @@
         card.innerHTML = `
           <div class="w-9 h-9 shrink-0 rounded-full flex items-center justify-center text-sm font-bold ${done ? "bg-emerald-100 text-emerald-700" : "bg-stone-100 text-stone-500"}">${done ? "✓" : "–"}</div>
           <div class="flex-1 min-w-0">
-            <p class="font-bold text-stone-800">${face.name} <span class="text-xs font-normal text-stone-500">${PHASE_LABELS[currentPhase]}${done ? `・保存済み ${done}枚` : ""}</span></p>
+            <p class="font-bold text-stone-800">${face.name} <span class="text-xs font-normal text-stone-500">${IS_KOGUCHI ? (done ? `保存済み ${done}枚` : "") : `${PHASE_LABELS[currentPhase]}${done ? `・保存済み ${done}枚` : ""}`}</span></p>
             <p class="text-xs text-stone-500">${face.note}</p>
           </div>
           <div class="shrink-0 flex flex-col items-end gap-1">
@@ -691,7 +937,11 @@
 
     async function startCapture(face, mode) {
       if (!checklistComplete()) { await window.showAlert("先に「① 撮影前のチェック」をすべて確認してください。"); return; }
-      if (!document.getElementById('crack-specimen').value) { await window.showAlert("先に試験体IDを選択してください。"); return; }
+      if (!currentTargetId()) { await window.showAlert(IS_KOGUCHI ? "先に試験片を選んでください。" : "先に試験体IDを選択してください。"); return; }
+      if (koguchiApiMissing) {
+        await window.showAlert("GAS がまだ木口の写真に対応していません（get_koguchi_photos がない）。このまま保存すると修論フォルダではなくギャラリーに入るので、GAS を更新してから撮ってください。");
+        return;
+      }
       currentFace = face;
       await stopCamera();  // QR読み取りのカメラが動いたままだと、撮影用にカメラを開けない
       if (mode === "app") document.getElementById('crack-input').click();
@@ -699,8 +949,9 @@
     }
 
     // ---------- ページ内カメラ（ガイド枠と水平計） ----------
-    // 側面は 366×90 mm。枠は画面の 85% に収まる最大の大きさにする
+    // 側面は 366×90 mm、木口の試験片は約90 mm角。枠は画面の 85% に収まる最大の大きさにする
     const GUIDE_ASPECT = { top: 1, side: 366 / 90 };
+    function guideAspect() { return (IS_KOGUCHI || isTopFace()) ? GUIDE_ASPECT.top : GUIDE_ASPECT.side; }
     const LEVEL_OK_DEG = 2;  // これ以内なら緑。2°の傾きなら、台形補正の前でも端の寸法の違いはごくわずか
     let liveStream = null;
     let liveImageCapture = null;
@@ -710,8 +961,10 @@
     async function openLiveCamera() {
       const overlay = document.getElementById('camera-overlay');
       document.getElementById('camera-title').textContent =
-        `${document.getElementById('crack-specimen').value} / ${currentFace.name} / ${PHASE_LABELS[currentPhase]}`;
-      document.getElementById('camera-hint').textContent = isTopFace()
+        `${currentTargetId()} / ${currentFace.name} / ${phaseLabel()}`;
+      document.getElementById('camera-hint').textContent = IS_KOGUCHI
+        ? "真上から。半孔を画面の上にし、試験片の4辺を白い枠いっぱいに合わせ、水平計の点を中央の円に入れる。画面をタップでピント"
+        : isTopFace()
         ? "真上から。試験体の四辺を白い枠に合わせ、水平計の点を中央の円に入れる。画面をタップでピント"
         : "側面を上にして地面に置き、真上から。上面側を画面の上に。試験体を白い枠に合わせ、水平計の点を中央の円に入れる。画面をタップでピント";
       document.getElementById('camera-resolution').textContent = "";
@@ -775,7 +1028,7 @@
     }
 
     function drawGuide(width, height, level) {
-      const aspect = isTopFace() ? GUIDE_ASPECT.top : GUIDE_ASPECT.side;
+      const aspect = guideAspect();
       let guideWidth = width * 0.85, guideHeight = guideWidth / aspect;
       if (guideHeight > height * 0.85) { guideHeight = height * 0.85; guideWidth = guideHeight * aspect; }
       const left = (width - guideWidth) / 2, top = (height - guideHeight) / 2;
@@ -922,7 +1175,7 @@
       image.onload = async () => {
         document.getElementById('review-image').src = url;
         document.getElementById('review-title').textContent =
-          `${document.getElementById('crack-specimen').value} / ${currentFace.name} / ${PHASE_LABELS[currentPhase]}`;
+          `${currentTargetId()} / ${currentFace.name} / ${phaseLabel()}`;
         drawCenterCrop(image);
         // ページ内カメラの写真にはEXIFが付かないので、レンズの代わりに撮影時の傾きを出す
         const lensCheck = source === "live"
@@ -1025,7 +1278,7 @@
 
     async function saveReviewedPhoto() {
       if (!reviewedFile) return;
-      const specimenId = document.getElementById('crack-specimen').value;
+      const specimenId = currentTargetId();
       const extension = reviewedFile.type === "image/png" ? "png" : "jpg";
       const filename = `${photoPrefix(specimenId, currentFace.code, currentPhase)}${timestamp()}.${extension}`;
       const file = reviewedFile;
@@ -1048,7 +1301,8 @@
         if (result.status === "success") {
           uploadedNames.push(filename);
           renderFaceCards();
-          renderPicker();
+          if (IS_KOGUCHI) renderPiecePicker();
+          else renderPicker();
         } else if (result.status === "auth_error") {
           window.logout();
         } else {

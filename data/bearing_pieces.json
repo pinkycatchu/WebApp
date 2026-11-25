@@ -1,0 +1,2305 @@
+{
+ "source": "試験片一覧.xlsx",
+ "pieces": [
+  {
+   "id": "NE-CLT-00-01-S1",
+   "panel": "NE-CLT-00-01",
+   "condition": "NE-CLT",
+   "direction": "S",
+   "position": "A-B角",
+   "dic": false,
+   "note": "",
+   "number": 1
+  },
+  {
+   "id": "NE-CLT-00-01-S2",
+   "panel": "NE-CLT-00-01",
+   "condition": "NE-CLT",
+   "direction": "S",
+   "position": "A中央",
+   "dic": false,
+   "note": "",
+   "number": 2
+  },
+  {
+   "id": "NE-CLT-00-01-S3",
+   "panel": "NE-CLT-00-01",
+   "condition": "NE-CLT",
+   "direction": "S",
+   "position": "C-D角",
+   "dic": true,
+   "note": "",
+   "number": 3
+  },
+  {
+   "id": "NE-CLT-00-01-S4",
+   "panel": "NE-CLT-00-01",
+   "condition": "NE-CLT",
+   "direction": "S",
+   "position": "C中央",
+   "dic": false,
+   "note": "",
+   "number": 4
+  },
+  {
+   "id": "NE-CLT-00-01-W1",
+   "panel": "NE-CLT-00-01",
+   "condition": "NE-CLT",
+   "direction": "W",
+   "position": "A-D角",
+   "dic": false,
+   "note": "",
+   "number": 1
+  },
+  {
+   "id": "NE-CLT-00-01-W2",
+   "panel": "NE-CLT-00-01",
+   "condition": "NE-CLT",
+   "direction": "W",
+   "position": "D中央",
+   "dic": false,
+   "note": "",
+   "number": 2
+  },
+  {
+   "id": "NE-CLT-00-01-W3",
+   "panel": "NE-CLT-00-01",
+   "condition": "NE-CLT",
+   "direction": "W",
+   "position": "B-C角",
+   "dic": false,
+   "note": "",
+   "number": 3
+  },
+  {
+   "id": "NE-CLT-00-01-W4",
+   "panel": "NE-CLT-00-01",
+   "condition": "NE-CLT",
+   "direction": "W",
+   "position": "B中央",
+   "dic": true,
+   "note": "",
+   "number": 4
+  },
+  {
+   "id": "NE-CLT-00-02-S5",
+   "panel": "NE-CLT-00-02",
+   "condition": "NE-CLT",
+   "direction": "S",
+   "position": "A-B角",
+   "dic": false,
+   "note": "",
+   "number": 5
+  },
+  {
+   "id": "NE-CLT-00-02-S6",
+   "panel": "NE-CLT-00-02",
+   "condition": "NE-CLT",
+   "direction": "S",
+   "position": "A中央",
+   "dic": true,
+   "note": "",
+   "number": 6
+  },
+  {
+   "id": "NE-CLT-00-02-S7",
+   "panel": "NE-CLT-00-02",
+   "condition": "NE-CLT",
+   "direction": "S",
+   "position": "C-D角",
+   "dic": false,
+   "note": "",
+   "number": 7
+  },
+  {
+   "id": "NE-CLT-00-02-S8",
+   "panel": "NE-CLT-00-02",
+   "condition": "NE-CLT",
+   "direction": "S",
+   "position": "C中央",
+   "dic": false,
+   "note": "",
+   "number": 8
+  },
+  {
+   "id": "NE-CLT-00-02-W5",
+   "panel": "NE-CLT-00-02",
+   "condition": "NE-CLT",
+   "direction": "W",
+   "position": "A-D角",
+   "dic": true,
+   "note": "",
+   "number": 5
+  },
+  {
+   "id": "NE-CLT-00-02-W6",
+   "panel": "NE-CLT-00-02",
+   "condition": "NE-CLT",
+   "direction": "W",
+   "position": "D中央",
+   "dic": false,
+   "note": "",
+   "number": 6
+  },
+  {
+   "id": "NE-CLT-00-02-W7",
+   "panel": "NE-CLT-00-02",
+   "condition": "NE-CLT",
+   "direction": "W",
+   "position": "B-C角",
+   "dic": false,
+   "note": "",
+   "number": 7
+  },
+  {
+   "id": "NE-CLT-00-02-W8",
+   "panel": "NE-CLT-00-02",
+   "condition": "NE-CLT",
+   "direction": "W",
+   "position": "B中央",
+   "dic": false,
+   "note": "",
+   "number": 8
+  },
+  {
+   "id": "NE-CLT-00-03-S9",
+   "panel": "NE-CLT-00-03",
+   "condition": "NE-CLT",
+   "direction": "S",
+   "position": "P1",
+   "dic": false,
+   "note": "",
+   "number": 9
+  },
+  {
+   "id": "NE-CLT-00-03-W9",
+   "panel": "NE-CLT-00-03",
+   "condition": "NE-CLT",
+   "direction": "W",
+   "position": "P2",
+   "dic": false,
+   "note": "",
+   "number": 9
+  },
+  {
+   "id": "CC-CLT-12-01-S1",
+   "panel": "CC-CLT-12-01",
+   "condition": "NE-CLT（追加）",
+   "direction": "S",
+   "position": "A-B角",
+   "dic": false,
+   "note": "新しいエンドミルの試し切り（11/6）。暴露なし扱い",
+   "number": 1
+  },
+  {
+   "id": "CC-CLT-12-01-S2",
+   "panel": "CC-CLT-12-01",
+   "condition": "NE-CLT（追加）",
+   "direction": "S",
+   "position": "A中央",
+   "dic": false,
+   "note": "新しいエンドミルの試し切り（11/6）。暴露なし扱い",
+   "number": 2
+  },
+  {
+   "id": "CC-CLT-12-01-S3",
+   "panel": "CC-CLT-12-01",
+   "condition": "NE-CLT（追加）",
+   "direction": "S",
+   "position": "C-D角",
+   "dic": false,
+   "note": "新しいエンドミルの試し切り（11/6）。暴露なし扱い",
+   "number": 3
+  },
+  {
+   "id": "CC-CLT-12-01-S4",
+   "panel": "CC-CLT-12-01",
+   "condition": "NE-CLT（追加）",
+   "direction": "S",
+   "position": "C中央",
+   "dic": false,
+   "note": "新しいエンドミルの試し切り（11/6）。暴露なし扱い",
+   "number": 4
+  },
+  {
+   "id": "CC-CLT-12-01-W1",
+   "panel": "CC-CLT-12-01",
+   "condition": "NE-CLT（追加）",
+   "direction": "W",
+   "position": "A-D角",
+   "dic": false,
+   "note": "新しいエンドミルの試し切り（11/6）。暴露なし扱い",
+   "number": 1
+  },
+  {
+   "id": "CC-CLT-12-01-W2",
+   "panel": "CC-CLT-12-01",
+   "condition": "NE-CLT（追加）",
+   "direction": "W",
+   "position": "D中央",
+   "dic": false,
+   "note": "新しいエンドミルの試し切り（11/6）。暴露なし扱い",
+   "number": 2
+  },
+  {
+   "id": "CC-CLT-12-01-W3",
+   "panel": "CC-CLT-12-01",
+   "condition": "NE-CLT（追加）",
+   "direction": "W",
+   "position": "B-C角",
+   "dic": false,
+   "note": "新しいエンドミルの試し切り（11/6）。暴露なし扱い",
+   "number": 3
+  },
+  {
+   "id": "CC-CLT-12-01-W4",
+   "panel": "CC-CLT-12-01",
+   "condition": "NE-CLT（追加）",
+   "direction": "W",
+   "position": "B中央",
+   "dic": false,
+   "note": "新しいエンドミルの試し切り（11/6）。暴露なし扱い",
+   "number": 4
+  },
+  {
+   "id": "CC-CLT-12-02-S5",
+   "panel": "CC-CLT-12-02",
+   "condition": "NE-CLT（追加）",
+   "direction": "S",
+   "position": "A-B角",
+   "dic": false,
+   "note": "暴露なし扱い（CC 12か月の中止分）",
+   "number": 5
+  },
+  {
+   "id": "CC-CLT-12-02-S6",
+   "panel": "CC-CLT-12-02",
+   "condition": "NE-CLT（追加）",
+   "direction": "S",
+   "position": "A中央",
+   "dic": false,
+   "note": "暴露なし扱い（CC 12か月の中止分）",
+   "number": 6
+  },
+  {
+   "id": "CC-CLT-12-02-S7",
+   "panel": "CC-CLT-12-02",
+   "condition": "NE-CLT（追加）",
+   "direction": "S",
+   "position": "C-D角",
+   "dic": false,
+   "note": "暴露なし扱い（CC 12か月の中止分）",
+   "number": 7
+  },
+  {
+   "id": "CC-CLT-12-02-S8",
+   "panel": "CC-CLT-12-02",
+   "condition": "NE-CLT（追加）",
+   "direction": "S",
+   "position": "C中央",
+   "dic": false,
+   "note": "暴露なし扱い（CC 12か月の中止分）",
+   "number": 8
+  },
+  {
+   "id": "CC-CLT-12-02-W5",
+   "panel": "CC-CLT-12-02",
+   "condition": "NE-CLT（追加）",
+   "direction": "W",
+   "position": "A-D角",
+   "dic": false,
+   "note": "暴露なし扱い（CC 12か月の中止分）",
+   "number": 5
+  },
+  {
+   "id": "CC-CLT-12-02-W6",
+   "panel": "CC-CLT-12-02",
+   "condition": "NE-CLT（追加）",
+   "direction": "W",
+   "position": "D中央",
+   "dic": false,
+   "note": "暴露なし扱い（CC 12か月の中止分）",
+   "number": 6
+  },
+  {
+   "id": "CC-CLT-12-02-W7",
+   "panel": "CC-CLT-12-02",
+   "condition": "NE-CLT（追加）",
+   "direction": "W",
+   "position": "B-C角",
+   "dic": false,
+   "note": "暴露なし扱い（CC 12か月の中止分）",
+   "number": 7
+  },
+  {
+   "id": "CC-CLT-12-02-W8",
+   "panel": "CC-CLT-12-02",
+   "condition": "NE-CLT（追加）",
+   "direction": "W",
+   "position": "B中央",
+   "dic": false,
+   "note": "暴露なし扱い（CC 12か月の中止分）",
+   "number": 8
+  },
+  {
+   "id": "CC-CLT-12-03-S9",
+   "panel": "CC-CLT-12-03",
+   "condition": "NE-CLT（追加）",
+   "direction": "S",
+   "position": "A-B角",
+   "dic": false,
+   "note": "暴露なし扱い（CC 12か月の中止分）",
+   "number": 9
+  },
+  {
+   "id": "CC-CLT-12-03-S10",
+   "panel": "CC-CLT-12-03",
+   "condition": "NE-CLT（追加）",
+   "direction": "S",
+   "position": "A中央",
+   "dic": false,
+   "note": "暴露なし扱い（CC 12か月の中止分）",
+   "number": 10
+  },
+  {
+   "id": "CC-CLT-12-03-S11",
+   "panel": "CC-CLT-12-03",
+   "condition": "NE-CLT（追加）",
+   "direction": "S",
+   "position": "C-D角",
+   "dic": false,
+   "note": "暴露なし扱い（CC 12か月の中止分）",
+   "number": 11
+  },
+  {
+   "id": "CC-CLT-12-03-S12",
+   "panel": "CC-CLT-12-03",
+   "condition": "NE-CLT（追加）",
+   "direction": "S",
+   "position": "C中央",
+   "dic": false,
+   "note": "暴露なし扱い（CC 12か月の中止分）",
+   "number": 12
+  },
+  {
+   "id": "CC-CLT-12-03-W9",
+   "panel": "CC-CLT-12-03",
+   "condition": "NE-CLT（追加）",
+   "direction": "W",
+   "position": "A-D角",
+   "dic": false,
+   "note": "暴露なし扱い（CC 12か月の中止分）",
+   "number": 9
+  },
+  {
+   "id": "CC-CLT-12-03-W10",
+   "panel": "CC-CLT-12-03",
+   "condition": "NE-CLT（追加）",
+   "direction": "W",
+   "position": "D中央",
+   "dic": false,
+   "note": "暴露なし扱い（CC 12か月の中止分）",
+   "number": 10
+  },
+  {
+   "id": "CC-CLT-12-03-W11",
+   "panel": "CC-CLT-12-03",
+   "condition": "NE-CLT（追加）",
+   "direction": "W",
+   "position": "B-C角",
+   "dic": false,
+   "note": "暴露なし扱い（CC 12か月の中止分）",
+   "number": 11
+  },
+  {
+   "id": "CC-CLT-12-03-W12",
+   "panel": "CC-CLT-12-03",
+   "condition": "NE-CLT（追加）",
+   "direction": "W",
+   "position": "B中央",
+   "dic": false,
+   "note": "暴露なし扱い（CC 12か月の中止分）",
+   "number": 12
+  },
+  {
+   "id": "NE-GLT-00-01-S1",
+   "panel": "NE-GLT-00-01",
+   "condition": "NE-GLT",
+   "direction": "S",
+   "position": "A-B角",
+   "dic": false,
+   "note": "",
+   "number": 1
+  },
+  {
+   "id": "NE-GLT-00-01-S2",
+   "panel": "NE-GLT-00-01",
+   "condition": "NE-GLT",
+   "direction": "S",
+   "position": "A中央",
+   "dic": true,
+   "note": "",
+   "number": 2
+  },
+  {
+   "id": "NE-GLT-00-01-S3",
+   "panel": "NE-GLT-00-01",
+   "condition": "NE-GLT",
+   "direction": "S",
+   "position": "C-D角",
+   "dic": false,
+   "note": "",
+   "number": 3
+  },
+  {
+   "id": "NE-GLT-00-01-S4",
+   "panel": "NE-GLT-00-01",
+   "condition": "NE-GLT",
+   "direction": "S",
+   "position": "C中央",
+   "dic": false,
+   "note": "",
+   "number": 4
+  },
+  {
+   "id": "NE-GLT-00-01-W1",
+   "panel": "NE-GLT-00-01",
+   "condition": "NE-GLT",
+   "direction": "W",
+   "position": "A-D角",
+   "dic": true,
+   "note": "",
+   "number": 1
+  },
+  {
+   "id": "NE-GLT-00-01-W2",
+   "panel": "NE-GLT-00-01",
+   "condition": "NE-GLT",
+   "direction": "W",
+   "position": "D中央",
+   "dic": false,
+   "note": "",
+   "number": 2
+  },
+  {
+   "id": "NE-GLT-00-01-W3",
+   "panel": "NE-GLT-00-01",
+   "condition": "NE-GLT",
+   "direction": "W",
+   "position": "B-C角",
+   "dic": false,
+   "note": "",
+   "number": 3
+  },
+  {
+   "id": "NE-GLT-00-01-W4",
+   "panel": "NE-GLT-00-01",
+   "condition": "NE-GLT",
+   "direction": "W",
+   "position": "B中央",
+   "dic": false,
+   "note": "",
+   "number": 4
+  },
+  {
+   "id": "NE-GLT-00-02-S5",
+   "panel": "NE-GLT-00-02",
+   "condition": "NE-GLT",
+   "direction": "S",
+   "position": "A-B角",
+   "dic": false,
+   "note": "",
+   "number": 5
+  },
+  {
+   "id": "NE-GLT-00-02-S6",
+   "panel": "NE-GLT-00-02",
+   "condition": "NE-GLT",
+   "direction": "S",
+   "position": "A中央",
+   "dic": false,
+   "note": "",
+   "number": 6
+  },
+  {
+   "id": "NE-GLT-00-02-S7",
+   "panel": "NE-GLT-00-02",
+   "condition": "NE-GLT",
+   "direction": "S",
+   "position": "C-D角",
+   "dic": false,
+   "note": "",
+   "number": 7
+  },
+  {
+   "id": "NE-GLT-00-02-S8",
+   "panel": "NE-GLT-00-02",
+   "condition": "NE-GLT",
+   "direction": "S",
+   "position": "C中央",
+   "dic": true,
+   "note": "",
+   "number": 8
+  },
+  {
+   "id": "NE-GLT-00-02-W5",
+   "panel": "NE-GLT-00-02",
+   "condition": "NE-GLT",
+   "direction": "W",
+   "position": "A-D角",
+   "dic": false,
+   "note": "",
+   "number": 5
+  },
+  {
+   "id": "NE-GLT-00-02-W6",
+   "panel": "NE-GLT-00-02",
+   "condition": "NE-GLT",
+   "direction": "W",
+   "position": "D中央",
+   "dic": false,
+   "note": "",
+   "number": 6
+  },
+  {
+   "id": "NE-GLT-00-02-W7",
+   "panel": "NE-GLT-00-02",
+   "condition": "NE-GLT",
+   "direction": "W",
+   "position": "B-C角",
+   "dic": true,
+   "note": "",
+   "number": 7
+  },
+  {
+   "id": "NE-GLT-00-02-W8",
+   "panel": "NE-GLT-00-02",
+   "condition": "NE-GLT",
+   "direction": "W",
+   "position": "B中央",
+   "dic": false,
+   "note": "",
+   "number": 8
+  },
+  {
+   "id": "NE-GLT-00-03-S9",
+   "panel": "NE-GLT-00-03",
+   "condition": "NE-GLT",
+   "direction": "S",
+   "position": "P1",
+   "dic": false,
+   "note": "",
+   "number": 9
+  },
+  {
+   "id": "NE-GLT-00-03-W9",
+   "panel": "NE-GLT-00-03",
+   "condition": "NE-GLT",
+   "direction": "W",
+   "position": "P2",
+   "dic": false,
+   "note": "",
+   "number": 9
+  },
+  {
+   "id": "NE-GLT-00-03-S10",
+   "panel": "NE-GLT-00-03",
+   "condition": "NE-GLT",
+   "direction": "S",
+   "position": "P3",
+   "dic": false,
+   "note": "",
+   "number": 10
+  },
+  {
+   "id": "CS-CLT-03-01-S1",
+   "panel": "CS-CLT-03-01",
+   "condition": "CS-CLT-03",
+   "direction": "S",
+   "position": "A-B角",
+   "dic": true,
+   "note": "金属用エンドミルで加工済み（ささくれ）。解析では別扱い",
+   "number": 1
+  },
+  {
+   "id": "CS-CLT-03-01-S2",
+   "panel": "CS-CLT-03-01",
+   "condition": "CS-CLT-03",
+   "direction": "S",
+   "position": "A中央",
+   "dic": false,
+   "note": "金属用エンドミルで加工済み（ささくれ）。解析では別扱い",
+   "number": 2
+  },
+  {
+   "id": "CS-CLT-03-01-S3",
+   "panel": "CS-CLT-03-01",
+   "condition": "CS-CLT-03",
+   "direction": "S",
+   "position": "C-D角",
+   "dic": false,
+   "note": "金属用エンドミルで加工済み（ささくれ）。解析では別扱い",
+   "number": 3
+  },
+  {
+   "id": "CS-CLT-03-01-S4",
+   "panel": "CS-CLT-03-01",
+   "condition": "CS-CLT-03",
+   "direction": "S",
+   "position": "C中央",
+   "dic": false,
+   "note": "金属用エンドミルで加工済み（ささくれ）。解析では別扱い",
+   "number": 4
+  },
+  {
+   "id": "CS-CLT-03-01-W1",
+   "panel": "CS-CLT-03-01",
+   "condition": "CS-CLT-03",
+   "direction": "W",
+   "position": "A-D角",
+   "dic": false,
+   "note": "金属用エンドミルで加工済み（ささくれ）。解析では別扱い",
+   "number": 1
+  },
+  {
+   "id": "CS-CLT-03-01-W2",
+   "panel": "CS-CLT-03-01",
+   "condition": "CS-CLT-03",
+   "direction": "W",
+   "position": "D中央",
+   "dic": true,
+   "note": "金属用エンドミルで加工済み（ささくれ）。解析では別扱い",
+   "number": 2
+  },
+  {
+   "id": "CS-CLT-03-01-W3",
+   "panel": "CS-CLT-03-01",
+   "condition": "CS-CLT-03",
+   "direction": "W",
+   "position": "B-C角",
+   "dic": false,
+   "note": "金属用エンドミルで加工済み（ささくれ）。解析では別扱い",
+   "number": 3
+  },
+  {
+   "id": "CS-CLT-03-01-W4",
+   "panel": "CS-CLT-03-01",
+   "condition": "CS-CLT-03",
+   "direction": "W",
+   "position": "B中央",
+   "dic": false,
+   "note": "金属用エンドミルで加工済み（ささくれ）。解析では別扱い",
+   "number": 4
+  },
+  {
+   "id": "CS-CLT-03-02-S9",
+   "panel": "CS-CLT-03-02",
+   "condition": "CS-CLT-03",
+   "direction": "S",
+   "position": "P1",
+   "dic": false,
+   "note": "",
+   "number": 9
+  },
+  {
+   "id": "CS-CLT-03-02-W9",
+   "panel": "CS-CLT-03-02",
+   "condition": "CS-CLT-03",
+   "direction": "W",
+   "position": "P2",
+   "dic": false,
+   "note": "",
+   "number": 9
+  },
+  {
+   "id": "CS-CLT-06-01-S1",
+   "panel": "CS-CLT-06-01",
+   "condition": "CS-CLT-06",
+   "direction": "S",
+   "position": "A-B角",
+   "dic": false,
+   "note": "",
+   "number": 1
+  },
+  {
+   "id": "CS-CLT-06-01-S2",
+   "panel": "CS-CLT-06-01",
+   "condition": "CS-CLT-06",
+   "direction": "S",
+   "position": "A中央",
+   "dic": false,
+   "note": "",
+   "number": 2
+  },
+  {
+   "id": "CS-CLT-06-01-S3",
+   "panel": "CS-CLT-06-01",
+   "condition": "CS-CLT-06",
+   "direction": "S",
+   "position": "C-D角",
+   "dic": false,
+   "note": "",
+   "number": 3
+  },
+  {
+   "id": "CS-CLT-06-01-S4",
+   "panel": "CS-CLT-06-01",
+   "condition": "CS-CLT-06",
+   "direction": "S",
+   "position": "C中央",
+   "dic": true,
+   "note": "",
+   "number": 4
+  },
+  {
+   "id": "CS-CLT-06-01-W1",
+   "panel": "CS-CLT-06-01",
+   "condition": "CS-CLT-06",
+   "direction": "W",
+   "position": "A-D角",
+   "dic": false,
+   "note": "",
+   "number": 1
+  },
+  {
+   "id": "CS-CLT-06-01-W2",
+   "panel": "CS-CLT-06-01",
+   "condition": "CS-CLT-06",
+   "direction": "W",
+   "position": "D中央",
+   "dic": false,
+   "note": "",
+   "number": 2
+  },
+  {
+   "id": "CS-CLT-06-01-W3",
+   "panel": "CS-CLT-06-01",
+   "condition": "CS-CLT-06",
+   "direction": "W",
+   "position": "B-C角",
+   "dic": false,
+   "note": "",
+   "number": 3
+  },
+  {
+   "id": "CS-CLT-06-01-W4",
+   "panel": "CS-CLT-06-01",
+   "condition": "CS-CLT-06",
+   "direction": "W",
+   "position": "B中央",
+   "dic": true,
+   "note": "",
+   "number": 4
+  },
+  {
+   "id": "CS-CLT-06-02-S9",
+   "panel": "CS-CLT-06-02",
+   "condition": "CS-CLT-06",
+   "direction": "S",
+   "position": "P1",
+   "dic": false,
+   "note": "",
+   "number": 9
+  },
+  {
+   "id": "CS-CLT-06-02-W9",
+   "panel": "CS-CLT-06-02",
+   "condition": "CS-CLT-06",
+   "direction": "W",
+   "position": "P2",
+   "dic": false,
+   "note": "",
+   "number": 9
+  },
+  {
+   "id": "CS-CLT-09-01-S1",
+   "panel": "CS-CLT-09-01",
+   "condition": "CS-CLT-09",
+   "direction": "S",
+   "position": "A-B角",
+   "dic": false,
+   "note": "",
+   "number": 1
+  },
+  {
+   "id": "CS-CLT-09-01-S2",
+   "panel": "CS-CLT-09-01",
+   "condition": "CS-CLT-09",
+   "direction": "S",
+   "position": "A中央",
+   "dic": false,
+   "note": "",
+   "number": 2
+  },
+  {
+   "id": "CS-CLT-09-01-S3",
+   "panel": "CS-CLT-09-01",
+   "condition": "CS-CLT-09",
+   "direction": "S",
+   "position": "C-D角",
+   "dic": true,
+   "note": "",
+   "number": 3
+  },
+  {
+   "id": "CS-CLT-09-01-S4",
+   "panel": "CS-CLT-09-01",
+   "condition": "CS-CLT-09",
+   "direction": "S",
+   "position": "C中央",
+   "dic": false,
+   "note": "",
+   "number": 4
+  },
+  {
+   "id": "CS-CLT-09-01-W1",
+   "panel": "CS-CLT-09-01",
+   "condition": "CS-CLT-09",
+   "direction": "W",
+   "position": "A-D角",
+   "dic": true,
+   "note": "",
+   "number": 1
+  },
+  {
+   "id": "CS-CLT-09-01-W2",
+   "panel": "CS-CLT-09-01",
+   "condition": "CS-CLT-09",
+   "direction": "W",
+   "position": "D中央",
+   "dic": false,
+   "note": "",
+   "number": 2
+  },
+  {
+   "id": "CS-CLT-09-01-W3",
+   "panel": "CS-CLT-09-01",
+   "condition": "CS-CLT-09",
+   "direction": "W",
+   "position": "B-C角",
+   "dic": false,
+   "note": "",
+   "number": 3
+  },
+  {
+   "id": "CS-CLT-09-01-W4",
+   "panel": "CS-CLT-09-01",
+   "condition": "CS-CLT-09",
+   "direction": "W",
+   "position": "B中央",
+   "dic": false,
+   "note": "",
+   "number": 4
+  },
+  {
+   "id": "CS-CLT-09-02-S9",
+   "panel": "CS-CLT-09-02",
+   "condition": "CS-CLT-09",
+   "direction": "S",
+   "position": "P1",
+   "dic": false,
+   "note": "",
+   "number": 9
+  },
+  {
+   "id": "CS-CLT-09-02-W9",
+   "panel": "CS-CLT-09-02",
+   "condition": "CS-CLT-09",
+   "direction": "W",
+   "position": "P2",
+   "dic": false,
+   "note": "",
+   "number": 9
+  },
+  {
+   "id": "CS-GLT-09-01-S1",
+   "panel": "CS-GLT-09-01",
+   "condition": "CS-GLT-09",
+   "direction": "S",
+   "position": "A-B角",
+   "dic": false,
+   "note": "",
+   "number": 1
+  },
+  {
+   "id": "CS-GLT-09-01-S2",
+   "panel": "CS-GLT-09-01",
+   "condition": "CS-GLT-09",
+   "direction": "S",
+   "position": "A中央",
+   "dic": true,
+   "note": "",
+   "number": 2
+  },
+  {
+   "id": "CS-GLT-09-01-S3",
+   "panel": "CS-GLT-09-01",
+   "condition": "CS-GLT-09",
+   "direction": "S",
+   "position": "C-D角",
+   "dic": false,
+   "note": "",
+   "number": 3
+  },
+  {
+   "id": "CS-GLT-09-01-S4",
+   "panel": "CS-GLT-09-01",
+   "condition": "CS-GLT-09",
+   "direction": "S",
+   "position": "C中央",
+   "dic": false,
+   "note": "",
+   "number": 4
+  },
+  {
+   "id": "CS-GLT-09-01-W1",
+   "panel": "CS-GLT-09-01",
+   "condition": "CS-GLT-09",
+   "direction": "W",
+   "position": "A-D角",
+   "dic": false,
+   "note": "",
+   "number": 1
+  },
+  {
+   "id": "CS-GLT-09-01-W2",
+   "panel": "CS-GLT-09-01",
+   "condition": "CS-GLT-09",
+   "direction": "W",
+   "position": "D中央",
+   "dic": true,
+   "note": "",
+   "number": 2
+  },
+  {
+   "id": "CS-GLT-09-01-W3",
+   "panel": "CS-GLT-09-01",
+   "condition": "CS-GLT-09",
+   "direction": "W",
+   "position": "B-C角",
+   "dic": false,
+   "note": "",
+   "number": 3
+  },
+  {
+   "id": "CS-GLT-09-01-W4",
+   "panel": "CS-GLT-09-01",
+   "condition": "CS-GLT-09",
+   "direction": "W",
+   "position": "B中央",
+   "dic": false,
+   "note": "",
+   "number": 4
+  },
+  {
+   "id": "CS-GLT-09-02-S9",
+   "panel": "CS-GLT-09-02",
+   "condition": "CS-GLT-09",
+   "direction": "S",
+   "position": "P1",
+   "dic": false,
+   "note": "",
+   "number": 9
+  },
+  {
+   "id": "CS-GLT-09-02-W9",
+   "panel": "CS-GLT-09-02",
+   "condition": "CS-GLT-09",
+   "direction": "W",
+   "position": "P2",
+   "dic": false,
+   "note": "",
+   "number": 9
+  },
+  {
+   "id": "CS-GLT-09-02-S10",
+   "panel": "CS-GLT-09-02",
+   "condition": "CS-GLT-09",
+   "direction": "S",
+   "position": "P3",
+   "dic": false,
+   "note": "",
+   "number": 10
+  },
+  {
+   "id": "CC-CLT-03-01-S1",
+   "panel": "CC-CLT-03-01",
+   "condition": "CC-CLT-03",
+   "direction": "S",
+   "position": "A-B角",
+   "dic": false,
+   "note": "",
+   "number": 1
+  },
+  {
+   "id": "CC-CLT-03-01-S2",
+   "panel": "CC-CLT-03-01",
+   "condition": "CC-CLT-03",
+   "direction": "S",
+   "position": "A中央",
+   "dic": false,
+   "note": "",
+   "number": 2
+  },
+  {
+   "id": "CC-CLT-03-01-S3",
+   "panel": "CC-CLT-03-01",
+   "condition": "CC-CLT-03",
+   "direction": "S",
+   "position": "C-D角",
+   "dic": true,
+   "note": "",
+   "number": 3
+  },
+  {
+   "id": "CC-CLT-03-01-S4",
+   "panel": "CC-CLT-03-01",
+   "condition": "CC-CLT-03",
+   "direction": "S",
+   "position": "C中央",
+   "dic": false,
+   "note": "",
+   "number": 4
+  },
+  {
+   "id": "CC-CLT-03-01-W1",
+   "panel": "CC-CLT-03-01",
+   "condition": "CC-CLT-03",
+   "direction": "W",
+   "position": "A-D角",
+   "dic": false,
+   "note": "",
+   "number": 1
+  },
+  {
+   "id": "CC-CLT-03-01-W2",
+   "panel": "CC-CLT-03-01",
+   "condition": "CC-CLT-03",
+   "direction": "W",
+   "position": "D中央",
+   "dic": false,
+   "note": "",
+   "number": 2
+  },
+  {
+   "id": "CC-CLT-03-01-W3",
+   "panel": "CC-CLT-03-01",
+   "condition": "CC-CLT-03",
+   "direction": "W",
+   "position": "B-C角",
+   "dic": true,
+   "note": "",
+   "number": 3
+  },
+  {
+   "id": "CC-CLT-03-01-W4",
+   "panel": "CC-CLT-03-01",
+   "condition": "CC-CLT-03",
+   "direction": "W",
+   "position": "B中央",
+   "dic": false,
+   "note": "",
+   "number": 4
+  },
+  {
+   "id": "CC-CLT-03-02-S5",
+   "panel": "CC-CLT-03-02",
+   "condition": "CC-CLT-03",
+   "direction": "S",
+   "position": "A-B角",
+   "dic": true,
+   "note": "",
+   "number": 5
+  },
+  {
+   "id": "CC-CLT-03-02-S6",
+   "panel": "CC-CLT-03-02",
+   "condition": "CC-CLT-03",
+   "direction": "S",
+   "position": "A中央",
+   "dic": false,
+   "note": "",
+   "number": 6
+  },
+  {
+   "id": "CC-CLT-03-02-S7",
+   "panel": "CC-CLT-03-02",
+   "condition": "CC-CLT-03",
+   "direction": "S",
+   "position": "C-D角",
+   "dic": false,
+   "note": "",
+   "number": 7
+  },
+  {
+   "id": "CC-CLT-03-02-S8",
+   "panel": "CC-CLT-03-02",
+   "condition": "CC-CLT-03",
+   "direction": "S",
+   "position": "C中央",
+   "dic": false,
+   "note": "",
+   "number": 8
+  },
+  {
+   "id": "CC-CLT-03-02-W5",
+   "panel": "CC-CLT-03-02",
+   "condition": "CC-CLT-03",
+   "direction": "W",
+   "position": "A-D角",
+   "dic": false,
+   "note": "",
+   "number": 5
+  },
+  {
+   "id": "CC-CLT-03-02-W6",
+   "panel": "CC-CLT-03-02",
+   "condition": "CC-CLT-03",
+   "direction": "W",
+   "position": "D中央",
+   "dic": true,
+   "note": "",
+   "number": 6
+  },
+  {
+   "id": "CC-CLT-03-02-W7",
+   "panel": "CC-CLT-03-02",
+   "condition": "CC-CLT-03",
+   "direction": "W",
+   "position": "B-C角",
+   "dic": false,
+   "note": "",
+   "number": 7
+  },
+  {
+   "id": "CC-CLT-03-02-W8",
+   "panel": "CC-CLT-03-02",
+   "condition": "CC-CLT-03",
+   "direction": "W",
+   "position": "B中央",
+   "dic": false,
+   "note": "",
+   "number": 8
+  },
+  {
+   "id": "CC-CLT-03-03-S9",
+   "panel": "CC-CLT-03-03",
+   "condition": "CC-CLT-03",
+   "direction": "S",
+   "position": "P1",
+   "dic": false,
+   "note": "",
+   "number": 9
+  },
+  {
+   "id": "CC-CLT-03-03-W9",
+   "panel": "CC-CLT-03-03",
+   "condition": "CC-CLT-03",
+   "direction": "W",
+   "position": "P2",
+   "dic": false,
+   "note": "",
+   "number": 9
+  },
+  {
+   "id": "CC-CLT-06-01-S1",
+   "panel": "CC-CLT-06-01",
+   "condition": "CC-CLT-06",
+   "direction": "S",
+   "position": "A-B角",
+   "dic": false,
+   "note": "",
+   "number": 1
+  },
+  {
+   "id": "CC-CLT-06-01-S2",
+   "panel": "CC-CLT-06-01",
+   "condition": "CC-CLT-06",
+   "direction": "S",
+   "position": "A中央",
+   "dic": true,
+   "note": "",
+   "number": 2
+  },
+  {
+   "id": "CC-CLT-06-01-S3",
+   "panel": "CC-CLT-06-01",
+   "condition": "CC-CLT-06",
+   "direction": "S",
+   "position": "C-D角",
+   "dic": false,
+   "note": "",
+   "number": 3
+  },
+  {
+   "id": "CC-CLT-06-01-S4",
+   "panel": "CC-CLT-06-01",
+   "condition": "CC-CLT-06",
+   "direction": "S",
+   "position": "C中央",
+   "dic": false,
+   "note": "",
+   "number": 4
+  },
+  {
+   "id": "CC-CLT-06-01-W1",
+   "panel": "CC-CLT-06-01",
+   "condition": "CC-CLT-06",
+   "direction": "W",
+   "position": "A-D角",
+   "dic": false,
+   "note": "",
+   "number": 1
+  },
+  {
+   "id": "CC-CLT-06-01-W2",
+   "panel": "CC-CLT-06-01",
+   "condition": "CC-CLT-06",
+   "direction": "W",
+   "position": "D中央",
+   "dic": false,
+   "note": "",
+   "number": 2
+  },
+  {
+   "id": "CC-CLT-06-01-W3",
+   "panel": "CC-CLT-06-01",
+   "condition": "CC-CLT-06",
+   "direction": "W",
+   "position": "B-C角",
+   "dic": true,
+   "note": "",
+   "number": 3
+  },
+  {
+   "id": "CC-CLT-06-01-W4",
+   "panel": "CC-CLT-06-01",
+   "condition": "CC-CLT-06",
+   "direction": "W",
+   "position": "B中央",
+   "dic": false,
+   "note": "",
+   "number": 4
+  },
+  {
+   "id": "CC-CLT-06-02-S5",
+   "panel": "CC-CLT-06-02",
+   "condition": "CC-CLT-06",
+   "direction": "S",
+   "position": "A-B角",
+   "dic": true,
+   "note": "",
+   "number": 5
+  },
+  {
+   "id": "CC-CLT-06-02-S6",
+   "panel": "CC-CLT-06-02",
+   "condition": "CC-CLT-06",
+   "direction": "S",
+   "position": "A中央",
+   "dic": false,
+   "note": "",
+   "number": 6
+  },
+  {
+   "id": "CC-CLT-06-02-S7",
+   "panel": "CC-CLT-06-02",
+   "condition": "CC-CLT-06",
+   "direction": "S",
+   "position": "C-D角",
+   "dic": false,
+   "note": "",
+   "number": 7
+  },
+  {
+   "id": "CC-CLT-06-02-S8",
+   "panel": "CC-CLT-06-02",
+   "condition": "CC-CLT-06",
+   "direction": "S",
+   "position": "C中央",
+   "dic": false,
+   "note": "",
+   "number": 8
+  },
+  {
+   "id": "CC-CLT-06-02-W5",
+   "panel": "CC-CLT-06-02",
+   "condition": "CC-CLT-06",
+   "direction": "W",
+   "position": "A-D角",
+   "dic": false,
+   "note": "",
+   "number": 5
+  },
+  {
+   "id": "CC-CLT-06-02-W6",
+   "panel": "CC-CLT-06-02",
+   "condition": "CC-CLT-06",
+   "direction": "W",
+   "position": "D中央",
+   "dic": false,
+   "note": "",
+   "number": 6
+  },
+  {
+   "id": "CC-CLT-06-02-W7",
+   "panel": "CC-CLT-06-02",
+   "condition": "CC-CLT-06",
+   "direction": "W",
+   "position": "B-C角",
+   "dic": true,
+   "note": "",
+   "number": 7
+  },
+  {
+   "id": "CC-CLT-06-02-W8",
+   "panel": "CC-CLT-06-02",
+   "condition": "CC-CLT-06",
+   "direction": "W",
+   "position": "B中央",
+   "dic": false,
+   "note": "",
+   "number": 8
+  },
+  {
+   "id": "CC-CLT-06-03-S9",
+   "panel": "CC-CLT-06-03",
+   "condition": "CC-CLT-06",
+   "direction": "S",
+   "position": "P1",
+   "dic": false,
+   "note": "",
+   "number": 9
+  },
+  {
+   "id": "CC-CLT-06-03-W9",
+   "panel": "CC-CLT-06-03",
+   "condition": "CC-CLT-06",
+   "direction": "W",
+   "position": "P2",
+   "dic": false,
+   "note": "",
+   "number": 9
+  },
+  {
+   "id": "CC-GLT-09-01-S1",
+   "panel": "CC-GLT-09-01",
+   "condition": "CC-GLT-06",
+   "direction": "S",
+   "position": "A-B角",
+   "dic": false,
+   "note": "planned_days 180（6か月扱い）",
+   "number": 1
+  },
+  {
+   "id": "CC-GLT-09-01-S2",
+   "panel": "CC-GLT-09-01",
+   "condition": "CC-GLT-06",
+   "direction": "S",
+   "position": "A中央",
+   "dic": false,
+   "note": "planned_days 180（6か月扱い）",
+   "number": 2
+  },
+  {
+   "id": "CC-GLT-09-01-S3",
+   "panel": "CC-GLT-09-01",
+   "condition": "CC-GLT-06",
+   "direction": "S",
+   "position": "C-D角",
+   "dic": true,
+   "note": "planned_days 180（6か月扱い）",
+   "number": 3
+  },
+  {
+   "id": "CC-GLT-09-01-S4",
+   "panel": "CC-GLT-09-01",
+   "condition": "CC-GLT-06",
+   "direction": "S",
+   "position": "C中央",
+   "dic": false,
+   "note": "planned_days 180（6か月扱い）",
+   "number": 4
+  },
+  {
+   "id": "CC-GLT-09-01-W1",
+   "panel": "CC-GLT-09-01",
+   "condition": "CC-GLT-06",
+   "direction": "W",
+   "position": "A-D角",
+   "dic": false,
+   "note": "planned_days 180（6か月扱い）",
+   "number": 1
+  },
+  {
+   "id": "CC-GLT-09-01-W2",
+   "panel": "CC-GLT-09-01",
+   "condition": "CC-GLT-06",
+   "direction": "W",
+   "position": "D中央",
+   "dic": false,
+   "note": "planned_days 180（6か月扱い）",
+   "number": 2
+  },
+  {
+   "id": "CC-GLT-09-01-W3",
+   "panel": "CC-GLT-09-01",
+   "condition": "CC-GLT-06",
+   "direction": "W",
+   "position": "B-C角",
+   "dic": true,
+   "note": "planned_days 180（6か月扱い）",
+   "number": 3
+  },
+  {
+   "id": "CC-GLT-09-01-W4",
+   "panel": "CC-GLT-09-01",
+   "condition": "CC-GLT-06",
+   "direction": "W",
+   "position": "B中央",
+   "dic": false,
+   "note": "planned_days 180（6か月扱い）",
+   "number": 4
+  },
+  {
+   "id": "CC-GLT-09-02-S5",
+   "panel": "CC-GLT-09-02",
+   "condition": "CC-GLT-06",
+   "direction": "S",
+   "position": "A-B角",
+   "dic": false,
+   "note": "planned_days 180（6か月扱い）",
+   "number": 5
+  },
+  {
+   "id": "CC-GLT-09-02-S6",
+   "panel": "CC-GLT-09-02",
+   "condition": "CC-GLT-06",
+   "direction": "S",
+   "position": "A中央",
+   "dic": false,
+   "note": "planned_days 180（6か月扱い）",
+   "number": 6
+  },
+  {
+   "id": "CC-GLT-09-02-S7",
+   "panel": "CC-GLT-09-02",
+   "condition": "CC-GLT-06",
+   "direction": "S",
+   "position": "C-D角",
+   "dic": true,
+   "note": "planned_days 180（6か月扱い）",
+   "number": 7
+  },
+  {
+   "id": "CC-GLT-09-02-S8",
+   "panel": "CC-GLT-09-02",
+   "condition": "CC-GLT-06",
+   "direction": "S",
+   "position": "C中央",
+   "dic": false,
+   "note": "planned_days 180（6か月扱い）",
+   "number": 8
+  },
+  {
+   "id": "CC-GLT-09-02-W5",
+   "panel": "CC-GLT-09-02",
+   "condition": "CC-GLT-06",
+   "direction": "W",
+   "position": "A-D角",
+   "dic": false,
+   "note": "planned_days 180（6か月扱い）",
+   "number": 5
+  },
+  {
+   "id": "CC-GLT-09-02-W6",
+   "panel": "CC-GLT-09-02",
+   "condition": "CC-GLT-06",
+   "direction": "W",
+   "position": "D中央",
+   "dic": false,
+   "note": "planned_days 180（6か月扱い）",
+   "number": 6
+  },
+  {
+   "id": "CC-GLT-09-02-W7",
+   "panel": "CC-GLT-09-02",
+   "condition": "CC-GLT-06",
+   "direction": "W",
+   "position": "B-C角",
+   "dic": false,
+   "note": "planned_days 180（6か月扱い）",
+   "number": 7
+  },
+  {
+   "id": "CC-GLT-09-02-W8",
+   "panel": "CC-GLT-09-02",
+   "condition": "CC-GLT-06",
+   "direction": "W",
+   "position": "B中央",
+   "dic": true,
+   "note": "planned_days 180（6か月扱い）",
+   "number": 8
+  },
+  {
+   "id": "CC-GLT-09-03-S9",
+   "panel": "CC-GLT-09-03",
+   "condition": "CC-GLT-06",
+   "direction": "S",
+   "position": "P1",
+   "dic": false,
+   "note": "planned_days 180（6か月扱い）",
+   "number": 9
+  },
+  {
+   "id": "CC-GLT-09-03-W9",
+   "panel": "CC-GLT-09-03",
+   "condition": "CC-GLT-06",
+   "direction": "W",
+   "position": "P2",
+   "dic": false,
+   "note": "planned_days 180（6か月扱い）",
+   "number": 9
+  },
+  {
+   "id": "CC-GLT-09-03-S10",
+   "panel": "CC-GLT-09-03",
+   "condition": "CC-GLT-06",
+   "direction": "S",
+   "position": "P3",
+   "dic": false,
+   "note": "planned_days 180（6か月扱い）",
+   "number": 10
+  },
+  {
+   "id": "OD-CLT-03-01-S1",
+   "panel": "OD-CLT-03-01",
+   "condition": "OD-CLT-03",
+   "direction": "S",
+   "position": "A-B角",
+   "dic": false,
+   "note": "",
+   "number": 1
+  },
+  {
+   "id": "OD-CLT-03-01-S2",
+   "panel": "OD-CLT-03-01",
+   "condition": "OD-CLT-03",
+   "direction": "S",
+   "position": "A中央",
+   "dic": false,
+   "note": "",
+   "number": 2
+  },
+  {
+   "id": "OD-CLT-03-01-S3",
+   "panel": "OD-CLT-03-01",
+   "condition": "OD-CLT-03",
+   "direction": "S",
+   "position": "C-D角",
+   "dic": true,
+   "note": "",
+   "number": 3
+  },
+  {
+   "id": "OD-CLT-03-01-S4",
+   "panel": "OD-CLT-03-01",
+   "condition": "OD-CLT-03",
+   "direction": "S",
+   "position": "C中央",
+   "dic": false,
+   "note": "",
+   "number": 4
+  },
+  {
+   "id": "OD-CLT-03-01-W1",
+   "panel": "OD-CLT-03-01",
+   "condition": "OD-CLT-03",
+   "direction": "W",
+   "position": "A-D角",
+   "dic": true,
+   "note": "",
+   "number": 1
+  },
+  {
+   "id": "OD-CLT-03-01-W2",
+   "panel": "OD-CLT-03-01",
+   "condition": "OD-CLT-03",
+   "direction": "W",
+   "position": "D中央",
+   "dic": false,
+   "note": "",
+   "number": 2
+  },
+  {
+   "id": "OD-CLT-03-01-W3",
+   "panel": "OD-CLT-03-01",
+   "condition": "OD-CLT-03",
+   "direction": "W",
+   "position": "B-C角",
+   "dic": false,
+   "note": "",
+   "number": 3
+  },
+  {
+   "id": "OD-CLT-03-01-W4",
+   "panel": "OD-CLT-03-01",
+   "condition": "OD-CLT-03",
+   "direction": "W",
+   "position": "B中央",
+   "dic": false,
+   "note": "",
+   "number": 4
+  },
+  {
+   "id": "OD-CLT-03-02-S9",
+   "panel": "OD-CLT-03-02",
+   "condition": "OD-CLT-03",
+   "direction": "S",
+   "position": "P1",
+   "dic": false,
+   "note": "暴露終了後にT-BOXに置き忘れていた期間あり。03-03と取り違えてNo.3に回した（11/17）",
+   "number": 9
+  },
+  {
+   "id": "OD-CLT-03-02-W9",
+   "panel": "OD-CLT-03-02",
+   "condition": "OD-CLT-03",
+   "direction": "W",
+   "position": "P2",
+   "dic": false,
+   "note": "暴露終了後にT-BOXに置き忘れていた期間あり。03-03と取り違えてNo.3に回した（11/17）",
+   "number": 9
+  },
+  {
+   "id": "OD-CLT-03-03-S5",
+   "panel": "OD-CLT-03-03",
+   "condition": "OD-CLT-03",
+   "direction": "S",
+   "position": "A-B角",
+   "dic": false,
+   "note": "03-02の代わりに支圧（2枚目）に加工した（11/17、取り違え）",
+   "number": 5
+  },
+  {
+   "id": "OD-CLT-03-03-S6",
+   "panel": "OD-CLT-03-03",
+   "condition": "OD-CLT-03",
+   "direction": "S",
+   "position": "A中央",
+   "dic": true,
+   "note": "03-02の代わりに支圧（2枚目）に加工した（11/17、取り違え）",
+   "number": 6
+  },
+  {
+   "id": "OD-CLT-03-03-S7",
+   "panel": "OD-CLT-03-03",
+   "condition": "OD-CLT-03",
+   "direction": "S",
+   "position": "C-D角",
+   "dic": false,
+   "note": "03-02の代わりに支圧（2枚目）に加工した（11/17、取り違え）",
+   "number": 7
+  },
+  {
+   "id": "OD-CLT-03-03-S8",
+   "panel": "OD-CLT-03-03",
+   "condition": "OD-CLT-03",
+   "direction": "S",
+   "position": "C中央",
+   "dic": false,
+   "note": "03-02の代わりに支圧（2枚目）に加工した（11/17、取り違え）",
+   "number": 8
+  },
+  {
+   "id": "OD-CLT-03-03-W5",
+   "panel": "OD-CLT-03-03",
+   "condition": "OD-CLT-03",
+   "direction": "W",
+   "position": "A-D角",
+   "dic": true,
+   "note": "03-02の代わりに支圧（2枚目）に加工した（11/17、取り違え）",
+   "number": 5
+  },
+  {
+   "id": "OD-CLT-03-03-W6",
+   "panel": "OD-CLT-03-03",
+   "condition": "OD-CLT-03",
+   "direction": "W",
+   "position": "D中央",
+   "dic": false,
+   "note": "03-02の代わりに支圧（2枚目）に加工した（11/17、取り違え）",
+   "number": 6
+  },
+  {
+   "id": "OD-CLT-03-03-W7",
+   "panel": "OD-CLT-03-03",
+   "condition": "OD-CLT-03",
+   "direction": "W",
+   "position": "B-C角",
+   "dic": false,
+   "note": "03-02の代わりに支圧（2枚目）に加工した（11/17、取り違え）",
+   "number": 7
+  },
+  {
+   "id": "OD-CLT-03-03-W8",
+   "panel": "OD-CLT-03-03",
+   "condition": "OD-CLT-03",
+   "direction": "W",
+   "position": "B中央",
+   "dic": false,
+   "note": "03-02の代わりに支圧（2枚目）に加工した（11/17、取り違え）",
+   "number": 8
+  },
+  {
+   "id": "OD-CLT-06-01-S1",
+   "panel": "OD-CLT-06-01",
+   "condition": "OD-CLT-06",
+   "direction": "S",
+   "position": "A-B角",
+   "dic": true,
+   "note": "",
+   "number": 1
+  },
+  {
+   "id": "OD-CLT-06-01-S2",
+   "panel": "OD-CLT-06-01",
+   "condition": "OD-CLT-06",
+   "direction": "S",
+   "position": "A中央",
+   "dic": false,
+   "note": "",
+   "number": 2
+  },
+  {
+   "id": "OD-CLT-06-01-S3",
+   "panel": "OD-CLT-06-01",
+   "condition": "OD-CLT-06",
+   "direction": "S",
+   "position": "C-D角",
+   "dic": false,
+   "note": "",
+   "number": 3
+  },
+  {
+   "id": "OD-CLT-06-01-S4",
+   "panel": "OD-CLT-06-01",
+   "condition": "OD-CLT-06",
+   "direction": "S",
+   "position": "C中央",
+   "dic": false,
+   "note": "",
+   "number": 4
+  },
+  {
+   "id": "OD-CLT-06-01-W1",
+   "panel": "OD-CLT-06-01",
+   "condition": "OD-CLT-06",
+   "direction": "W",
+   "position": "A-D角",
+   "dic": false,
+   "note": "",
+   "number": 1
+  },
+  {
+   "id": "OD-CLT-06-01-W2",
+   "panel": "OD-CLT-06-01",
+   "condition": "OD-CLT-06",
+   "direction": "W",
+   "position": "D中央",
+   "dic": true,
+   "note": "",
+   "number": 2
+  },
+  {
+   "id": "OD-CLT-06-01-W3",
+   "panel": "OD-CLT-06-01",
+   "condition": "OD-CLT-06",
+   "direction": "W",
+   "position": "B-C角",
+   "dic": false,
+   "note": "",
+   "number": 3
+  },
+  {
+   "id": "OD-CLT-06-01-W4",
+   "panel": "OD-CLT-06-01",
+   "condition": "OD-CLT-06",
+   "direction": "W",
+   "position": "B中央",
+   "dic": false,
+   "note": "",
+   "number": 4
+  },
+  {
+   "id": "OD-CLT-06-02-S5",
+   "panel": "OD-CLT-06-02",
+   "condition": "OD-CLT-06",
+   "direction": "S",
+   "position": "A-B角",
+   "dic": false,
+   "note": "",
+   "number": 5
+  },
+  {
+   "id": "OD-CLT-06-02-S6",
+   "panel": "OD-CLT-06-02",
+   "condition": "OD-CLT-06",
+   "direction": "S",
+   "position": "A中央",
+   "dic": false,
+   "note": "",
+   "number": 6
+  },
+  {
+   "id": "OD-CLT-06-02-S7",
+   "panel": "OD-CLT-06-02",
+   "condition": "OD-CLT-06",
+   "direction": "S",
+   "position": "C-D角",
+   "dic": false,
+   "note": "",
+   "number": 7
+  },
+  {
+   "id": "OD-CLT-06-02-S8",
+   "panel": "OD-CLT-06-02",
+   "condition": "OD-CLT-06",
+   "direction": "S",
+   "position": "C中央",
+   "dic": true,
+   "note": "",
+   "number": 8
+  },
+  {
+   "id": "OD-CLT-06-02-W5",
+   "panel": "OD-CLT-06-02",
+   "condition": "OD-CLT-06",
+   "direction": "W",
+   "position": "A-D角",
+   "dic": false,
+   "note": "",
+   "number": 5
+  },
+  {
+   "id": "OD-CLT-06-02-W6",
+   "panel": "OD-CLT-06-02",
+   "condition": "OD-CLT-06",
+   "direction": "W",
+   "position": "D中央",
+   "dic": false,
+   "note": "",
+   "number": 6
+  },
+  {
+   "id": "OD-CLT-06-02-W7",
+   "panel": "OD-CLT-06-02",
+   "condition": "OD-CLT-06",
+   "direction": "W",
+   "position": "B-C角",
+   "dic": false,
+   "note": "",
+   "number": 7
+  },
+  {
+   "id": "OD-CLT-06-02-W8",
+   "panel": "OD-CLT-06-02",
+   "condition": "OD-CLT-06",
+   "direction": "W",
+   "position": "B中央",
+   "dic": true,
+   "note": "",
+   "number": 8
+  },
+  {
+   "id": "OD-CLT-06-03-S9",
+   "panel": "OD-CLT-06-03",
+   "condition": "OD-CLT-06",
+   "direction": "S",
+   "position": "P1",
+   "dic": false,
+   "note": "",
+   "number": 9
+  },
+  {
+   "id": "OD-CLT-06-03-W9",
+   "panel": "OD-CLT-06-03",
+   "condition": "OD-CLT-06",
+   "direction": "W",
+   "position": "P2",
+   "dic": false,
+   "note": "",
+   "number": 9
+  },
+  {
+   "id": "OD-CLT-09-01-S1",
+   "panel": "OD-CLT-09-01",
+   "condition": "OD-CLT-09",
+   "direction": "S",
+   "position": "A-B角",
+   "dic": false,
+   "note": "",
+   "number": 1
+  },
+  {
+   "id": "OD-CLT-09-01-S2",
+   "panel": "OD-CLT-09-01",
+   "condition": "OD-CLT-09",
+   "direction": "S",
+   "position": "A中央",
+   "dic": false,
+   "note": "",
+   "number": 2
+  },
+  {
+   "id": "OD-CLT-09-01-S3",
+   "panel": "OD-CLT-09-01",
+   "condition": "OD-CLT-09",
+   "direction": "S",
+   "position": "C-D角",
+   "dic": true,
+   "note": "",
+   "number": 3
+  },
+  {
+   "id": "OD-CLT-09-01-S4",
+   "panel": "OD-CLT-09-01",
+   "condition": "OD-CLT-09",
+   "direction": "S",
+   "position": "C中央",
+   "dic": false,
+   "note": "",
+   "number": 4
+  },
+  {
+   "id": "OD-CLT-09-01-W1",
+   "panel": "OD-CLT-09-01",
+   "condition": "OD-CLT-09",
+   "direction": "W",
+   "position": "A-D角",
+   "dic": false,
+   "note": "",
+   "number": 1
+  },
+  {
+   "id": "OD-CLT-09-01-W2",
+   "panel": "OD-CLT-09-01",
+   "condition": "OD-CLT-09",
+   "direction": "W",
+   "position": "D中央",
+   "dic": false,
+   "note": "",
+   "number": 2
+  },
+  {
+   "id": "OD-CLT-09-01-W3",
+   "panel": "OD-CLT-09-01",
+   "condition": "OD-CLT-09",
+   "direction": "W",
+   "position": "B-C角",
+   "dic": false,
+   "note": "",
+   "number": 3
+  },
+  {
+   "id": "OD-CLT-09-01-W4",
+   "panel": "OD-CLT-09-01",
+   "condition": "OD-CLT-09",
+   "direction": "W",
+   "position": "B中央",
+   "dic": true,
+   "note": "",
+   "number": 4
+  },
+  {
+   "id": "OD-CLT-09-02-S5",
+   "panel": "OD-CLT-09-02",
+   "condition": "OD-CLT-09",
+   "direction": "S",
+   "position": "A-B角",
+   "dic": false,
+   "note": "",
+   "number": 5
+  },
+  {
+   "id": "OD-CLT-09-02-S6",
+   "panel": "OD-CLT-09-02",
+   "condition": "OD-CLT-09",
+   "direction": "S",
+   "position": "A中央",
+   "dic": false,
+   "note": "",
+   "number": 6
+  },
+  {
+   "id": "OD-CLT-09-02-S7",
+   "panel": "OD-CLT-09-02",
+   "condition": "OD-CLT-09",
+   "direction": "S",
+   "position": "C-D角",
+   "dic": false,
+   "note": "",
+   "number": 7
+  },
+  {
+   "id": "OD-CLT-09-02-S8",
+   "panel": "OD-CLT-09-02",
+   "condition": "OD-CLT-09",
+   "direction": "S",
+   "position": "C中央",
+   "dic": true,
+   "note": "",
+   "number": 8
+  },
+  {
+   "id": "OD-CLT-09-02-W5",
+   "panel": "OD-CLT-09-02",
+   "condition": "OD-CLT-09",
+   "direction": "W",
+   "position": "A-D角",
+   "dic": true,
+   "note": "",
+   "number": 5
+  },
+  {
+   "id": "OD-CLT-09-02-W6",
+   "panel": "OD-CLT-09-02",
+   "condition": "OD-CLT-09",
+   "direction": "W",
+   "position": "D中央",
+   "dic": false,
+   "note": "",
+   "number": 6
+  },
+  {
+   "id": "OD-CLT-09-02-W7",
+   "panel": "OD-CLT-09-02",
+   "condition": "OD-CLT-09",
+   "direction": "W",
+   "position": "B-C角",
+   "dic": false,
+   "note": "",
+   "number": 7
+  },
+  {
+   "id": "OD-CLT-09-02-W8",
+   "panel": "OD-CLT-09-02",
+   "condition": "OD-CLT-09",
+   "direction": "W",
+   "position": "B中央",
+   "dic": false,
+   "note": "",
+   "number": 8
+  },
+  {
+   "id": "OD-CLT-09-03-S9",
+   "panel": "OD-CLT-09-03",
+   "condition": "OD-CLT-09",
+   "direction": "S",
+   "position": "P1",
+   "dic": false,
+   "note": "",
+   "number": 9
+  },
+  {
+   "id": "OD-CLT-09-03-W9",
+   "panel": "OD-CLT-09-03",
+   "condition": "OD-CLT-09",
+   "direction": "W",
+   "position": "P2",
+   "dic": false,
+   "note": "",
+   "number": 9
+  },
+  {
+   "id": "OD-GLT-09-01-S1",
+   "panel": "OD-GLT-09-01",
+   "condition": "OD-GLT-09",
+   "direction": "S",
+   "position": "A-B角",
+   "dic": false,
+   "note": "",
+   "number": 1
+  },
+  {
+   "id": "OD-GLT-09-01-S2",
+   "panel": "OD-GLT-09-01",
+   "condition": "OD-GLT-09",
+   "direction": "S",
+   "position": "A中央",
+   "dic": false,
+   "note": "",
+   "number": 2
+  },
+  {
+   "id": "OD-GLT-09-01-S3",
+   "panel": "OD-GLT-09-01",
+   "condition": "OD-GLT-09",
+   "direction": "S",
+   "position": "C-D角",
+   "dic": false,
+   "note": "",
+   "number": 3
+  },
+  {
+   "id": "OD-GLT-09-01-S4",
+   "panel": "OD-GLT-09-01",
+   "condition": "OD-GLT-09",
+   "direction": "S",
+   "position": "C中央",
+   "dic": true,
+   "note": "",
+   "number": 4
+  },
+  {
+   "id": "OD-GLT-09-01-W1",
+   "panel": "OD-GLT-09-01",
+   "condition": "OD-GLT-09",
+   "direction": "W",
+   "position": "A-D角",
+   "dic": false,
+   "note": "",
+   "number": 1
+  },
+  {
+   "id": "OD-GLT-09-01-W2",
+   "panel": "OD-GLT-09-01",
+   "condition": "OD-GLT-09",
+   "direction": "W",
+   "position": "D中央",
+   "dic": true,
+   "note": "",
+   "number": 2
+  },
+  {
+   "id": "OD-GLT-09-01-W3",
+   "panel": "OD-GLT-09-01",
+   "condition": "OD-GLT-09",
+   "direction": "W",
+   "position": "B-C角",
+   "dic": false,
+   "note": "",
+   "number": 3
+  },
+  {
+   "id": "OD-GLT-09-01-W4",
+   "panel": "OD-GLT-09-01",
+   "condition": "OD-GLT-09",
+   "direction": "W",
+   "position": "B中央",
+   "dic": false,
+   "note": "",
+   "number": 4
+  },
+  {
+   "id": "OD-GLT-09-02-S5",
+   "panel": "OD-GLT-09-02",
+   "condition": "OD-GLT-09",
+   "direction": "S",
+   "position": "A-B角",
+   "dic": false,
+   "note": "",
+   "number": 5
+  },
+  {
+   "id": "OD-GLT-09-02-S6",
+   "panel": "OD-GLT-09-02",
+   "condition": "OD-GLT-09",
+   "direction": "S",
+   "position": "A中央",
+   "dic": false,
+   "note": "",
+   "number": 6
+  },
+  {
+   "id": "OD-GLT-09-02-S7",
+   "panel": "OD-GLT-09-02",
+   "condition": "OD-GLT-09",
+   "direction": "S",
+   "position": "C-D角",
+   "dic": false,
+   "note": "",
+   "number": 7
+  },
+  {
+   "id": "OD-GLT-09-02-S8",
+   "panel": "OD-GLT-09-02",
+   "condition": "OD-GLT-09",
+   "direction": "S",
+   "position": "C中央",
+   "dic": true,
+   "note": "",
+   "number": 8
+  },
+  {
+   "id": "OD-GLT-09-02-W5",
+   "panel": "OD-GLT-09-02",
+   "condition": "OD-GLT-09",
+   "direction": "W",
+   "position": "A-D角",
+   "dic": false,
+   "note": "",
+   "number": 5
+  },
+  {
+   "id": "OD-GLT-09-02-W6",
+   "panel": "OD-GLT-09-02",
+   "condition": "OD-GLT-09",
+   "direction": "W",
+   "position": "D中央",
+   "dic": false,
+   "note": "",
+   "number": 6
+  },
+  {
+   "id": "OD-GLT-09-02-W7",
+   "panel": "OD-GLT-09-02",
+   "condition": "OD-GLT-09",
+   "direction": "W",
+   "position": "B-C角",
+   "dic": true,
+   "note": "",
+   "number": 7
+  },
+  {
+   "id": "OD-GLT-09-02-W8",
+   "panel": "OD-GLT-09-02",
+   "condition": "OD-GLT-09",
+   "direction": "W",
+   "position": "B中央",
+   "dic": false,
+   "note": "",
+   "number": 8
+  },
+  {
+   "id": "OD-GLT-09-03-S9",
+   "panel": "OD-GLT-09-03",
+   "condition": "OD-GLT-09",
+   "direction": "S",
+   "position": "P1",
+   "dic": false,
+   "note": "",
+   "number": 9
+  },
+  {
+   "id": "OD-GLT-09-03-W9",
+   "panel": "OD-GLT-09-03",
+   "condition": "OD-GLT-09",
+   "direction": "W",
+   "position": "P2",
+   "dic": false,
+   "note": "",
+   "number": 9
+  },
+  {
+   "id": "OD-GLT-09-03-S10",
+   "panel": "OD-GLT-09-03",
+   "condition": "OD-GLT-09",
+   "direction": "S",
+   "position": "P3",
+   "dic": false,
+   "note": "",
+   "number": 10
+  }
+ ]
+}
